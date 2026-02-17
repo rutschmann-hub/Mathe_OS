@@ -60,17 +60,133 @@ const topicData = {
             {
                 name: 'Exponential- und Logarithmusfunktionen',
                 description: 'e-Funktionen, natürlicher Logarithmus und ihre Anwendungen',
-                icon: 'fas fa-chart-line'
+                icon: 'fas fa-chart-line',
+                subtopics: [
+                    {
+                        name: 'Die natürliche Exponentialfunktion & Zahl e',
+                        description: 'Grundlagen der e-Funktion und die Eulersche Zahl',
+                        icon: 'fas fa-superscript'
+                    },
+                    {
+                        name: 'Exponentialgleichungen & natürlicher Logarithmus',
+                        description: 'Lösen von Exponentialgleichungen mit dem natürlichen Logarithmus',
+                        icon: 'fas fa-equals'
+                    },
+                    {
+                        name: 'Exponentialfunktionen & ihre Graphen',
+                        description: 'Graphische Darstellung und Eigenschaften von e-Funktionen',
+                        icon: 'fas fa-chart-area'
+                    },
+                    {
+                        name: 'Exponentialfunktionen mit Parametern',
+                        description: 'Parametervariation und ihre Auswirkungen auf den Graphen',
+                        icon: 'fas fa-sliders-h'
+                    },
+                    {
+                        name: 'Die Umkehrfunktion',
+                        description: 'Zusammenhang zwischen Exponential- und Logarithmusfunktion',
+                        icon: 'fas fa-exchange-alt'
+                    },
+                    {
+                        name: 'Logarithmusfunktion & Ableitung',
+                        description: 'Eigenschaften der Logarithmusfunktion und ihre Ableitung',
+                        icon: 'fas fa-function'
+                    },
+                    {
+                        name: 'Anwendungen von Exponentialfunktionen',
+                        description: 'Praktische Anwendungen in Wachstums- und Zerfallsprozessen',
+                        icon: 'fas fa-seedling'
+                    }
+                ]
             },
             {
                 name: 'Integralrechnung',
                 description: 'Stammfunktionen, bestimmte Integrale und Flächenberechnungen',
-                icon: 'fas fa-area-chart'
+                icon: 'fas fa-area-chart',
+                subtopics: [
+                    {
+                        name: 'Rekonstruktion einer Größe',
+                        description: 'Aufbau von Größen aus ihren Änderungsraten',
+                        icon: 'fas fa-puzzle-piece'
+                    },
+                    {
+                        name: 'Integral als Flächeninhalt',
+                        description: 'Geometrische Interpretation des bestimmten Integrals',
+                        icon: 'fas fa-square'
+                    },
+                    {
+                        name: 'Hauptsatz',
+                        description: 'Hauptsatz der Differential- und Integralrechnung',
+                        icon: 'fas fa-key'
+                    },
+                    {
+                        name: 'Stammfunktionen',
+                        description: 'Bestimmung von Stammfunktionen und Integrationsregeln',
+                        icon: 'fas fa-function'
+                    },
+                    {
+                        name: 'Graphen von Stammfunktionen',
+                        description: 'Grafische Beziehung zwischen Funktionen und Stammfunktionen',
+                        icon: 'fas fa-chart-line'
+                    },
+                    {
+                        name: 'Integral und Flächeninhalt',
+                        description: 'Berechnung von Flächeninhalten mit bestimmten Integralen',
+                        icon: 'fas fa-vector-square'
+                    },
+                    {
+                        name: 'Rotationskörper',
+                        description: 'Volumenberechnung von Rotationskörpern',
+                        icon: 'fas fa-globe'
+                    }
+                ]
             },
             {
                 name: 'Funktionen und ihre Graphen',
                 description: 'Kurvendiskussion, Extremwerte und vollständige Funktionsuntersuchung',
-                icon: 'fas fa-project-diagram'
+                icon: 'fas fa-project-diagram',
+                subtopics: [
+                    {
+                        name: 'Strecken, Verschieben, Spiegeln',
+                        description: 'Transformationen von Funktionsgraphen',
+                        icon: 'fas fa-arrows-alt'
+                    },
+                    {
+                        name: 'Linearfaktorzerlegung',
+                        description: 'Zerlegung von Polynomen in Linearfaktoren',
+                        icon: 'fas fa-cut'
+                    },
+                    {
+                        name: 'Gleichungen lösen',
+                        description: 'Algebraische und graphische Lösungsverfahren',
+                        icon: 'fas fa-equals'
+                    },
+                    {
+                        name: 'Trigonometrische Funktionen',
+                        description: 'Sinus-, Kosinus- und Tangensfunktion und ihre Eigenschaften',
+                        icon: 'fas fa-wave-square'
+                    },
+                    {
+                        name: 'Asymptoten',
+                        description: 'Senkrechte, waagerechte und schiefe Asymptoten',
+                        icon: 'fas fa-long-arrow-alt-right'
+                    },
+                    {
+                        name: 'Funktionsterm und Graph',
+                        description: 'Zusammenhang zwischen algebraischer und grafischer Darstellung',
+                        icon: 'fas fa-chart-area'
+                    },
+                    {
+                        name: 'Funktionenscharen',
+                        description: 'Parameterabhängige Funktionen und ihre Eigenschaften',
+                        icon: 'fas fa-layer-group'
+                    },
+                    {
+                        name: 'Näherungsverfahren',
+                        description: 'Numerische Verfahren zur Nullstellenbestimmung',
+                        icon: 'fas fa-crosshairs'
+                    }
+                ]
             }
         ]
     },
