@@ -478,11 +478,8 @@
         <div class="container">
             <div class="header-content">
                 <h1>
-                    Mathematik <span class="math-accent">∫</span> Leistungskurs
+                    Mathematik <span class="math-accent">∫</span> Oberstufe
                 </h1>
-                <p class="subtitle">
-                    Baden-Württemberg • Digitales Lernsystem für <em>Analysis</em>, <em>Stochastik</em> und <em>Analytische Geometrie</em>
-                </p>
             </div>
         </div>
     </header>
@@ -538,7 +535,7 @@
                     <div class="topic-meta">
                         <span class="topic-count">
                             <i class="fas fa-layer-group"></i>
-                            4 Bereiche
+                            3 Bereiche
                         </span>
                         <span class="explore-arrow">
                             <i class="fas fa-arrow-right"></i>
@@ -680,19 +677,19 @@
                 description: 'Die Stochastik hilft uns dabei, Unsicherheit und Zufall mathematisch zu beschreiben. Von einfachen Wahrscheinlichkeiten bis hin zu komplexen statistischen Tests.',
                 subtopics: [
                     {
-                        name: 'Wahrscheinlichkeitstheorie',
-                        description: 'Grundlagen, Axiome und kombinatorische Probleme',
-                        icon: 'fas fa-percentage'
+                        name: 'Grundlagen der Wahrscheinlichkeitsrechnung',
+                        description: 'Wahrscheinlichkeitsbegriff, Axiome und kombinatorische Grundlagen',
+                        icon: 'fas fa-dice'
                     },
                     {
-                        name: 'Verteilungen',
-                        description: 'Normal-, Binomial- und weitere Verteilungen',
+                        name: 'Testen mit der Binomialverteilung',
+                        description: 'Binomialverteilung und ihre Anwendung in Signifikanztests',
                         icon: 'fas fa-chart-bar'
                     },
                     {
-                        name: 'Hypothesentests',
-                        description: 'Signifikanztests und Konfidenzintervalle',
-                        icon: 'fas fa-search'
+                        name: 'Normalverteilung',
+                        description: 'Eigenschaften und Anwendungen der Normalverteilung',
+                        icon: 'fas fa-chart-line'
                     }
                 ]
             },
@@ -702,23 +699,18 @@
                 description: 'Die analytische Geometrie verbindet Geometrie mit Algebra. Mit Vektoren beschreiben wir Objekte im Raum und lösen geometrische Probleme rechnerisch.',
                 subtopics: [
                     {
-                        name: 'Vektoren',
-                        description: 'Grundoperationen, Skalar- und Vektorprodukt',
-                        icon: 'fas fa-arrows-alt'
+                        name: 'Lineare Gleichungssysteme (LGS)',
+                        description: 'Lösung linearer Gleichungssysteme und Anwendungen',
+                        icon: 'fas fa-calculator'
                     },
                     {
-                        name: 'Geraden',
-                        description: 'Parameterform und Schnittberechnungen',
-                        icon: 'fas fa-minus'
-                    },
-                    {
-                        name: 'Ebenen',
-                        description: 'Parameter- und Normalenform, Lagebeziehungen',
-                        icon: 'fas fa-square'
+                        name: 'Geraden und Ebenen',
+                        description: 'Parameterformen und Schnittberechnungen im Raum',
+                        icon: 'fas fa-cube'
                     },
                     {
                         name: 'Abstände und Winkel',
-                        description: 'Metrische Eigenschaften im Raum',
+                        description: 'Metrische Eigenschaften und Berechnungen im Raum',
                         icon: 'fas fa-ruler'
                     }
                 ]
@@ -788,7 +780,7 @@
 
         function showMainTopics() {
             document.getElementById('page-title').textContent = 'Hauptthemen';
-            document.getElementById('page-subtitle').textContent = 'Wähle einen Themenbereich aus, um tiefer in die Mathematik des Leistungskurses einzusteigen.';
+            document.getElementById('page-subtitle').textContent = 'Wähle einen Themenbereich aus, um tiefer in die Mathematik der Oberstufe einzusteigen.';
             
             // Reset expanded content
             const expandedContent = document.getElementById('expanded-content');
@@ -824,7 +816,7 @@
                     <div class="topic-meta">
                         <span class="topic-count">
                             <i class="fas fa-layer-group"></i>
-                            4 Bereiche
+                            3 Bereiche
                         </span>
                         <span class="explore-arrow">
                             <i class="fas fa-arrow-right"></i>
