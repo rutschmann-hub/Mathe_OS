@@ -537,6 +537,12 @@ body::before {
     font-size: 1.1em !important;
 }
 
+/* Custom styling for integral limits */
+.header .MathJax .mjx-c-221E {
+    color: var(--primary-navy) !important;
+    font-weight: bold !important;
+}
+
 /* Animation Keyframes */
 @keyframes fadeInUp {
     from {
