@@ -82,17 +82,103 @@ const topicData = {
             {
                 name: 'Grundlagen der Wahrscheinlichkeitsrechnung',
                 description: 'Wahrscheinlichkeitsbegriff, Axiome und kombinatorische Grundlagen',
-                icon: 'fas fa-dice'
+                icon: 'fas fa-dice',
+                subtopics: [
+                    {
+                        name: 'Kombinatorik',
+                        description: 'Abzählverfahren und kombinatorische Grundlagen',
+                        icon: 'fas fa-sort-numeric-up'
+                    },
+                    {
+                        name: 'Pfadregeln & Erwartungswert',
+                        description: 'Baumdiagramme und Berechnung von Erwartungswerten',
+                        icon: 'fas fa-sitemap'
+                    },
+                    {
+                        name: 'Bedingte Wahrscheinlichkeit',
+                        description: 'Wahrscheinlichkeiten unter gegebenen Bedingungen',
+                        icon: 'fas fa-filter'
+                    },
+                    {
+                        name: 'Stochastische Unabhängigkeit',
+                        description: 'Unabhängige Ereignisse und ihre Eigenschaften',
+                        icon: 'fas fa-unlink'
+                    },
+                    {
+                        name: 'Bernoulli & Binomialverteilung',
+                        description: 'Bernoulli-Experimente und Binomialverteilung',
+                        icon: 'fas fa-coins'
+                    },
+                    {
+                        name: 'Histogramm & Erwartungswert',
+                        description: 'Graphische Darstellung und statistische Kennwerte',
+                        icon: 'fas fa-chart-bar'
+                    },
+                    {
+                        name: 'Probleme bearbeiten',
+                        description: 'Anwendung der Wahrscheinlichkeitsrechnung auf komplexe Probleme',
+                        icon: 'fas fa-puzzle-piece'
+                    }
+                ]
             },
             {
                 name: 'Testen mit der Binomialverteilung',
                 description: 'Binomialverteilung und ihre Anwendung in Signifikanztests',
-                icon: 'fas fa-chart-bar'
+                icon: 'fas fa-chart-bar',
+                subtopics: [
+                    {
+                        name: 'Einseitiger Hypothesentest',
+                        description: 'Tests mit einer gerichteten Alternativhypothese',
+                        icon: 'fas fa-arrow-right'
+                    },
+                    {
+                        name: 'Fehlerquellen beim Testen',
+                        description: 'Alpha- und Beta-Fehler in der statistischen Testtheorie',
+                        icon: 'fas fa-exclamation-triangle'
+                    },
+                    {
+                        name: 'Nullhypothese',
+                        description: 'Formulierung und Überprüfung von Nullhypothesen',
+                        icon: 'fas fa-balance-scale'
+                    },
+                    {
+                        name: 'Zweiseitiger Hypothesentest',
+                        description: 'Tests mit ungerichteten Alternativhypothesen',
+                        icon: 'fas fa-arrows-alt-h'
+                    }
+                ]
             },
             {
                 name: 'Normalverteilung',
                 description: 'Eigenschaften und Anwendungen der Normalverteilung',
-                icon: 'fas fa-chart-line'
+                icon: 'fas fa-chart-line',
+                subtopics: [
+                    {
+                        name: 'Die Normalverteilung',
+                        description: 'Grundlagen und Eigenschaften der Normalverteilung',
+                        icon: 'fas fa-chart-area'
+                    },
+                    {
+                        name: 'Die Gauß\'sche Glocke',
+                        description: 'Form und Parameter der Glockenkurve',
+                        icon: 'fas fa-bell'
+                    },
+                    {
+                        name: 'Sigma-Regeln',
+                        description: 'Ein-, Zwei- und Drei-Sigma-Regeln für Wahrscheinlichkeiten',
+                        icon: 'fas fa-ruler-horizontal'
+                    },
+                    {
+                        name: 'Umkehraufgaben zur Normalverteilung',
+                        description: 'Bestimmung von Parametern bei gegebenen Wahrscheinlichkeiten',
+                        icon: 'fas fa-undo'
+                    },
+                    {
+                        name: 'Stetige Zufallsgrößen',
+                        description: 'Eigenschaften stetiger Verteilungen und Dichte',
+                        icon: 'fas fa-wave-square'
+                    }
+                ]
             }
         ]
     },
@@ -104,17 +190,123 @@ const topicData = {
             {
                 name: 'Lineare Gleichungssysteme (LGS)',
                 description: 'Lösung linearer Gleichungssysteme und Anwendungen',
-                icon: 'fas fa-calculator'
+                icon: 'fas fa-calculator',
+                subtopics: [
+                    {
+                        name: 'Gauß-Verfahren',
+                        description: 'Systematisches Lösen von LGS durch Eliminationsverfahren',
+                        icon: 'fas fa-list-ol'
+                    },
+                    {
+                        name: 'Lösungsmenge',
+                        description: 'Eindeutige, unendlich viele oder keine Lösungen',
+                        icon: 'fas fa-check-circle'
+                    },
+                    {
+                        name: 'LGS mit Parametern rechts',
+                        description: 'Gleichungssysteme mit Parametern auf der rechten Seite',
+                        icon: 'fas fa-equals'
+                    }
+                ]
             },
             {
                 name: 'Geraden und Ebenen',
                 description: 'Parameterformen und Schnittberechnungen im Raum',
-                icon: 'fas fa-cube'
+                icon: 'fas fa-cube',
+                subtopics: [
+                    {
+                        name: 'Vektoren im Raum',
+                        description: 'Grundlagen der Vektorrechnung im dreidimensionalen Raum',
+                        icon: 'fas fa-arrows-alt'
+                    },
+                    {
+                        name: 'Geraden',
+                        description: 'Parameterform von Geraden und ihre Eigenschaften',
+                        icon: 'fas fa-minus'
+                    },
+                    {
+                        name: 'Ebenen - Parameterform',
+                        description: 'Darstellung von Ebenen durch Parametergleichungen',
+                        icon: 'fas fa-square'
+                    },
+                    {
+                        name: 'Skalarprodukt / Orthogonalität',
+                        description: 'Berechnung des Skalarprodukts und orthogonale Vektoren',
+                        icon: 'fas fa-times'
+                    },
+                    {
+                        name: 'Normalenform / Koordinatenform',
+                        description: 'Alternative Darstellungen von Ebenen',
+                        icon: 'fas fa-compass'
+                    },
+                    {
+                        name: 'Ebenengleichungen umformen',
+                        description: 'Umrechnung zwischen verschiedenen Ebenenformen',
+                        icon: 'fas fa-exchange-alt'
+                    },
+                    {
+                        name: 'Ebenen visualisieren',
+                        description: 'Grafische Darstellung und Interpretation von Ebenen',
+                        icon: 'fas fa-eye'
+                    },
+                    {
+                        name: 'Lage: Ebene-Gerade',
+                        description: 'Lagebeziehungen zwischen Ebenen und Geraden',
+                        icon: 'fas fa-project-diagram'
+                    },
+                    {
+                        name: 'Lage: Ebene-Ebene',
+                        description: 'Lagebeziehungen zwischen zwei Ebenen',
+                        icon: 'fas fa-layer-group'
+                    }
+                ]
             },
             {
                 name: 'Abstände und Winkel',
                 description: 'Metrische Eigenschaften und Berechnungen im Raum',
-                icon: 'fas fa-ruler'
+                icon: 'fas fa-ruler',
+                subtopics: [
+                    {
+                        name: 'Abstand Punkt - Ebene',
+                        description: 'Berechnung des kürzesten Abstands zwischen Punkt und Ebene',
+                        icon: 'fas fa-bullseye'
+                    },
+                    {
+                        name: 'Abstand Punkt - Gerade',
+                        description: 'Abstandsberechnung zwischen einem Punkt und einer Geraden',
+                        icon: 'fas fa-crosshairs'
+                    },
+                    {
+                        name: 'Abstand windschiefer Geraden',
+                        description: 'Abstand zwischen sich nicht schneidenden Geraden im Raum',
+                        icon: 'fas fa-expand-arrows-alt'
+                    },
+                    {
+                        name: 'Spiegelung & Symmetrie',
+                        description: 'Spiegelungen an Ebenen und Symmetrieeigenschaften',
+                        icon: 'fas fa-reflect'
+                    },
+                    {
+                        name: 'Winkel zwischen Vektoren',
+                        description: 'Berechnung von Winkeln mit dem Skalarprodukt',
+                        icon: 'fas fa-angle-up'
+                    },
+                    {
+                        name: 'Schnittwinkel',
+                        description: 'Winkel zwischen Geraden und Ebenen',
+                        icon: 'fas fa-intersection'
+                    },
+                    {
+                        name: 'Anwendungen Vektorprodukt',
+                        description: 'Kreuzprodukt und seine geometrischen Anwendungen',
+                        icon: 'fas fa-star'
+                    },
+                    {
+                        name: 'Gerade Bewegungen modellieren',
+                        description: 'Praktische Anwendungen in der Bewegungsmodellierung',
+                        icon: 'fas fa-route'
+                    }
+                ]
             }
         ]
     }
