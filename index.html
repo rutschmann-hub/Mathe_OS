@@ -139,13 +139,83 @@
             font-style: italic;
         }
 
+        /* Topic Navigation Bar */
+        .topic-nav-container {
+            background: linear-gradient(135deg, var(--soft-gray) 0%, var(--warm-white) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 101;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .topic-nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .topic-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: var(--warm-white);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 168, 69, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .topic-nav-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary-mustard);
+            background: linear-gradient(135deg, var(--warm-white), var(--soft-gray));
+        }
+
+        .topic-nav-item:hover::before {
+            left: 100%;
+        }
+
+        .topic-nav-item.active {
+            background: var(--primary-mustard);
+            color: white;
+            border-color: var(--primary-mustard);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 168, 69, 0.3);
+        }
+
+        .topic-nav-item i {
+            font-size: 1.1rem;
+        }
+
         /* Breadcrumb Navigation */
         .breadcrumb-container {
             background: var(--warm-white);
             border-bottom: 1px solid var(--border-subtle);
-            padding: 1.5rem 0;
+            padding: 1rem 0;
             position: sticky;
-            top: 0;
+            top: 76px; /* Height of topic nav bar */
             z-index: 100;
             backdrop-filter: blur(10px);
             box-shadow: var(--shadow-soft);
@@ -423,6 +493,19 @@
         }
         
         @media (max-width: 768px) {
+            .topic-nav {
+                gap: 1rem;
+            }
+            
+            .topic-nav-item {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .breadcrumb-container {
+                top: 60px; /* Smaller topic nav on mobile */
+            }
+            
             .topics-grid {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
@@ -502,11 +585,31 @@
         <div class="container">
             <div class="header-content">
                 <h1>
-                    Mathematik $\int$ Oberstufe
+                    Mathematik $\int_{-\infty}^{+\infty}$ Oberstufe
                 </h1>
             </div>
         </div>
     </header>
+
+    <!-- Topic Navigation Bar -->
+    <nav class="topic-nav-container">
+        <div class="container">
+            <div class="topic-nav" id="topic-nav">
+                <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'analysis')">
+                    <i class="fas fa-chart-line"></i>
+                    Analysis
+                </a>
+                <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'geometrie')">
+                    <i class="fas fa-cube"></i>
+                    Analytische Geometrie
+                </a>
+                <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'stochastik')">
+                    <i class="fas fa-dice"></i>
+                    Stochastik
+                </a>
+            </div>
+        </div>
+    </nav>
 
     <!-- Breadcrumb Navigation -->
     <nav class="breadcrumb-container">
@@ -747,12 +850,14 @@
             
             if (level === 'home') {
                 updateBreadcrumb([{ name: 'Startseite', level: 'home' }]);
+                updateTopicNav(null);
                 showMainTopics();
             } else if (level === 'topic' && topic) {
                 updateBreadcrumb([
                     { name: 'Startseite', level: 'home' },
                     { name: topicData[topic].title, level: 'topic', topic: topic }
                 ]);
+                updateTopicNav(topic);
                 showTopicDetails(topic);
             } else if (level === 'subtopic' && topic && subtopic) {
                 updateBreadcrumb([
@@ -760,7 +865,22 @@
                     { name: topicData[topic].title, level: 'topic', topic: topic },
                     { name: subtopic, level: 'subtopic', topic: topic, subtopic: subtopic }
                 ]);
+                updateTopicNav(topic);
                 showSubtopicDetails(topic, subtopic);
+            }
+        }
+
+        function updateTopicNav(activeTopic) {
+            const topicNavItems = document.querySelectorAll('.topic-nav-item');
+            topicNavItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (activeTopic) {
+                const activeItem = document.querySelector(`.topic-nav-item[onclick*="${activeTopic}"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
             }
         }
 
