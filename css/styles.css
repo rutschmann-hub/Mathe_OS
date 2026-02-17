@@ -75,9 +75,12 @@ body::before {
 .header {
     background: var(--primary-mustard);
     color: white;
-    padding: 3rem 0 4rem;
+    padding: 2rem 0;
     position: relative;
     overflow: hidden;
+    border: 3px solid var(--primary-navy);
+    border-bottom: 5px solid var(--primary-navy);
+    box-shadow: 0 4px 15px rgba(26, 35, 50, 0.2);
 }
 
 .header::before {
@@ -93,15 +96,18 @@ body::before {
 
 .header-content {
     text-align: center;
+    position: relative;
+    z-index: 2;
 }
 
 .header h1 {
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 700;
-    margin-bottom: 1rem;
-    text-shadow: 2px 4px 8px rgba(0,0,0,0.1);
-    letter-spacing: -1px;
+    font-family: var(--font-body);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    margin-bottom: 0;
+    text-shadow: 2px 2px 4px rgba(26, 35, 50, 0.3);
+    letter-spacing: 0.5px;
+    color: white;
 }
 
 .header .subtitle {
@@ -496,7 +502,7 @@ body::before {
     }
     
     .header {
-        padding: 2rem 0 3rem;
+        padding: 1.5rem 0;
     }
     
     .topic-card {
@@ -529,17 +535,12 @@ body::before {
 
 /* MathJax Styling */
 .MathJax {
-    color: var(--accent-gold) !important;
+    color: var(--primary-navy) !important;
 }
 
 .header .MathJax {
-    color: var(--accent-gold) !important;
-    font-size: 1.1em !important;
-}
-
-/* Custom styling for integral limits */
-.header .MathJax .mjx-c-221E {
     color: var(--primary-navy) !important;
+    font-size: 1em !important;
     font-weight: bold !important;
 }
 
