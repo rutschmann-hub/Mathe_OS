@@ -6,6 +6,20 @@
     <title>Mathe LK Baden-Württemberg | Digitales Lernsystem</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Source+Sans+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- MathJax for LaTeX support -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
     <style>
         :root {
             /* Primary Scientific Palette - Updated with Mustard Yellow */
@@ -470,6 +484,16 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--secondary-teal);
         }
+
+        /* MathJax Styling */
+        .MathJax {
+            color: var(--accent-gold) !important;
+        }
+
+        .header .MathJax {
+            color: var(--accent-gold) !important;
+            font-size: 1.1em !important;
+        }
     </style>
 </head>
 <body>
@@ -478,7 +502,7 @@
         <div class="container">
             <div class="header-content">
                 <h1>
-                    Mathematik <span class="math-accent">∫</span> Oberstufe
+                    Mathematik $\int$ Oberstufe
                 </h1>
             </div>
         </div>
