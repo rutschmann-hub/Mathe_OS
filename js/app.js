@@ -429,72 +429,7 @@ const topicData = {
 };
 
 function updateSidebars(level, topic = null, subtopic = null) {
-    updateLearningPath(level, topic, subtopic);
     updateFormulaCheatsheet(level, topic, subtopic);
-}
-
-function updateLearningPath(level, topic, subtopic) {
-    const pathContainer = document.querySelector('.learning-path');
-    if (!pathContainer) return;
-    
-    let pathHTML = '<h3>Lernpfad</h3>';
-    
-    if (level === 'home') {
-        pathHTML += `
-            <div class="path-item completed">
-                <span class="path-indicator completed">✓</span>
-                <span>Startseite</span>
-            </div>
-            <div class="path-item current">
-                <span class="path-indicator current">●</span>
-                <span>Hauptthemen</span>
-            </div>
-        `;
-    } else if (level === 'topic' && topic) {
-        const topicTitle = topicData[topic].title;
-        pathHTML += `
-            <div class="path-item completed">
-                <span class="path-indicator completed">✓</span>
-                <span>Startseite</span>
-            </div>
-            <div class="path-item completed">
-                <span class="path-indicator completed">✓</span>
-                <span>Hauptthemen</span>
-            </div>
-            <div class="path-item current">
-                <span class="path-indicator current">●</span>
-                <span>${topicTitle}</span>
-            </div>
-        `;
-        
-        // Add upcoming subtopics
-        topicData[topic].subtopics.slice(0, 3).forEach(sub => {
-            pathHTML += `
-                <div class="path-item upcoming">
-                    <span class="path-indicator upcoming"></span>
-                    <span>${sub.name}</span>
-                </div>
-            `;
-        });
-    } else if (level === 'subtopic' && topic && subtopic) {
-        const topicTitle = topicData[topic].title;
-        pathHTML += `
-            <div class="path-item completed">
-                <span class="path-indicator completed">✓</span>
-                <span>Startseite</span>
-            </div>
-            <div class="path-item completed">
-                <span class="path-indicator completed">✓</span>
-                <span>${topicTitle}</span>
-            </div>
-            <div class="path-item current">
-                <span class="path-indicator current">●</span>
-                <span>${subtopic}</span>
-            </div>
-        `;
-    }
-    
-    pathContainer.innerHTML = pathHTML;
 }
 
 function updateFormulaCheatsheet(level, topic, subtopic) {
@@ -572,16 +507,15 @@ function updateFormulaCheatsheet(level, topic, subtopic) {
     } else {
         cheatsheetHTML += `
             <div class="important-note">
-                <h4><i class="fas fa-lightbulb"></i> Grundlagen</h4>
-                <p>Wähle ein Thema aus, um relevante Formeln und Merksätze zu sehen.</p>
+                <h4><i class="fas fa-lightbulb"></i> Übersicht</h4>
+                <p>Wähle ein Thema aus der linken Navigation oder den Karten unten.</p>
             </div>
 
             <div class="formula-item">
-                <div class="formula-title">Allgemeine Hinweise</div>
+                <div class="formula-title">Tipp</div>
                 <div class="formula-content">
-                    • Präge dir die Grundformen ein<br>
-                    • Übe regelmäßig mit Beispielen<br>
-                    • Verstehe die Zusammenhänge
+                    Die Formeln ändern sich je nach<br>
+                    gewähltem Themenbereich automatisch.
                 </div>
             </div>
         `;
@@ -769,26 +703,8 @@ function showTopicDetails(topic) {
 }
 
 function expandTopic(topicKey, cardElement) {
-    if (currentLevel === 'home') {
-        // Navigate to topic details
-        navigateTo('topic', topicKey);
-    } else {
-        // Show expanded content for subtopic
-        const expandedContent = document.getElementById('expanded-content');
-        
-        if (expandedCard === cardElement) {
-            expandedContent.classList.remove('show');
-            expandedCard = null;
-            return;
-        }
-        
-        expandedCard = cardElement;
-        
-        const data = topicData[topicKey];
-        document.getElementById('expanded-title').textContent = data.title;
-        document.getElementById('expanded-description').textContent = data.description;
-        expandedContent.classList.add('show');
-    }
+    // Navigate directly to topic details
+    navigateTo('topic', topicKey);
 }
 
 function showSubtopicDetails(topic, subtopic) {
