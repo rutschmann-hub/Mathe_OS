@@ -428,6 +428,167 @@ const topicData = {
     }
 };
 
+function updateSidebars(level, topic = null, subtopic = null) {
+    updateLearningPath(level, topic, subtopic);
+    updateFormulaCheatsheet(level, topic, subtopic);
+}
+
+function updateLearningPath(level, topic, subtopic) {
+    const pathContainer = document.querySelector('.learning-path');
+    if (!pathContainer) return;
+    
+    let pathHTML = '<h3>Lernpfad</h3>';
+    
+    if (level === 'home') {
+        pathHTML += `
+            <div class="path-item completed">
+                <span class="path-indicator completed">✓</span>
+                <span>Startseite</span>
+            </div>
+            <div class="path-item current">
+                <span class="path-indicator current">●</span>
+                <span>Hauptthemen</span>
+            </div>
+        `;
+    } else if (level === 'topic' && topic) {
+        const topicTitle = topicData[topic].title;
+        pathHTML += `
+            <div class="path-item completed">
+                <span class="path-indicator completed">✓</span>
+                <span>Startseite</span>
+            </div>
+            <div class="path-item completed">
+                <span class="path-indicator completed">✓</span>
+                <span>Hauptthemen</span>
+            </div>
+            <div class="path-item current">
+                <span class="path-indicator current">●</span>
+                <span>${topicTitle}</span>
+            </div>
+        `;
+        
+        // Add upcoming subtopics
+        topicData[topic].subtopics.slice(0, 3).forEach(sub => {
+            pathHTML += `
+                <div class="path-item upcoming">
+                    <span class="path-indicator upcoming"></span>
+                    <span>${sub.name}</span>
+                </div>
+            `;
+        });
+    } else if (level === 'subtopic' && topic && subtopic) {
+        const topicTitle = topicData[topic].title;
+        pathHTML += `
+            <div class="path-item completed">
+                <span class="path-indicator completed">✓</span>
+                <span>Startseite</span>
+            </div>
+            <div class="path-item completed">
+                <span class="path-indicator completed">✓</span>
+                <span>${topicTitle}</span>
+            </div>
+            <div class="path-item current">
+                <span class="path-indicator current">●</span>
+                <span>${subtopic}</span>
+            </div>
+        `;
+    }
+    
+    pathContainer.innerHTML = pathHTML;
+}
+
+function updateFormulaCheatsheet(level, topic, subtopic) {
+    const cheatsheetContainer = document.querySelector('.formula-cheatsheet');
+    if (!cheatsheetContainer) return;
+    
+    let cheatsheetHTML = '<h3>Wichtige Formeln</h3>';
+    
+    if (topic === 'analysis') {
+        cheatsheetHTML += `
+            <div class="important-note">
+                <h4><i class="fas fa-function"></i> Analysis</h4>
+                <p>Grundlegende Formeln zur Differential- und Integralrechnung</p>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Ableitung</div>
+                <div class="formula-content">f'(x) = lim[h→0] (f(x+h)-f(x))/h</div>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Kettenregel</div>
+                <div class="formula-content">(f(g(x)))' = f'(g(x)) · g'(x)</div>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Produktregel</div>
+                <div class="formula-content">(u·v)' = u'·v + u·v'</div>
+            </div>
+        `;
+    } else if (topic === 'geometrie') {
+        cheatsheetHTML += `
+            <div class="important-note">
+                <h4><i class="fas fa-cube"></i> Geometrie</h4>
+                <p>Wichtige Formeln für Vektoren und räumliche Berechnungen</p>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Skalarprodukt</div>
+                <div class="formula-content">a⃗ · b⃗ = |a⃗| · |b⃗| · cos(α)</div>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Betrag eines Vektors</div>
+                <div class="formula-content">|a⃗| = √(ax² + ay² + az²)</div>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Abstand Punkt-Ebene</div>
+                <div class="formula-content">d = |ax₀ + by₀ + cz₀ + d| / √(a² + b² + c²)</div>
+            </div>
+        `;
+    } else if (topic === 'stochastik') {
+        cheatsheetHTML += `
+            <div class="important-note">
+                <h4><i class="fas fa-dice"></i> Stochastik</h4>
+                <p>Grundlegende Wahrscheinlichkeitsformeln und Verteilungen</p>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Binomialverteilung</div>
+                <div class="formula-content">P(X = k) = (n über k) · p^k · (1-p)^(n-k)</div>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Erwartungswert</div>
+                <div class="formula-content">E(X) = μ = n · p</div>
+            </div>
+            
+            <div class="formula-item">
+                <div class="formula-title">Standardabweichung</div>
+                <div class="formula-content">σ = √(n · p · (1-p))</div>
+            </div>
+        `;
+    } else {
+        cheatsheetHTML += `
+            <div class="important-note">
+                <h4><i class="fas fa-lightbulb"></i> Grundlagen</h4>
+                <p>Wähle ein Thema aus, um relevante Formeln und Merksätze zu sehen.</p>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Allgemeine Hinweise</div>
+                <div class="formula-content">
+                    • Präge dir die Grundformen ein<br>
+                    • Übe regelmäßig mit Beispielen<br>
+                    • Verstehe die Zusammenhänge
+                </div>
+            </div>
+        `;
+    }
+    
+    cheatsheetContainer.innerHTML = cheatsheetHTML;
+}
 // Navigation functions
 function navigateTo(level, topic = null, subtopic = null) {
     currentLevel = level;
@@ -435,6 +596,7 @@ function navigateTo(level, topic = null, subtopic = null) {
     if (level === 'home') {
         updateBreadcrumb([{ name: 'Startseite', level: 'home' }]);
         updateTopicNav(null);
+        updateSidebars('home');
         showMainTopics();
     } else if (level === 'topic' && topic) {
         updateBreadcrumb([
@@ -442,6 +604,7 @@ function navigateTo(level, topic = null, subtopic = null) {
             { name: topicData[topic].title, level: 'topic', topic: topic }
         ]);
         updateTopicNav(topic);
+        updateSidebars('topic', topic);
         showTopicDetails(topic);
     } else if (level === 'subtopic' && topic && subtopic) {
         updateBreadcrumb([
@@ -450,6 +613,7 @@ function navigateTo(level, topic = null, subtopic = null) {
             { name: subtopic, level: 'subtopic', topic: topic, subtopic: subtopic }
         ]);
         updateTopicNav(topic);
+        updateSidebars('subtopic', topic, subtopic);
         showSubtopicDetails(topic, subtopic);
     }
 }
