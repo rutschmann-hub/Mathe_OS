@@ -246,7 +246,7 @@ body::before {
 
 /* Main Content Area with Sidebars */
 .main-content {
-    padding: 3rem 0;
+    padding: 0;
     min-height: 60vh;
     display: flex;
     gap: 2rem;
@@ -254,6 +254,8 @@ body::before {
     margin: 0 auto;
     padding-left: 2rem;
     padding-right: 2rem;
+    align-items: flex-start;
+    padding-top: 3rem;
 }
 
 .sidebar-left {
@@ -271,15 +273,20 @@ body::before {
     flex-shrink: 0;
 }
 
-/* Quick Actions Sidebar */
+/* Content Header - Remove extra margin to align with sidebars */
+.content-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    margin-top: 0;
+}
+
+/* Quick Actions Sidebar - Start at same level as content */
 .quick-actions {
-    background: var(--warm-white);
-    border-radius: var(--radius-large);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-subtle);
     position: sticky;
     top: 160px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    padding-right: 0.5rem;
 }
 
 .quick-actions h3 {
@@ -287,7 +294,8 @@ body::before {
     font-size: 1.1rem;
     color: var(--primary-navy);
     margin-bottom: 1rem;
-    text-align: center;
+    margin-top: 0;
+    padding: 0 0.8rem;
 }
 
 .action-item {
@@ -300,12 +308,29 @@ body::before {
     transition: all 0.3s ease;
     margin-bottom: 0.5rem;
     border-left: 3px solid transparent;
+    background: var(--warm-white);
+    box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
+    border: 1px solid var(--border-subtle);
 }
 
 .action-item:hover {
-    background: linear-gradient(135deg, var(--soft-gray), var(--warm-white));
-    border-left-color: var(--primary-mustard);
+    background: var(--primary-mustard);
+    color: white;
+    border-left-color: var(--primary-navy);
     transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(212, 168, 69, 0.2);
+}
+
+.action-item:hover i {
+    color: white;
+}
+
+.action-item:hover span {
+    color: white;
+}
+
+.action-item:hover small {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .action-item i {
@@ -330,20 +355,16 @@ body::before {
 .divider {
     height: 1px;
     background: var(--border-subtle);
-    margin: 1rem 0;
+    margin: 1rem 0.8rem;
 }
 
-/* Formula Cheatsheet Sidebar */
+/* Formula Cheatsheet Sidebar - Start at same level as content */
 .formula-cheatsheet {
-    background: var(--warm-white);
-    border-radius: var(--radius-large);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-subtle);
     position: sticky;
     top: 160px;
     max-height: calc(100vh - 180px);
     overflow-y: auto;
+    padding-left: 0.5rem;
 }
 
 .formula-cheatsheet h3 {
@@ -351,15 +372,18 @@ body::before {
     font-size: 1.1rem;
     color: var(--primary-navy);
     margin-bottom: 1rem;
-    text-align: center;
+    margin-top: 0;
+    padding: 0 0.8rem;
 }
 
 .formula-item {
-    background: var(--soft-gray);
+    background: var(--warm-white);
     border-radius: var(--radius-small);
     padding: 1rem;
     margin-bottom: 1rem;
     border-left: 3px solid var(--primary-mustard);
+    box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
+    border: 1px solid var(--border-subtle);
 }
 
 .formula-item:last-child {
@@ -380,11 +404,13 @@ body::before {
 }
 
 .important-note {
-    background: linear-gradient(135deg, rgba(212, 168, 69, 0.1), rgba(61, 124, 124, 0.1));
+    background: var(--warm-white);
     border-radius: var(--radius-small);
     padding: 1rem;
     margin-bottom: 1rem;
     border-left: 3px solid var(--secondary-teal);
+    box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
+    border: 1px solid var(--border-subtle);
 }
 
 .important-note h4 {
@@ -416,10 +442,27 @@ body::before {
         position: static;
     }
     
-    .learning-path,
+    .quick-actions,
     .formula-cheatsheet {
         position: static;
         max-height: none;
+        padding: 0;
+    }
+    
+    .quick-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .quick-actions h3 {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .action-item {
+        flex: 1;
+        min-width: 150px;
     }
 }
 
