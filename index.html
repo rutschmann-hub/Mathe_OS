@@ -56,25 +56,41 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Left Sidebar: Learning Path -->
+        <!-- Left Sidebar: Table of Contents / Quick Actions -->
         <aside class="sidebar-left">
-            <div class="learning-path">
-                <h3>Lernpfad</h3>
-                <div class="path-item completed">
-                    <span class="path-indicator completed">✓</span>
-                    <span>Startseite</span>
-                </div>
-                <div class="path-item current">
-                    <span class="path-indicator current">●</span>
-                    <span>Hauptthemen</span>
-                </div>
-                <div class="path-item upcoming">
-                    <span class="path-indicator upcoming"></span>
+            <div class="quick-actions">
+                <h3>Schnellzugriff</h3>
+                
+                <div class="action-item" onclick="navigateTo('topic', 'analysis')">
+                    <i class="fas fa-chart-line"></i>
                     <span>Analysis</span>
+                    <small>4 Kapitel</small>
                 </div>
-                <div class="path-item upcoming">
-                    <span class="path-indicator upcoming"></span>
-                    <span>Differentialrechnung</span>
+                
+                <div class="action-item" onclick="navigateTo('topic', 'geometrie')">
+                    <i class="fas fa-cube"></i>
+                    <span>Geometrie</span>
+                    <small>3 Kapitel</small>
+                </div>
+                
+                <div class="action-item" onclick="navigateTo('topic', 'stochastik')">
+                    <i class="fas fa-dice"></i>
+                    <span>Stochastik</span>
+                    <small>3 Kapitel</small>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="action-item">
+                    <i class="fas fa-calculator"></i>
+                    <span>Rechner</span>
+                    <small>Bald verfügbar</small>
+                </div>
+                
+                <div class="action-item">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Favoriten</span>
+                    <small>Bald verfügbar</small>
                 </div>
             </div>
         </aside>
@@ -150,12 +166,6 @@
                 <div class="progress-dot active"></div>
                 <div class="progress-dot"></div>
                 <div class="progress-dot"></div>
-            </div>
-
-            <!-- Expanded Content -->
-            <div class="expanded-content" id="expanded-content">
-                <h2 id="expanded-title">Themenbereich</h2>
-                <p id="expanded-description">Hier werden die Details zum ausgewählten Themenbereich angezeigt.</p>
             </div>
         </div>
 
