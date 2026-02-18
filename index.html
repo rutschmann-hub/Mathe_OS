@@ -56,7 +56,31 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="container">
+        <!-- Left Sidebar: Learning Path -->
+        <aside class="sidebar-left">
+            <div class="learning-path">
+                <h3>Lernpfad</h3>
+                <div class="path-item completed">
+                    <span class="path-indicator completed">✓</span>
+                    <span>Startseite</span>
+                </div>
+                <div class="path-item current">
+                    <span class="path-indicator current">●</span>
+                    <span>Hauptthemen</span>
+                </div>
+                <div class="path-item upcoming">
+                    <span class="path-indicator upcoming"></span>
+                    <span>Analysis</span>
+                </div>
+                <div class="path-item upcoming">
+                    <span class="path-indicator upcoming"></span>
+                    <span>Differentialrechnung</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center: Main Content -->
+        <div class="content-center">
             <div class="content-header">
                 <h2 class="content-title" id="page-title">Hauptthemen</h2>
                 <p class="content-subtitle" id="page-subtitle">
@@ -134,6 +158,27 @@
                 <p id="expanded-description">Hier werden die Details zum ausgewählten Themenbereich angezeigt.</p>
             </div>
         </div>
+
+        <!-- Right Sidebar: Formula Cheatsheet -->
+        <aside class="sidebar-right">
+            <div class="formula-cheatsheet">
+                <h3>Wichtige Formeln</h3>
+                
+                <div class="important-note">
+                    <h4><i class="fas fa-lightbulb"></i> Grundlagen</h4>
+                    <p>Wähle ein Thema aus, um relevante Formeln und Merksätze zu sehen.</p>
+                </div>
+
+                <div class="formula-item">
+                    <div class="formula-title">Allgemeine Hinweise</div>
+                    <div class="formula-content">
+                        • Präge dir die Grundformen ein<br>
+                        • Übe regelmäßig mit Beispielen<br>
+                        • Verstehe die Zusammenhänge
+                    </div>
+                </div>
+            </div>
+        </aside>
     </main>
 
     <!-- Footer -->
