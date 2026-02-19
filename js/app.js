@@ -435,98 +435,576 @@ function updateSidebars(level, topic = null, subtopic = null) {
 function updateFormulaCheatsheet(level, topic, subtopic) {
     const cheatsheetContainer = document.querySelector('.formula-cheatsheet');
     if (!cheatsheetContainer) return;
-    
+
     let cheatsheetHTML = '<h3>Wichtige Formeln</h3>';
-    
-    if (topic === 'analysis') {
-        cheatsheetHTML += `
-            <div class="important-note">
-                <h4><i class="fas fa-function"></i> Analysis</h4>
-                <p>Grundlegende Formeln zur Differential- und Integralrechnung</p>
+
+    // Hilfsfunktion: Hint-Box für Ebenen 1–3
+    function sidebarHint(iconClass, title, hints) {
+        return `
+            <div class="sidebar-info-header">
+                <i class="fas ${iconClass}"></i>
+                <span>${title}</span>
             </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Ableitung</div>
-                <div class="formula-content">f'(x) = lim[h→0] (f(x+h)-f(x))/h</div>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Kettenregel</div>
-                <div class="formula-content">(f(g(x)))' = f'(g(x)) · g'(x)</div>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Produktregel</div>
-                <div class="formula-content">(u·v)' = u'·v + u·v'</div>
-            </div>
+            <p class="sidebar-info-hint">Öffne eine Unterseite,<br>um die Formeln zu sehen.</p>
+            <div class="sidebar-divider"></div>
+            <p class="sidebar-info-label">Wichtige Konzepte</p>
+            ${hints.map(h => `<div class="sidebar-hint-item"><i class="fas ${h.icon}"></i><span>${h.text}</span></div>`).join('')}
         `;
-    } else if (topic === 'geometrie') {
+    }
+
+    if (topic === 'ableitungsregeln') {
         cheatsheetHTML += `
             <div class="important-note">
-                <h4><i class="fas fa-cube"></i> Geometrie</h4>
-                <p>Wichtige Formeln für Vektoren und räumliche Berechnungen</p>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Skalarprodukt</div>
-                <div class="formula-content">a⃗ · b⃗ = |a⃗| · |b⃗| · cos(α)</div>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Betrag eines Vektors</div>
-                <div class="formula-content">|a⃗| = √(ax² + ay² + az²)</div>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Abstand Punkt-Ebene</div>
-                <div class="formula-content">d = |ax₀ + by₀ + cz₀ + d| / √(a² + b² + c²)</div>
-            </div>
-        `;
-    } else if (topic === 'stochastik') {
-        cheatsheetHTML += `
-            <div class="important-note">
-                <h4><i class="fas fa-dice"></i> Stochastik</h4>
-                <p>Grundlegende Wahrscheinlichkeitsformeln und Verteilungen</p>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Binomialverteilung</div>
-                <div class="formula-content">P(X = k) = (n über k) · p^k · (1-p)^(n-k)</div>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Erwartungswert</div>
-                <div class="formula-content">E(X) = μ = n · p</div>
-            </div>
-            
-            <div class="formula-item">
-                <div class="formula-title">Standardabweichung</div>
-                <div class="formula-content">σ = √(n · p · (1-p))</div>
-            </div>
-        `;
-    } else {
-        cheatsheetHTML += `
-            <div class="important-note">
-                <h4><i class="fas fa-lightbulb"></i> Übersicht</h4>
-                <p>Wähle ein Thema aus der linken Navigation oder den Karten unten.</p>
+                <h4><i class="fas fa-calculator"></i> Ableitungsregeln</h4>
+                <p>Alle Regeln zur Differentiation auf einen Blick</p>
             </div>
 
             <div class="formula-item">
-                <div class="formula-title">Tipp</div>
-                <div class="formula-content">
-                    Die Formeln ändern sich je nach<br>
-                    gewähltem Themenbereich automatisch.
-                </div>
+                <div class="formula-title">Potenzregel</div>
+                <div class="formula-content">\\(\\left(x^n\\right)' = n \\cdot x^{n-1}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Faktorregel</div>
+                <div class="formula-content">\\((c \\cdot f)' = c \\cdot f'\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Summenregel</div>
+                <div class="formula-content">\\((f + g)' = f' + g'\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Produktregel</div>
+                <div class="formula-content">\\((u \\cdot v)' = u'v + uv'\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Quotientenregel</div>
+                <div class="formula-content">\\(f(x)=\\dfrac{u(x)}{v(x)},\\quad f'(x) = \\dfrac{u'(x)\\cdot v(x) - u(x)\\cdot v'(x)}{[v(x)]^2}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Kettenregel</div>
+                <div class="formula-content">\\((f(g(x)))' = f'(g(x)) \\cdot g'(x)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">\\(e^x\\) und \\(\\ln(x)\\)</div>
+                <div class="formula-content">\\((e^x)' = e^x\\)<br>\\((\\ln x)' = \\tfrac{1}{x}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">\\(\\sin\\) und \\(\\cos\\)</div>
+                <div class="formula-content">\\((\\sin x)' = \\cos x\\)<br>\\((\\cos x)' = -\\sin x\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Differenzenquotient</div>
+                <div class="formula-content">\\(\\dfrac{f(a+h)-f(a)}{h}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Ableitung (Grenzwert)</div>
+                <div class="formula-content">\\(f'(a) = \\lim_{h \\to 0} \\dfrac{f(a+h)-f(a)}{h}\\)</div>
             </div>
         `;
+    } else if (topic === 'analysis' && level !== 'detail') {
+        cheatsheetHTML += sidebarHint('fa-chart-line', 'Analysis', [
+            { icon: 'fa-chart-line', text: 'Ableitungen beschreiben Steigungen' },
+            { icon: 'fa-infinity',   text: 'Integrale berechnen Flächeninhalte' },
+            { icon: 'fa-mountain',   text: 'Extrema → f\'(x) = 0 prüfen' },
+            { icon: 'fa-seedling',   text: 'e-Funktion: f\'(x) = f(x)' },
+        ]);
+    } else if (topic === 'analysis_formeln') {
+        cheatsheetHTML += `
+            <div class="important-note">
+                <h4><i class="fas fa-function"></i> Analysis</h4>
+                <p>Alle wichtigen Formeln zur Differential- und Integralrechnung (BW Kursstufe)</p>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Differenzenquotient</div>
+                <div class="formula-content">\\(\\dfrac{\\Delta f}{\\Delta x} = \\dfrac{f(x_0+h)-f(x_0)}{h}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Ableitung (Grenzwert)</div>
+                <div class="formula-content">\\(f'(x_0) = \\lim_{h \\to 0} \\dfrac{f(x_0+h)-f(x_0)}{h}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Potenzregel</div>
+                <div class="formula-content">\\(f(x)=x^n \\Rightarrow f'(x)=n\\cdot x^{n-1}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Faktorregel</div>
+                <div class="formula-content">\\((c\\cdot f)' = c\\cdot f'\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Summenregel</div>
+                <div class="formula-content">\\((f+g)' = f'+g'\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Produktregel</div>
+                <div class="formula-content">\\((u\\cdot v)' = u'\\cdot v + u\\cdot v'\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Quotientenregel</div>
+                <div class="formula-content">\\(f(x)=\\dfrac{u(x)}{v(x)},\\quad f'(x) = \\dfrac{u'(x)\\cdot v(x) - u(x)\\cdot v'(x)}{[v(x)]^2}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Kettenregel</div>
+                <div class="formula-content">\\((f(g(x)))' = f'(g(x))\\cdot g'(x)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Tangentengleichung</div>
+                <div class="formula-content">\\(t(x) = f'(x_0)\\cdot(x-x_0)+f(x_0)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Normalengleichung</div>
+                <div class="formula-content">\\(n(x) = -\\dfrac{1}{f'(x_0)}\\cdot(x-x_0)+f(x_0)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Notwendige Bed. Extremum</div>
+                <div class="formula-content">\\(f'(x_0)=0\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Hinreichende Bed. Extremum</div>
+                <div class="formula-content">\\(f'(x_0)=0\\) und \\(f''(x_0)\\neq 0\\):<br>
+                    \\(f''(x_0)>0\\Rightarrow\\) Minimum<br>
+                    \\(f''(x_0)<0\\Rightarrow\\) Maximum</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Wendepunkt</div>
+                <div class="formula-content">\\(f''(x_0)=0\\) und \\(f'''(x_0)\\neq 0\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Monotonie</div>
+                <div class="formula-content">\\(f'(x)>0\\Rightarrow\\) streng monoton steigend<br>
+                    \\(f'(x)<0\\Rightarrow\\) streng monoton fallend</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Krümmung</div>
+                <div class="formula-content">\\(f''(x)>0\\Rightarrow\\) linksgekrümmt<br>
+                    \\(f''(x)<0\\Rightarrow\\) rechtsgekrümmt</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Nat. Exponentialfunktion</div>
+                <div class="formula-content">\\(f(x)=e^x \\Rightarrow f'(x)=e^x\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Allg. Exponentialfunktion</div>
+                <div class="formula-content">\\(f(x)=a^x \\Rightarrow f'(x)=a^x\\cdot\\ln(a)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Nat. Logarithmus</div>
+                <div class="formula-content">\\(f(x)=\\ln(x) \\Rightarrow f'(x)=\\dfrac{1}{x}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Logarithmusgesetze</div>
+                <div class="formula-content">\\(\\ln(a\\cdot b)=\\ln a+\\ln b\\)<br>
+                    \\(\\ln\\left(\\dfrac{a}{b}\\right)=\\ln a-\\ln b\\)<br>
+                    \\(\\ln(a^n)=n\\cdot\\ln a\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Umkehrfunktion e / ln</div>
+                <div class="formula-content">\\(e^{\\ln(x)}=x\\quad\\text{und}\\quad\\ln(e^x)=x\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Stammfunktion (Potenz)</div>
+                <div class="formula-content">\\(\\int x^n\\,dx = \\dfrac{x^{n+1}}{n+1}+C\\quad(n\\neq -1)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Stammfunktion (e-Funkt.)</div>
+                <div class="formula-content">\\(\\int e^x\\,dx = e^x+C\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Stammfunktion (1/x)</div>
+                <div class="formula-content">\\(\\int \\dfrac{1}{x}\\,dx = \\ln|x|+C\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Hauptsatz der Integralrechnung</div>
+                <div class="formula-content">\\(\\int_a^b f(x)\\,dx = F(b)-F(a)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Linearität des Integrals</div>
+                <div class="formula-content">\\(\\int_a^b c\\cdot f(x)\\,dx = c\\cdot\\int_a^b f(x)\\,dx\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Additivität des Integrals</div>
+                <div class="formula-content">\\(\\int_a^c f\\,dx = \\int_a^b f\\,dx + \\int_b^c f\\,dx\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Flächeninhalt (x-Achse)</div>
+                <div class="formula-content">\\(A = \\int_a^b |f(x)|\\,dx\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Fläche zwischen zwei Kurven</div>
+                <div class="formula-content">\\(A = \\int_a^b |f(x)-g(x)|\\,dx\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Rotationsvolumen (x-Achse)</div>
+                <div class="formula-content">\\(V = \\pi\\cdot\\int_a^b [f(x)]^2\\,dx\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Mittelwert einer Funktion</div>
+                <div class="formula-content">\\(\\bar{f} = \\dfrac{1}{b-a}\\int_a^b f(x)\\,dx\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Sinus &amp; Kosinus (Ableitung)</div>
+                <div class="formula-content">\\(\\sin'(x)=\\cos(x)\\quad\\cos'(x)=-\\sin(x)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Pythagoreischer Lehrsatz</div>
+                <div class="formula-content">\\(\\sin^2(x)+\\cos^2(x)=1\\)</div>
+            </div>
+        `;
+    } else if (topic === 'geometrie' && level !== 'detail') {
+        cheatsheetHTML += sidebarHint('fa-cube', 'Analytische Geometrie', [
+            { icon: 'fa-arrows-alt',  text: 'Vektoren beschreiben Richtungen im Raum' },
+            { icon: 'fa-dot-circle',  text: 'Skalarprodukt = 0 → orthogonal' },
+            { icon: 'fa-layer-group', text: '3 Ebenenformen: Parameter, Normal, Koordinaten' },
+            { icon: 'fa-ruler',       text: 'Abstand via Hessescher Normalform' },
+        ]);
+    } else if (topic === 'geometrie_formeln') {
+        cheatsheetHTML += `
+            <div class="important-note">
+                <h4><i class="fas fa-cube"></i> Analytische Geometrie</h4>
+                <p>Alle wichtigen Formeln für Vektoren, Geraden und Ebenen (BW Kursstufe)</p>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Vektor zwischen zwei Punkten</div>
+                <div class="formula-content">\\(\\vec{AB} = B - A = \\begin{pmatrix}b_1-a_1\\\\b_2-a_2\\\\b_3-a_3\\end{pmatrix}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Betrag eines Vektors</div>
+                <div class="formula-content">\\(|\\vec{a}| = \\sqrt{a_1^2+a_2^2+a_3^2}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Einheitsvektor</div>
+                <div class="formula-content">\\(\\vec{e}_a = \\dfrac{\\vec{a}}{|\\vec{a}|}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Skalarprodukt</div>
+                <div class="formula-content">\\(\\vec{a}\\cdot\\vec{b} = a_1 b_1+a_2 b_2+a_3 b_3\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Skalarprodukt (geometrisch)</div>
+                <div class="formula-content">\\(\\vec{a}\\cdot\\vec{b} = |\\vec{a}|\\cdot|\\vec{b}|\\cdot\\cos\\alpha\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Winkel zwischen Vektoren</div>
+                <div class="formula-content">\\(\\cos\\alpha = \\dfrac{\\vec{a}\\cdot\\vec{b}}{|\\vec{a}|\\cdot|\\vec{b}|}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Orthogonalität</div>
+                <div class="formula-content">\\(\\vec{a}\\perp\\vec{b} \\Leftrightarrow \\vec{a}\\cdot\\vec{b}=0\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Kreuzprodukt (Normalenvektor)</div>
+                <div class="formula-content">\\(\\vec{a}\\times\\vec{b} = \\begin{pmatrix}a_2 b_3-a_3 b_2\\\\a_3 b_1-a_1 b_3\\\\a_1 b_2-a_2 b_1\\end{pmatrix}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Geradengleichung (Parameterform)</div>
+                <div class="formula-content">\\(g\\colon\\vec{x} = \\vec{p}+t\\cdot\\vec{u}\\quad t\\in\\mathbb{R}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Ebene (Parameterform)</div>
+                <div class="formula-content">\\(E\\colon\\vec{x} = \\vec{p}+s\\cdot\\vec{u}+t\\cdot\\vec{v}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Ebene (Normalenform)</div>
+                <div class="formula-content">\\(E\\colon\\vec{n}\\cdot(\\vec{x}-\\vec{p})=0\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Ebene (Koordinatenform)</div>
+                <div class="formula-content">\\(E\\colon ax_1+bx_2+cx_3=d\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Hessesche Normalform</div>
+                <div class="formula-content">\\(E\\colon\\vec{n}_0\\cdot\\vec{x}=d_0\\quad\\text{mit }\\vec{n}_0=\\dfrac{\\vec{n}}{|\\vec{n}|}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Abstand Punkt–Ebene (HNF)</div>
+                <div class="formula-content">\\(d(P,E) = |\\vec{n}_0\\cdot\\vec{p}-d_0|\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Abstand Punkt–Ebene (Koordinatenform)</div>
+                <div class="formula-content">\\(d = \\dfrac{|ax_0+by_0+cz_0-d|}{\\sqrt{a^2+b^2+c^2}}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Abstand Punkt–Gerade</div>
+                <div class="formula-content">\\(d(P,g) = \\dfrac{|\\vec{AP}\\times\\vec{u}|}{|\\vec{u}|}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Abstand windschiefer Geraden</div>
+                <div class="formula-content">\\(d = \\dfrac{|\\vec{AB}\\cdot(\\vec{u}\\times\\vec{v})|}{|\\vec{u}\\times\\vec{v}|}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Schnittwinkel Gerade–Ebene</div>
+                <div class="formula-content">\\(\\sin\\varphi = \\dfrac{|\\vec{u}\\cdot\\vec{n}|}{|\\vec{u}|\\cdot|\\vec{n}|}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Schnittwinkel Ebene–Ebene</div>
+                <div class="formula-content">\\(\\cos\\varphi = \\dfrac{|\\vec{n_1}\\cdot\\vec{n_2}|}{|\\vec{n_1}|\\cdot|\\vec{n_2}|}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Spurpunkte einer Ebene</div>
+                <div class="formula-content">Jeweils zwei Koordinaten \\(=0\\) setzen und lösen.</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Gaußsches Eliminationsverfahren</div>
+                <div class="formula-content">LGS auf Stufenform bringen durch<br>Addition/Subtraktion der Gleichungen.</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Spiegelung Punkt an Ebene</div>
+                <div class="formula-content">\\(P' = P + 2d\\cdot\\vec{n}_0\\)<br>\\(d = d(P,E)\\) mit Vorzeichen (HNF)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Fläche eines Dreiecks</div>
+                <div class="formula-content">\\(A = \\dfrac{1}{2}\\,|\\vec{AB}\\times\\vec{AC}|\\)</div>
+            </div>
+        `;
+    } else if (topic === 'stochastik' && level !== 'detail') {
+        cheatsheetHTML += sidebarHint('fa-dice', 'Stochastik', [
+            { icon: 'fa-coins',         text: 'Bernoulli: nur Treffer oder kein Treffer' },
+            { icon: 'fa-chart-bar',     text: 'Binomial: n unabh. Bernoulli-Experimente' },
+            { icon: 'fa-bell',          text: 'Normalverteilung: symmetrisch um μ' },
+            { icon: 'fa-balance-scale', text: 'Hypothesentest: H₀ annehmen oder ablehnen' },
+        ]);
+    } else if (topic === 'stochastik_formeln') {
+        cheatsheetHTML += `
+            <div class="important-note">
+                <h4><i class="fas fa-dice"></i> Stochastik</h4>
+                <p>Alle wichtigen Formeln zur Wahrscheinlichkeit &amp; Statistik (BW Kursstufe)</p>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Klassische Wahrscheinlichkeit</div>
+                <div class="formula-content">\\(P(A) = \\dfrac{\\text{günstige Ergebnisse}}{\\text{mögliche Ergebnisse}}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Gegenwahrscheinlichkeit</div>
+                <div class="formula-content">\\(P(\\bar{A}) = 1 - P(A)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Additionssatz</div>
+                <div class="formula-content">\\(P(A\\cup B) = P(A)+P(B)-P(A\\cap B)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Bedingte Wahrscheinlichkeit</div>
+                <div class="formula-content">\\(P(A\\mid B) = \\dfrac{P(A\\cap B)}{P(B)}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Multiplikationssatz</div>
+                <div class="formula-content">\\(P(A\\cap B) = P(A)\\cdot P(B\\mid A)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Stochastische Unabhängigkeit</div>
+                <div class="formula-content">\\(P(A\\cap B) = P(A)\\cdot P(B)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Satz der totalen Wahrscheinlichkeit</div>
+                <div class="formula-content">\\(P(B) = \\sum_{i} P(B\\mid A_i)\\cdot P(A_i)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Satz von Bayes</div>
+                <div class="formula-content">\\(P(A_i\\mid B) = \\dfrac{P(B\\mid A_i)\\cdot P(A_i)}{P(B)}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Permutationen</div>
+                <div class="formula-content">\\(n!\\) (Anordnungen von \\(n\\) Elementen)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Kombinationen (ohne Whg., ohne Reihenf.)</div>
+                <div class="formula-content">\\(\\binom{n}{k} = \\dfrac{n!}{k!\\cdot(n-k)!}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Bernoulli-Experiment</div>
+                <div class="formula-content">\\(n\\) unabhängige Versuche, je Treffer mit \\(P=p\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Binomialverteilung \\(X\\sim B(n,p)\\)</div>
+                <div class="formula-content">\\(P(X=k) = \\binom{n}{k}\\cdot p^k\\cdot(1-p)^{n-k}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Kumulierte Binomialwskt.</div>
+                <div class="formula-content">\\(P(X\\leq k) = \\sum_{i=0}^{k}\\binom{n}{i}p^i(1-p)^{n-i}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Erwartungswert (Binomial)</div>
+                <div class="formula-content">\\(E(X) = \\mu = n\\cdot p\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Varianz (Binomial)</div>
+                <div class="formula-content">\\(\\text{Var}(X) = \\sigma^2 = n\\cdot p\\cdot(1-p)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Standardabweichung (Binomial)</div>
+                <div class="formula-content">\\(\\sigma = \\sqrt{n\\cdot p\\cdot(1-p)}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Normalverteilung \\(X\\sim N(\\mu,\\sigma^2)\\)</div>
+                <div class="formula-content">\\(\\varphi(x) = \\dfrac{1}{\\sigma\\sqrt{2\\pi}}e^{-\\frac{1}{2}\\left(\\frac{x-\\mu}{\\sigma}\\right)^2}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Standardnormalverteilung</div>
+                <div class="formula-content">\\(Z = \\dfrac{X-\\mu}{\\sigma}\\sim N(0,1)\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">\\(\\sigma\\)-Regeln (Normalverteilung)</div>
+                <div class="formula-content">\\(P(\\mu-\\sigma\\leq X\\leq\\mu+\\sigma)\\approx 68{,}3\\%\\)<br>
+                    \\(P(\\mu-2\\sigma\\leq X\\leq\\mu+2\\sigma)\\approx 95{,}4\\%\\)<br>
+                    \\(P(\\mu-3\\sigma\\leq X\\leq\\mu+3\\sigma)\\approx 99{,}7\\%\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Lokaler Grenzwertsatz (Faustregel)</div>
+                <div class="formula-content">Normalverteilung als Näherung für \\(B(n,p)\\) wenn \\(n\\cdot p\\cdot(1-p)\\geq 9\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Hypothesentest – Nullhypothese</div>
+                <div class="formula-content">\\(H_0\\colon p = p_0\\qquad H_1\\colon p\\neq p_0\\) (oder \\(<, >\\))</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Signifikanzniveau</div>
+                <div class="formula-content">\\(\\alpha\\) (meist \\(5\\%\\) oder \\(1\\%\\)) — maximale Irrtumswahrscheinlichkeit</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Ablehnungsbereich (einseitig rechts)</div>
+                <div class="formula-content">\\(K = \\{k\\in\\mathbb{N}_0 : P(X\\geq k)\\leq\\alpha\\}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Ablehnungsbereich (einseitig links)</div>
+                <div class="formula-content">\\(K = \\{k\\in\\mathbb{N}_0 : P(X\\leq k)\\leq\\alpha\\}\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Fehler 1. Art (\\(\\alpha\\)-Fehler)</div>
+                <div class="formula-content">\\(H_0\\) wird abgelehnt, obwohl sie wahr ist.<br>\\(P(\\text{Fehler 1. Art})\\leq\\alpha\\)</div>
+            </div>
+
+            <div class="formula-item">
+                <div class="formula-title">Fehler 2. Art (\\(\\beta\\)-Fehler)</div>
+                <div class="formula-content">\\(H_0\\) wird angenommen, obwohl sie falsch ist.</div>
+            </div>
+        `;
+    } else {
+        // Startseite
+        cheatsheetHTML += `
+            <div class="sidebar-info-header">
+                <i class="fas fa-book-open"></i>
+                <span>Lernbereich</span>
+            </div>
+            <p class="sidebar-info-hint">Wähle ein Thema aus,<br>um loszulegen.</p>
+            <div class="sidebar-divider"></div>
+            <p class="sidebar-info-label">Themengebiete</p>
+            <div class="sidebar-hint-item"><i class="fas fa-chart-line"></i><span>Analysis</span></div>
+            <div class="sidebar-hint-item"><i class="fas fa-cube"></i><span>Analytische Geometrie</span></div>
+            <div class="sidebar-hint-item"><i class="fas fa-dice"></i><span>Stochastik</span></div>
+            <div class="sidebar-divider"></div>
+            <p class="sidebar-info-label">Tipp</p>
+            <div class="sidebar-hint-item"><i class="fas fa-mouse-pointer"></i><span>Klicke eine Kachel an, um Inhalte zu öffnen</span></div>
+            <div class="sidebar-hint-item"><i class="fas fa-graduation-cap"></i><span>Formeln erscheinen auf den Unterseiten</span></div>
+        `;
     }
-    
+
     cheatsheetContainer.innerHTML = cheatsheetHTML;
+
+    if (window.MathJax) {
+        MathJax.typesetPromise([cheatsheetContainer]);
+    }
 }
 // Navigation functions
-function navigateTo(level, topic = null, subtopic = null) {
+function navigateTo(level, topic = null, subtopic = null, detail = null) {
     currentLevel = level;
-    
+
+    // URL-Hash setzen
+    if (level === 'home') {
+        history.replaceState(null, '', '#');
+    } else if (level === 'topic' && topic) {
+        history.replaceState(null, '', `#${topic}`);
+    } else if (level === 'subtopic' && topic && subtopic) {
+        history.replaceState(null, '', `#${topic}/${encodeURIComponent(subtopic)}`);
+    } else if (level === 'detail' && topic && subtopic && detail) {
+        history.replaceState(null, '', `#${topic}/${encodeURIComponent(subtopic)}/${encodeURIComponent(detail)}`);
+    }
+
     if (level === 'home') {
         updateBreadcrumb([{ name: 'Startseite', level: 'home' }]);
         updateTopicNav(null);
@@ -547,8 +1025,27 @@ function navigateTo(level, topic = null, subtopic = null) {
             { name: subtopic, level: 'subtopic', topic: topic, subtopic: subtopic }
         ]);
         updateTopicNav(topic);
-        updateSidebars('subtopic', topic, subtopic);
+        updateSidebars('subtopic_nav', topic, subtopic);
         showSubtopicDetails(topic, subtopic);
+    }
+}
+
+function restoreFromHash() {
+    const hash = decodeURIComponent(window.location.hash.replace('#', ''));
+    if (!hash) return;
+
+    const parts = hash.split('/');
+    const topic = parts[0];
+    const subtopic = parts[1];
+    const detail = parts[2];
+
+    if (detail && topic && subtopic) {
+        navigateTo('subtopic', topic, subtopic);
+        showDetailContent(topic, subtopic, detail);
+    } else if (subtopic && topic) {
+        navigateTo('subtopic', topic, subtopic);
+    } else if (topic && topicData[topic]) {
+        navigateTo('topic', topic);
     }
 }
 
@@ -584,6 +1081,8 @@ function updateBreadcrumb(items) {
                 navigateTo('topic', item.topic);
             } else if (item.level === 'subtopic') {
                 navigateTo('subtopic', item.topic, item.subtopic);
+            } else if (item.level === 'detail') {
+                showDetailContent(item.topic, item.subtopic, item.detail);
             }
         };
         
@@ -757,15 +1256,177 @@ function showSubtopicDetails(topic, subtopic) {
 }
 
 function showDetailContent(topic, subtopic, detailTopic) {
-    // Show expanded content for the detailed topic
+    // URL-Hash setzen
+    history.replaceState(null, '', `#${topic}/${encodeURIComponent(subtopic)}/${encodeURIComponent(detailTopic)}`);
+
+    // Breadcrumb aktualisieren
+    updateBreadcrumb([
+        { name: 'Startseite', level: 'home' },
+        { name: topicData[topic].title, level: 'topic', topic: topic },
+        { name: subtopic, level: 'subtopic', topic: topic, subtopic: subtopic },
+        { name: detailTopic, level: 'detail', topic: topic, subtopic: subtopic, detail: detailTopic }
+    ]);
+
+    // Spezifische Unterseiten
+    if (topic === 'analysis' && detailTopic === 'Ableitung und Ableitungsregeln') {
+        showAbleitungsseite();
+        updateFormulaCheatsheet('detail', 'ableitungsregeln');
+        return;
+    }
+
+    // Standard-Fallback
+    const topicsGrid = document.getElementById('topics-grid');
+    topicsGrid.innerHTML = '';
     const expandedContent = document.getElementById('expanded-content');
     document.getElementById('expanded-title').textContent = detailTopic;
     document.getElementById('expanded-description').textContent = `Hier werden die detaillierten Inhalte zu "${detailTopic}" entwickelt. Interaktive Erklärungen, Beispiele, Übungsaufgaben und Lösungswege werden hier entstehen.`;
     expandedContent.classList.add('show');
 }
 
+function showAbleitungsseite() {
+    const topicsGrid = document.getElementById('topics-grid');
+    const expandedContent = document.getElementById('expanded-content');
+    expandedContent.classList.remove('show');
+
+    topicsGrid.innerHTML = `
+    <div class="detail-page">
+
+        <!-- Einführung -->
+        <section class="detail-section">
+            <h2 class="detail-heading">Ableitung und Ableitungsregeln</h2>
+            <p class="detail-intro">
+                Die Bestimmung von Ableitungsfunktionen mithilfe des Grenzwertes von Differenzenquotienten
+                ist aufwendig. Man kann damit aber die Ableitungen wichtiger Funktionen sowie Ableitungsregeln
+                herleiten, mit denen sich zusammengesetzte, differenzierbare Funktionen viel einfacher ableiten lassen.
+            </p>
+        </section>
+
+        <!-- Differenzenquotient & Ableitung als Tabelle -->
+        <section class="detail-section">
+            <h3 class="detail-subheading">Definition</h3>
+            <div class="concept-table">
+                <div class="concept-row concept-header">
+                    <div class="concept-cell">Grafik</div>
+                    <div class="concept-cell">Definition</div>
+                    <div class="concept-cell">Bedeutung im Anwendungskontext</div>
+                </div>
+
+                <div class="concept-row">
+                    <div class="concept-cell concept-cell-img">
+                        <img src="img/Differenzenquotient.png" alt="Grafik Differenzenquotient" class="concept-img">
+                    </div>
+                    <div class="concept-cell">
+                        <div class="concept-label">Differenzenquotient</div>
+                        <div class="concept-formula">
+                            \\(\\dfrac{f(a+h)-f(a)}{h} \\quad (h \\neq 0)\\)
+                        </div>
+                    </div>
+                    <div class="concept-cell">
+                        <strong>Mittlere Änderungsrate</strong> von \\(f\\) im Intervall \\(I = [a;\\ a+h]\\)
+                        <br><br>
+                        <span class="concept-note">= Steigung der Sekante durch \\(P(a\\mid f(a))\\) und \\(Q(a{+}h\\mid f(a{+}h))\\)</span>
+                    </div>
+                </div>
+
+                <div class="concept-row">
+                    <div class="concept-cell concept-cell-img">
+                        <img src="img/Ableitung.png" alt="Grafik Ableitung" class="concept-img">
+                    </div>
+                    <div class="concept-cell">
+                        <div class="concept-label">Ableitung</div>
+                        <div class="concept-formula">
+                            \\(f'(a) = \\lim_{\\substack{h \\to 0 \\\\ h \\neq 0}} \\dfrac{f(a+h)-f(a)}{h}\\)
+                        </div>
+                    </div>
+                    <div class="concept-cell">
+                        <strong>Momentane Änderungsrate</strong> von \\(f\\) an der Stelle \\(a\\)
+                        <br><br>
+                        <span class="concept-note">= Steigung der Tangente an den Graphen von \\(f\\) in \\(P(a\\mid f(a))\\)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ableitungstabelle -->
+        <section class="detail-section">
+            <h3 class="detail-subheading">Wichtige Ableitungen &amp; Ableitungsregeln</h3>
+            <div class="deriv-table-wrapper">
+                <table class="deriv-table">
+                    <tbody>
+                        <tr class="deriv-row-fx">
+                            <td class="deriv-label">\\(f(x)\\)</td>
+                            <td>\\(x^r\\)</td>
+                            <td>\\(\\dfrac{u(x)}{v(x)}\\)</td>
+                            <td>\\(g(x)+h(x)\\)</td>
+                            <td>\\(c\\cdot g(x)\\)</td>
+                            <td>\\(\\sqrt{x} = x^{\\frac{1}{2}}\\)</td>
+                            <td>\\(\\dfrac{1}{x} = x^{-1}\\)</td>
+                            <td>\\(\\sin(x)\\)</td>
+                            <td>\\(\\cos(x)\\)</td>
+                        </tr>
+                        <tr class="deriv-row-dfx">
+                            <td class="deriv-label">\\(f'(x)\\)</td>
+                            <td>\\(r\\cdot x^{r-1}\\)</td>
+                            <td>\\(\\dfrac{u'v - uv'}{v^2}\\)</td>
+                            <td>\\(g'(x)+h'(x)\\)</td>
+                            <td>\\(c\\cdot g'(x)\\)</td>
+                            <td>\\(\\tfrac{1}{2}x^{-\\frac{1}{2}} = \\dfrac{1}{2\\sqrt{x}}\\)</td>
+                            <td>\\(-x^{-2} = -\\dfrac{1}{x^2}\\)</td>
+                            <td>\\(\\cos(x)\\)</td>
+                            <td>\\(-\\sin(x)\\)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Produktregel, Quotientenregel, Kettenregel -->
+        <section class="detail-section">
+            <h3 class="detail-subheading">Zusammengesetzte Funktionen</h3>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-card-title"><i class="fas fa-times"></i> Produktregel</div>
+                    <div class="rule-card-formula">\\((u \\cdot v)' = u' \\cdot v + u \\cdot v'\\)</div>
+                    <div class="rule-card-example">
+                        <span class="example-label">Beispiel:</span>
+                        \\(f(x) = x^2 \\cdot \\sin(x)\\)<br>
+                        \\(f'(x) = 2x \\cdot \\sin(x) + x^2 \\cdot \\cos(x)\\)
+                    </div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-card-title"><i class="fas fa-divide"></i> Quotientenregel</div>
+                    <div class="rule-card-formula" style="font-size:0.78rem;">\\(f(x)=\\dfrac{u(x)}{v(x)}\\)<br><br>\\(f'(x) = \\dfrac{u'(x)\\cdot v(x) - u(x)\\cdot v'(x)}{[v(x)]^2}\\)</div>
+                    <div class="rule-card-example">
+                        <span class="example-label">Beispiel:</span>
+                        \\(f(x) = \\dfrac{\\sin(x)}{x}\\)<br>
+                        \\(f'(x) = \\dfrac{\\cos(x)\\cdot x - \\sin(x)}{x^2}\\)
+                    </div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-card-title"><i class="fas fa-link"></i> Kettenregel</div>
+                    <div class="rule-card-formula">\\((f(g(x)))' = f'(g(x)) \\cdot g'(x)\\)</div>
+                    <div class="rule-card-example">
+                        <span class="example-label">Beispiel:</span>
+                        \\(f(x) = \\sin(x^2)\\)<br>
+                        \\(f'(x) = \\cos(x^2) \\cdot 2x\\)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    `;
+
+    if (window.MathJax) {
+        MathJax.typesetPromise([topicsGrid]);
+    }
+}
+
 // Progress dots functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Seite beim Laden aus URL-Hash wiederherstellen
+    restoreFromHash();
+
     document.querySelectorAll('.progress-dot').forEach((dot, index) => {
         dot.addEventListener('click', () => {
             document.querySelectorAll('.progress-dot').forEach(d => d.classList.remove('active'));
