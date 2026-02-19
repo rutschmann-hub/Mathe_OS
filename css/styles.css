@@ -318,6 +318,8 @@ body::before {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    text-decoration: none;
+    color: inherit;
     padding: 0.6rem 0.7rem;
     border-radius: var(--radius-small);
     cursor: pointer;
