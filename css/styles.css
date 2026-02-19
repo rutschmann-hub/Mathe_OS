@@ -347,10 +347,6 @@ body::before {
     color: white;
 }
 
-.action-item:hover small {
-    color: rgba(255, 255, 255, 0.8);
-}
-
 .action-item i {
     width: 20px;
     color: var(--primary-mustard);
@@ -363,11 +359,6 @@ body::before {
     color: var(--primary-navy);
     flex: 1;
     font-size: 0.8rem;
-}
-
-.action-item small {
-    color: var(--text-muted);
-    font-size: 0.75rem;
 }
 
 .divider {
