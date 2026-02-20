@@ -50,19 +50,35 @@
     <!-- Topic Navigation Bar -->
     <nav class="topic-nav-container">
         <div class="container">
-            <div class="topic-nav" id="topic-nav">
-                <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'analysis')">
-                    <i class="fas fa-chart-line"></i>
-                    Analysis
-                </a>
-                <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'geometrie')">
-                    <i class="fas fa-cube"></i>
-                    Analytische Geometrie
-                </a>
-                <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'stochastik')">
-                    <i class="fas fa-dice"></i>
-                    Stochastik
-                </a>
+            <div class="topic-nav-layout">
+                <div class="topic-nav-search-wrap">
+                    <form class="breadcrumb-search" id="breadcrumb-search-form" role="search">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input
+                            id="topic-search"
+                            class="topic-search-input"
+                            type="search"
+                            placeholder="Thema suchen"
+                            autocomplete="off"
+                        >
+                    </form>
+                    <div class="search-results" id="search-results" hidden></div>
+                </div>
+
+                <div class="topic-nav" id="topic-nav">
+                    <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'analysis')">
+                        <i class="fas fa-chart-line"></i>
+                        Analysis
+                    </a>
+                    <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'geometrie')">
+                        <i class="fas fa-cube"></i>
+                        Analytische Geometrie
+                    </a>
+                    <a href="#" class="topic-nav-item" onclick="navigateTo('topic', 'stochastik')">
+                        <i class="fas fa-dice"></i>
+                        Stochastik
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -70,10 +86,12 @@
     <!-- Breadcrumb Navigation -->
     <nav class="breadcrumb-container">
         <div class="container">
-            <div class="breadcrumb" id="breadcrumb">
-                <a href="#" class="breadcrumb-item current" onclick="navigateTo('home')">
-                    <i class="fas fa-home"></i> Startseite
-                </a>
+            <div class="breadcrumb-layout">
+                <div class="breadcrumb" id="breadcrumb">
+                    <a href="#" class="breadcrumb-item current" onclick="navigateTo('home')">
+                        <i class="fas fa-home"></i> Startseite
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -127,36 +145,6 @@
                     Wähle einen Themenbereich aus, um tiefer in die Mathematik der Oberstufe einzusteigen.
                 </p>
             </div>
-
-            <section class="home-toolbar">
-                <div class="toolbar-card toolbar-search">
-                    <label class="toolbar-label" for="topic-search">Thema suchen</label>
-                    <div class="search-input-wrap">
-                        <i class="fas fa-search" aria-hidden="true"></i>
-                        <input
-                            id="topic-search"
-                            class="topic-search-input"
-                            type="search"
-                            placeholder="z. B. Kettenregel, Binomialverteilung ..."
-                            autocomplete="off"
-                        >
-                    </div>
-                    <p class="toolbar-meta" id="search-result-count">3 von 3 Themen sichtbar</p>
-                </div>
-
-                <div class="toolbar-card toolbar-progress">
-                    <p class="toolbar-label">Lernfortschritt</p>
-                    <p class="progress-text" id="learning-progress-text">0 / 0 Themen besucht</p>
-                    <div class="progress-track" aria-hidden="true">
-                        <div class="progress-fill" id="learning-progress-fill"></div>
-                    </div>
-                </div>
-
-                <div class="toolbar-card toolbar-last">
-                    <p class="toolbar-label">Zuletzt besucht</p>
-                    <a href="#" class="last-visited-link" id="last-visited-link">Noch kein Thema geöffnet</a>
-                </div>
-            </section>
 
             <!-- Topics Grid -->
             <div class="topics-grid" id="topics-grid">

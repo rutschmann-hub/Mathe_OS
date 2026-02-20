@@ -2,10 +2,7 @@
 let currentLevel = 'home';
 let expandedCard = null;
 let navigationHistory = [];
-let homeSearchQuery = '';
-
-const VISITED_UNITS_KEY = 'matheos_visited_units_v1';
-const LAST_VISITED_KEY = 'matheos_last_visited_v1';
+let searchMatches = [];
 
 // Topic data structure
 const topicData = {
@@ -456,132 +453,11 @@ const homeTopicCards = [
     }
 ];
 
-const totalLearningUnits = Object.values(topicData).reduce((total, topic) => {
-    return total + topic.subtopics.reduce((innerTotal, subtopic) => {
-        if (Array.isArray(subtopic.subtopics) && subtopic.subtopics.length > 0) {
-            return innerTotal + subtopic.subtopics.length;
-        }
-        return innerTotal + 1;
-    }, 0);
-}, 0);
-
-function getVisitedUnits() {
-    try {
-        const raw = localStorage.getItem(VISITED_UNITS_KEY);
-        if (!raw) return new Set();
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return new Set();
-        return new Set(parsed);
-    } catch (error) {
-        return new Set();
-    }
-}
-
-function saveVisitedUnits(unitsSet) {
-    try {
-        localStorage.setItem(VISITED_UNITS_KEY, JSON.stringify([...unitsSet]));
-    } catch (error) {
-        // Ignore storage errors silently
-    }
-}
-
-function markUnitVisited(topic, subtopic, detailTopic) {
-    if (!topic || !subtopic || !detailTopic) return;
-    const units = getVisitedUnits();
-    units.add(`${topic}::${subtopic}::${detailTopic}`);
-    saveVisitedUnits(units);
-}
-
-function updateLearningProgress() {
-    const progressText = document.getElementById('learning-progress-text');
-    const progressFill = document.getElementById('learning-progress-fill');
-    if (!progressText || !progressFill) return;
-
-    const visitedCount = getVisitedUnits().size;
-    const total = totalLearningUnits || 1;
-    const percentage = Math.min(100, Math.round((visitedCount / total) * 100));
-
-    progressText.textContent = `${visitedCount} / ${totalLearningUnits} Themen besucht`;
-    progressFill.style.width = `${percentage}%`;
-}
-
-function saveLastVisited(label, hashPath) {
-    if (!label || !hashPath) return;
-    try {
-        localStorage.setItem(LAST_VISITED_KEY, JSON.stringify({ label, hashPath }));
-    } catch (error) {
-        // Ignore storage errors silently
-    }
-}
-
-function getLastVisited() {
-    try {
-        const raw = localStorage.getItem(LAST_VISITED_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed.label !== 'string' || typeof parsed.hashPath !== 'string') {
-            return null;
-        }
-        return parsed;
-    } catch (error) {
-        return null;
-    }
-}
-
-function updateLastVisitedLink() {
-    const lastVisitedLink = document.getElementById('last-visited-link');
-    if (!lastVisitedLink) return;
-
-    const lastVisited = getLastVisited();
-    if (!lastVisited) {
-        lastVisitedLink.textContent = 'Noch kein Thema geöffnet';
-        lastVisitedLink.dataset.hashPath = '';
-        lastVisitedLink.classList.add('disabled');
-        return;
-    }
-
-    lastVisitedLink.textContent = lastVisited.label;
-    lastVisitedLink.dataset.hashPath = lastVisited.hashPath;
-    lastVisitedLink.classList.remove('disabled');
-}
-
-function updateSearchResultCount(visibleCount, totalCount) {
-    const searchResultCount = document.getElementById('search-result-count');
-    if (!searchResultCount) return;
-    searchResultCount.textContent = `${visibleCount} von ${totalCount} Themen sichtbar`;
-}
-
-function updateHomeToolbarVisibility() {
-    const homeToolbar = document.querySelector('.home-toolbar');
-    if (!homeToolbar) return;
-    homeToolbar.style.display = currentLevel === 'home' ? 'grid' : 'none';
-}
-
 function renderHomeTopicCards() {
     const topicsGrid = document.getElementById('topics-grid');
     if (!topicsGrid) return;
 
-    const search = homeSearchQuery.trim().toLowerCase();
-    const filteredCards = homeTopicCards.filter((card) => {
-        if (!search) return true;
-        const haystack = `${card.title} ${card.description}`.toLowerCase();
-        return haystack.includes(search);
-    });
-
-    updateSearchResultCount(filteredCards.length, homeTopicCards.length);
-
-    if (filteredCards.length === 0) {
-        topicsGrid.innerHTML = `
-            <div class="topic-card empty-search-card">
-                <div class="topic-icon"><i class="fas fa-search-minus"></i></div>
-                <h3>Kein Treffer</h3>
-                <p>Versuche einen allgemeineren Suchbegriff wie „Analysis“ oder „Wahrscheinlichkeit“.</p>
-            </div>
-        `;
-        return;
-    }
-
-    topicsGrid.innerHTML = filteredCards.map((card) => `
+    topicsGrid.innerHTML = homeTopicCards.map((card) => `
         <div class="topic-card" onclick="expandTopic('${card.key}', this)">
             <div class="topic-icon">
                 <i class="${card.icon}"></i>
@@ -601,6 +477,92 @@ function renderHomeTopicCards() {
     `).join('');
 }
 
+function buildSearchIndex() {
+    const index = [];
+
+    Object.entries(topicData).forEach(([topicKey, topic]) => {
+        index.push({
+            title: topic.title,
+            label: topic.title,
+            hashPath: topicKey,
+            searchText: `${topic.title} ${topic.subtitle} ${topic.description}`.toLowerCase()
+        });
+
+        topic.subtopics.forEach((subtopic) => {
+            const subtopicPath = `${topicKey}/${encodeURIComponent(subtopic.name)}`;
+            index.push({
+                title: subtopic.name,
+                label: `${topic.title} > ${subtopic.name}`,
+                hashPath: subtopicPath,
+                searchText: `${topic.title} ${subtopic.name} ${subtopic.description}`.toLowerCase()
+            });
+
+            if (Array.isArray(subtopic.subtopics)) {
+                subtopic.subtopics.forEach((detailTopic) => {
+                    index.push({
+                        title: detailTopic.name,
+                        label: `${topic.title} > ${subtopic.name} > ${detailTopic.name}`,
+                        hashPath: `${subtopicPath}/${encodeURIComponent(detailTopic.name)}`,
+                        searchText: `${topic.title} ${subtopic.name} ${detailTopic.name} ${detailTopic.description}`.toLowerCase()
+                    });
+                });
+            }
+        });
+    });
+
+    return index;
+}
+
+const searchIndex = buildSearchIndex();
+
+function getSearchMatches(query) {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return [];
+
+    return searchIndex
+        .filter((entry) => entry.searchText.includes(normalized))
+        .sort((a, b) => {
+            const aStarts = a.title.toLowerCase().startsWith(normalized) ? 0 : 1;
+            const bStarts = b.title.toLowerCase().startsWith(normalized) ? 0 : 1;
+            if (aStarts !== bStarts) return aStarts - bStarts;
+            return a.title.length - b.title.length;
+        })
+        .slice(0, 8);
+}
+
+function renderSearchResults(results, query) {
+    const searchResults = document.getElementById('search-results');
+    if (!searchResults) return;
+
+    const normalized = query.trim();
+    if (!normalized) {
+        searchResults.hidden = true;
+        searchResults.innerHTML = '';
+        return;
+    }
+
+    if (results.length === 0) {
+        searchResults.hidden = false;
+        searchResults.innerHTML = '<div class="search-result-empty">Keine Treffer</div>';
+        return;
+    }
+
+    searchResults.hidden = false;
+    searchResults.innerHTML = results.map((result) => `
+        <button type="button" class="search-result-item" data-hash-path="${result.hashPath}">
+            <span class="search-result-title">${result.title}</span>
+            <span class="search-result-path">${result.label}</span>
+        </button>
+    `).join('');
+}
+
+function hideSearchResults() {
+    const searchResults = document.getElementById('search-results');
+    if (!searchResults) return;
+    searchResults.hidden = true;
+    searchResults.innerHTML = '';
+}
+
 function navigateByHashPath(hashPath) {
     if (!hashPath) return;
 
@@ -617,6 +579,8 @@ function navigateByHashPath(hashPath) {
     } else if (topic && topicData[topic]) {
         navigateTo('topic', topic);
     }
+
+    hideSearchResults();
 }
 
 function updateSidebars(level, topic = null, subtopic = null) {
@@ -1201,7 +1165,6 @@ function navigateTo(level, topic = null, subtopic = null, detail = null) {
         updateTopicNav(null);
         updateSidebars('home');
         showMainTopics();
-        saveLastVisited('Startseite', '');
     } else if (level === 'topic' && topic) {
         updateBreadcrumb([
             { name: 'Startseite', level: 'home' },
@@ -1210,7 +1173,6 @@ function navigateTo(level, topic = null, subtopic = null, detail = null) {
         updateTopicNav(topic);
         updateSidebars('topic', topic);
         showTopicDetails(topic);
-        saveLastVisited(topicData[topic].title, topic);
     } else if (level === 'subtopic' && topic && subtopic) {
         updateBreadcrumb([
             { name: 'Startseite', level: 'home' },
@@ -1220,11 +1182,7 @@ function navigateTo(level, topic = null, subtopic = null, detail = null) {
         updateTopicNav(topic);
         updateSidebars('subtopic_nav', topic, subtopic);
         showSubtopicDetails(topic, subtopic);
-        saveLastVisited(`${topicData[topic].title} > ${subtopic}`, `${topic}/${encodeURIComponent(subtopic)}`);
     }
-
-    updateLastVisitedLink();
-    updateHomeToolbarVisibility();
 }
 
 function restoreFromHash() {
@@ -1397,11 +1355,6 @@ function showDetailContent(topic, subtopic, detailTopic) {
         { name: detailTopic, level: 'detail', topic: topic, subtopic: subtopic, detail: detailTopic }
     ]);
 
-    markUnitVisited(topic, subtopic, detailTopic);
-    updateLearningProgress();
-    saveLastVisited(`${topicData[topic].title} > ${subtopic} > ${detailTopic}`, `${topic}/${encodeURIComponent(subtopic)}/${encodeURIComponent(detailTopic)}`);
-    updateLastVisitedLink();
-
     // Spezifische Unterseiten
     if (topic === 'analysis' && detailTopic === 'Ableitung und Ableitungsregeln') {
         showAbleitungsseite();
@@ -1557,33 +1510,48 @@ function showAbleitungsseite() {
     }
 }
 
-// Progress dots functionality
+// Search and initial page setup
 document.addEventListener('DOMContentLoaded', function() {
     const topicSearchInput = document.getElementById('topic-search');
+    const searchResults = document.getElementById('search-results');
+    const breadcrumbSearchForm = document.getElementById('breadcrumb-search-form');
+
     if (topicSearchInput) {
         topicSearchInput.addEventListener('input', (event) => {
-            homeSearchQuery = event.target.value || '';
-            if (currentLevel === 'home') {
-                renderHomeTopicCards();
-            }
+            const query = event.target.value || '';
+            searchMatches = getSearchMatches(query);
+            renderSearchResults(searchMatches, query);
         });
-    }
 
-    const lastVisitedLink = document.getElementById('last-visited-link');
-    if (lastVisitedLink) {
-        lastVisitedLink.addEventListener('click', (event) => {
-            const hashPath = lastVisitedLink.dataset.hashPath;
-            if (!hashPath) {
+        topicSearchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
                 event.preventDefault();
-                return;
+                if (searchMatches.length > 0) {
+                    navigateByHashPath(searchMatches[0].hashPath);
+                }
+            } else if (event.key === 'Escape') {
+                hideSearchResults();
+                topicSearchInput.blur();
             }
-            event.preventDefault();
-            navigateByHashPath(hashPath);
         });
     }
 
-    updateLearningProgress();
-    updateLastVisitedLink();
+    if (breadcrumbSearchForm) {
+        breadcrumbSearchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (searchMatches.length > 0) {
+                navigateByHashPath(searchMatches[0].hashPath);
+            }
+        });
+    }
+
+    if (searchResults) {
+        searchResults.addEventListener('click', (event) => {
+            const button = event.target.closest('.search-result-item');
+            if (!button) return;
+            navigateByHashPath(button.dataset.hashPath || '');
+        });
+    }
 
     // Seite beim Laden aus URL-Hash wiederherstellen
     const wasRestored = restoreFromHash();
@@ -1591,7 +1559,12 @@ document.addEventListener('DOMContentLoaded', function() {
         navigateTo('home');
     }
 
-    updateHomeToolbarVisibility();
+    document.addEventListener('click', (event) => {
+        const insideSearch = event.target.closest('.breadcrumb-search') || event.target.closest('#search-results');
+        if (!insideSearch) {
+            hideSearchResults();
+        }
+    });
 
     // Smooth scroll behavior for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
