@@ -128,6 +128,36 @@
                 </p>
             </div>
 
+            <section class="home-toolbar">
+                <div class="toolbar-card toolbar-search">
+                    <label class="toolbar-label" for="topic-search">Thema suchen</label>
+                    <div class="search-input-wrap">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input
+                            id="topic-search"
+                            class="topic-search-input"
+                            type="search"
+                            placeholder="z. B. Kettenregel, Binomialverteilung ..."
+                            autocomplete="off"
+                        >
+                    </div>
+                    <p class="toolbar-meta" id="search-result-count">3 von 3 Themen sichtbar</p>
+                </div>
+
+                <div class="toolbar-card toolbar-progress">
+                    <p class="toolbar-label">Lernfortschritt</p>
+                    <p class="progress-text" id="learning-progress-text">0 / 0 Themen besucht</p>
+                    <div class="progress-track" aria-hidden="true">
+                        <div class="progress-fill" id="learning-progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="toolbar-card toolbar-last">
+                    <p class="toolbar-label">Zuletzt besucht</p>
+                    <a href="#" class="last-visited-link" id="last-visited-link">Noch kein Thema geöffnet</a>
+                </div>
+            </section>
+
             <!-- Topics Grid -->
             <div class="topics-grid" id="topics-grid">
                 <!-- Analysis -->
@@ -191,12 +221,6 @@
                 <p id="expanded-description"></p>
             </div>
 
-            <!-- Progress Dots -->
-            <div class="progress-dots">
-                <div class="progress-dot active"></div>
-                <div class="progress-dot"></div>
-                <div class="progress-dot"></div>
-            </div>
         </div>
 
         <!-- Right Sidebar: Formula Cheatsheet -->

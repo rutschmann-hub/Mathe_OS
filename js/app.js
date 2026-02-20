@@ -2,6 +2,10 @@
 let currentLevel = 'home';
 let expandedCard = null;
 let navigationHistory = [];
+let homeSearchQuery = '';
+
+const VISITED_UNITS_KEY = 'matheos_visited_units_v1';
+const LAST_VISITED_KEY = 'matheos_last_visited_v1';
 
 // Topic data structure
 const topicData = {
@@ -427,6 +431,193 @@ const topicData = {
         ]
     }
 };
+
+const homeTopicCards = [
+    {
+        key: 'analysis',
+        icon: 'fas fa-chart-line',
+        title: 'Analysis',
+        description: 'Differentialrechnung, Integralrechnung und Kurvendiskussion. Von Grenzwerten bis zu komplexen Funktionsuntersuchungen.',
+        countLabel: '4 Bereiche'
+    },
+    {
+        key: 'geometrie',
+        icon: 'fas fa-cube',
+        title: 'Analytische Geometrie',
+        description: 'Vektoren, Geraden und Ebenen im Raum. Mathematische Beschreibung geometrischer Strukturen.',
+        countLabel: '3 Bereiche'
+    },
+    {
+        key: 'stochastik',
+        icon: 'fas fa-dice',
+        title: 'Stochastik',
+        description: 'Wahrscheinlichkeitsrechnung, Verteilungen und Hypothesentests. Vom Zufall zur statistischen Sicherheit.',
+        countLabel: '3 Bereiche'
+    }
+];
+
+const totalLearningUnits = Object.values(topicData).reduce((total, topic) => {
+    return total + topic.subtopics.reduce((innerTotal, subtopic) => {
+        if (Array.isArray(subtopic.subtopics) && subtopic.subtopics.length > 0) {
+            return innerTotal + subtopic.subtopics.length;
+        }
+        return innerTotal + 1;
+    }, 0);
+}, 0);
+
+function getVisitedUnits() {
+    try {
+        const raw = localStorage.getItem(VISITED_UNITS_KEY);
+        if (!raw) return new Set();
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed);
+    } catch (error) {
+        return new Set();
+    }
+}
+
+function saveVisitedUnits(unitsSet) {
+    try {
+        localStorage.setItem(VISITED_UNITS_KEY, JSON.stringify([...unitsSet]));
+    } catch (error) {
+        // Ignore storage errors silently
+    }
+}
+
+function markUnitVisited(topic, subtopic, detailTopic) {
+    if (!topic || !subtopic || !detailTopic) return;
+    const units = getVisitedUnits();
+    units.add(`${topic}::${subtopic}::${detailTopic}`);
+    saveVisitedUnits(units);
+}
+
+function updateLearningProgress() {
+    const progressText = document.getElementById('learning-progress-text');
+    const progressFill = document.getElementById('learning-progress-fill');
+    if (!progressText || !progressFill) return;
+
+    const visitedCount = getVisitedUnits().size;
+    const total = totalLearningUnits || 1;
+    const percentage = Math.min(100, Math.round((visitedCount / total) * 100));
+
+    progressText.textContent = `${visitedCount} / ${totalLearningUnits} Themen besucht`;
+    progressFill.style.width = `${percentage}%`;
+}
+
+function saveLastVisited(label, hashPath) {
+    if (!label || !hashPath) return;
+    try {
+        localStorage.setItem(LAST_VISITED_KEY, JSON.stringify({ label, hashPath }));
+    } catch (error) {
+        // Ignore storage errors silently
+    }
+}
+
+function getLastVisited() {
+    try {
+        const raw = localStorage.getItem(LAST_VISITED_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed.label !== 'string' || typeof parsed.hashPath !== 'string') {
+            return null;
+        }
+        return parsed;
+    } catch (error) {
+        return null;
+    }
+}
+
+function updateLastVisitedLink() {
+    const lastVisitedLink = document.getElementById('last-visited-link');
+    if (!lastVisitedLink) return;
+
+    const lastVisited = getLastVisited();
+    if (!lastVisited) {
+        lastVisitedLink.textContent = 'Noch kein Thema geöffnet';
+        lastVisitedLink.dataset.hashPath = '';
+        lastVisitedLink.classList.add('disabled');
+        return;
+    }
+
+    lastVisitedLink.textContent = lastVisited.label;
+    lastVisitedLink.dataset.hashPath = lastVisited.hashPath;
+    lastVisitedLink.classList.remove('disabled');
+}
+
+function updateSearchResultCount(visibleCount, totalCount) {
+    const searchResultCount = document.getElementById('search-result-count');
+    if (!searchResultCount) return;
+    searchResultCount.textContent = `${visibleCount} von ${totalCount} Themen sichtbar`;
+}
+
+function updateHomeToolbarVisibility() {
+    const homeToolbar = document.querySelector('.home-toolbar');
+    if (!homeToolbar) return;
+    homeToolbar.style.display = currentLevel === 'home' ? 'grid' : 'none';
+}
+
+function renderHomeTopicCards() {
+    const topicsGrid = document.getElementById('topics-grid');
+    if (!topicsGrid) return;
+
+    const search = homeSearchQuery.trim().toLowerCase();
+    const filteredCards = homeTopicCards.filter((card) => {
+        if (!search) return true;
+        const haystack = `${card.title} ${card.description}`.toLowerCase();
+        return haystack.includes(search);
+    });
+
+    updateSearchResultCount(filteredCards.length, homeTopicCards.length);
+
+    if (filteredCards.length === 0) {
+        topicsGrid.innerHTML = `
+            <div class="topic-card empty-search-card">
+                <div class="topic-icon"><i class="fas fa-search-minus"></i></div>
+                <h3>Kein Treffer</h3>
+                <p>Versuche einen allgemeineren Suchbegriff wie „Analysis“ oder „Wahrscheinlichkeit“.</p>
+            </div>
+        `;
+        return;
+    }
+
+    topicsGrid.innerHTML = filteredCards.map((card) => `
+        <div class="topic-card" onclick="expandTopic('${card.key}', this)">
+            <div class="topic-icon">
+                <i class="${card.icon}"></i>
+            </div>
+            <h3>${card.title}</h3>
+            <p>${card.description}</p>
+            <div class="topic-meta">
+                <span class="topic-count">
+                    <i class="fas fa-layer-group"></i>
+                    ${card.countLabel}
+                </span>
+                <span class="explore-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function navigateByHashPath(hashPath) {
+    if (!hashPath) return;
+
+    const parts = decodeURIComponent(hashPath).split('/');
+    const topic = parts[0];
+    const subtopic = parts[1];
+    const detail = parts[2];
+
+    if (detail && topic && subtopic) {
+        navigateTo('subtopic', topic, subtopic);
+        showDetailContent(topic, subtopic, detail);
+    } else if (subtopic && topic) {
+        navigateTo('subtopic', topic, subtopic);
+    } else if (topic && topicData[topic]) {
+        navigateTo('topic', topic);
+    }
+}
 
 function updateSidebars(level, topic = null, subtopic = null) {
     updateFormulaCheatsheet(level, topic, subtopic);
@@ -1010,6 +1201,7 @@ function navigateTo(level, topic = null, subtopic = null, detail = null) {
         updateTopicNav(null);
         updateSidebars('home');
         showMainTopics();
+        saveLastVisited('Startseite', '');
     } else if (level === 'topic' && topic) {
         updateBreadcrumb([
             { name: 'Startseite', level: 'home' },
@@ -1018,6 +1210,7 @@ function navigateTo(level, topic = null, subtopic = null, detail = null) {
         updateTopicNav(topic);
         updateSidebars('topic', topic);
         showTopicDetails(topic);
+        saveLastVisited(topicData[topic].title, topic);
     } else if (level === 'subtopic' && topic && subtopic) {
         updateBreadcrumb([
             { name: 'Startseite', level: 'home' },
@@ -1027,26 +1220,18 @@ function navigateTo(level, topic = null, subtopic = null, detail = null) {
         updateTopicNav(topic);
         updateSidebars('subtopic_nav', topic, subtopic);
         showSubtopicDetails(topic, subtopic);
+        saveLastVisited(`${topicData[topic].title} > ${subtopic}`, `${topic}/${encodeURIComponent(subtopic)}`);
     }
+
+    updateLastVisitedLink();
+    updateHomeToolbarVisibility();
 }
 
 function restoreFromHash() {
     const hash = decodeURIComponent(window.location.hash.replace('#', ''));
-    if (!hash) return;
-
-    const parts = hash.split('/');
-    const topic = parts[0];
-    const subtopic = parts[1];
-    const detail = parts[2];
-
-    if (detail && topic && subtopic) {
-        navigateTo('subtopic', topic, subtopic);
-        showDetailContent(topic, subtopic, detail);
-    } else if (subtopic && topic) {
-        navigateTo('subtopic', topic, subtopic);
-    } else if (topic && topicData[topic]) {
-        navigateTo('topic', topic);
-    }
+    if (!hash) return false;
+    navigateByHashPath(hash);
+    return true;
 }
 
 function updateTopicNav(activeTopic) {
@@ -1111,61 +1296,8 @@ function showMainTopics() {
     const expandedContent = document.getElementById('expanded-content');
     expandedContent.classList.remove('show');
     expandedCard = null;
-    
-    // Show main topic cards
-    const topicsGrid = document.getElementById('topics-grid');
-    topicsGrid.innerHTML = `
-        <div class="topic-card" onclick="expandTopic('analysis', this)">
-            <div class="topic-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <h3>Analysis</h3>
-            <p>Differentialrechnung, Integralrechnung und Kurvendiskussion. Von Grenzwerten bis zu komplexen Funktionsuntersuchungen.</p>
-            <div class="topic-meta">
-                <span class="topic-count">
-                    <i class="fas fa-layer-group"></i>
-                    4 Bereiche
-                </span>
-                <span class="explore-arrow">
-                    <i class="fas fa-arrow-right"></i>
-                </span>
-            </div>
-        </div>
 
-        <div class="topic-card" onclick="expandTopic('geometrie', this)">
-            <div class="topic-icon">
-                <i class="fas fa-cube"></i>
-            </div>
-            <h3>Analytische Geometrie</h3>
-            <p>Vektoren, Geraden und Ebenen im Raum. Mathematische Beschreibung geometrischer Strukturen.</p>
-            <div class="topic-meta">
-                <span class="topic-count">
-                    <i class="fas fa-layer-group"></i>
-                    3 Bereiche
-                </span>
-                <span class="explore-arrow">
-                    <i class="fas fa-arrow-right"></i>
-                </span>
-            </div>
-        </div>
-
-        <div class="topic-card" onclick="expandTopic('stochastik', this)">
-            <div class="topic-icon">
-                <i class="fas fa-dice"></i>
-            </div>
-            <h3>Stochastik</h3>
-            <p>Wahrscheinlichkeitsrechnung, Verteilungen und Hypothesentests. Vom Zufall zur statistischen Sicherheit.</p>
-            <div class="topic-meta">
-                <span class="topic-count">
-                    <i class="fas fa-layer-group"></i>
-                    3 Bereiche
-                </span>
-                <span class="explore-arrow">
-                    <i class="fas fa-arrow-right"></i>
-                </span>
-            </div>
-        </div>
-    `;
+    renderHomeTopicCards();
 }
 
 function showTopicDetails(topic) {
@@ -1185,7 +1317,7 @@ function showTopicDetails(topic) {
             <div class="topic-meta">
                 <span class="topic-count">
                     <i class="fas fa-book"></i>
-                    Inhalte folgen
+                    ${Array.isArray(subtopic.subtopics) ? `${subtopic.subtopics.length} Unterthemen` : '1 Unterthema'}
                 </span>
                 <span class="explore-arrow">
                     <i class="fas fa-arrow-right"></i>
@@ -1193,12 +1325,10 @@ function showTopicDetails(topic) {
             </div>
         </div>
     `).join('');
-    
-    // Show topic description in expanded content
+
+    // Kein blauer Erklärungskasten auf der Themenebene
     const expandedContent = document.getElementById('expanded-content');
-    document.getElementById('expanded-title').textContent = data.title;
-    document.getElementById('expanded-description').textContent = data.description;
-    expandedContent.classList.add('show');
+    expandedContent.classList.remove('show');
 }
 
 function expandTopic(topicKey, cardElement) {
@@ -1234,7 +1364,7 @@ function showSubtopicDetails(topic, subtopic) {
                 <div class="topic-meta">
                     <span class="topic-count">
                         <i class="fas fa-book-open"></i>
-                        Inhalte folgen
+                        Lerninhalt
                     </span>
                     <span class="explore-arrow">
                         <i class="fas fa-arrow-right"></i>
@@ -1266,6 +1396,11 @@ function showDetailContent(topic, subtopic, detailTopic) {
         { name: subtopic, level: 'subtopic', topic: topic, subtopic: subtopic },
         { name: detailTopic, level: 'detail', topic: topic, subtopic: subtopic, detail: detailTopic }
     ]);
+
+    markUnitVisited(topic, subtopic, detailTopic);
+    updateLearningProgress();
+    saveLastVisited(`${topicData[topic].title} > ${subtopic} > ${detailTopic}`, `${topic}/${encodeURIComponent(subtopic)}/${encodeURIComponent(detailTopic)}`);
+    updateLastVisitedLink();
 
     // Spezifische Unterseiten
     if (topic === 'analysis' && detailTopic === 'Ableitung und Ableitungsregeln') {
@@ -1424,21 +1559,51 @@ function showAbleitungsseite() {
 
 // Progress dots functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Seite beim Laden aus URL-Hash wiederherstellen
-    restoreFromHash();
-
-    document.querySelectorAll('.progress-dot').forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            document.querySelectorAll('.progress-dot').forEach(d => d.classList.remove('active'));
-            dot.classList.add('active');
+    const topicSearchInput = document.getElementById('topic-search');
+    if (topicSearchInput) {
+        topicSearchInput.addEventListener('input', (event) => {
+            homeSearchQuery = event.target.value || '';
+            if (currentLevel === 'home') {
+                renderHomeTopicCards();
+            }
         });
-    });
+    }
+
+    const lastVisitedLink = document.getElementById('last-visited-link');
+    if (lastVisitedLink) {
+        lastVisitedLink.addEventListener('click', (event) => {
+            const hashPath = lastVisitedLink.dataset.hashPath;
+            if (!hashPath) {
+                event.preventDefault();
+                return;
+            }
+            event.preventDefault();
+            navigateByHashPath(hashPath);
+        });
+    }
+
+    updateLearningProgress();
+    updateLastVisitedLink();
+
+    // Seite beim Laden aus URL-Hash wiederherstellen
+    const wasRestored = restoreFromHash();
+    if (!wasRestored) {
+        navigateTo('home');
+    }
+
+    updateHomeToolbarVisibility();
 
     // Smooth scroll behavior for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href === '#') {
+                e.preventDefault();
+                return;
+            }
+
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth' });
             }
