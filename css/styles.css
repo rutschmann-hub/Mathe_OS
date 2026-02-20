@@ -884,6 +884,87 @@ body::before {
 
 }
 
+/* iPad / Tablet optimization */
+@media (min-width: 769px) and (max-width: 1180px) {
+    .topic-nav-container .container {
+        padding: 0 2rem;
+    }
+
+    .topic-nav-layout {
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr;
+        min-height: 0;
+        gap: 0.8rem;
+    }
+
+    .topic-nav-search-wrap {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        width: min(520px, 100%);
+    }
+
+    .topic-nav {
+        justify-content: center;
+        gap: 0.95rem;
+    }
+
+    .topic-nav-item {
+        min-height: 48px;
+        padding: 0.75rem 1.15rem;
+        font-size: 0.95rem;
+    }
+
+    .breadcrumb-container .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    .main-content {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    .topics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+
+    .action-item {
+        min-height: 48px;
+        padding: 0.75rem 0.8rem;
+    }
+
+    .search-results {
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+}
+
+/* Touch devices: avoid sticky hover effects */
+@media (hover: none) and (pointer: coarse) {
+    .topic-card:hover {
+        transform: none;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .topic-card:hover::before {
+        transform: scaleX(0);
+    }
+
+    .topic-nav-item:hover,
+    .action-item:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .topic-nav-item:hover::before {
+        left: -100%;
+    }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 10px;
