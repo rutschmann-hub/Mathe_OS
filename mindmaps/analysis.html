@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analysis Mindmap</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+  :root {
+    --navy: #1a2332;
+    --mustard: #d4a845;
+    --gold: #e6b84a;
+    --cream: #faf8f4;
+    --panel-bg: #fffefb;
+    --text: #2b2f36;
+    --muted: #6f7480;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: radial-gradient(circle at 20% 20%, #f7f2e6 0%, var(--cream) 45%, #f3eee7 100%);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    padding: 16px;
+    color: var(--text);
+  }
+
+  .viewport {
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1120px;
+  }
+
+  .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1100px;
+    height: 820px;
+    transform-origin: top left;
+  }
+
+  svg.lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    border-radius: 14px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .center {
+    width: 165px;
+    height: 165px;
+    border-radius: 50%;
+    border: 3px solid var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    left: 468px;
+    top: 328px;
+    box-shadow: 0 10px 30px rgba(26, 35, 50, 0.25);
+    background: var(--navy);
+    color: #fff;
+    cursor: default;
+  }
+
+  .branch {
+    width: 205px;
+    height: 62px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    border: 2px solid rgba(26, 35, 50, 0.85);
+    box-shadow: 0 4px 14px rgba(26, 35, 50, 0.12);
+    padding: 0 14px;
+    color: var(--navy);
+    background: linear-gradient(180deg, #fffefb 0%, #fff8ea 100%);
+  }
+
+  .branch:hover,
+  .branch.active {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 24px rgba(26, 35, 50, 0.18);
+    border-color: var(--mustard);
+  }
+
+  #b-funk  { left: 55px;  top:  75px; }
+  #b-graph { left: 55px;  top: 368px; }
+  #b-kurv  { left: 55px;  top: 638px; }
+  #b-abl   { left: 840px; top:  75px; }
+  #b-int   { left: 840px; top: 368px; }
+  #b-gleich{ left: 840px; top: 638px; }
+
+  .panel {
+    display: none;
+    opacity: 0;
+    position: absolute;
+    background: var(--panel-bg);
+    border: 1.5px solid #ead9af;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.8;
+    white-space: nowrap;
+    z-index: 30;
+    box-shadow: 0 14px 36px rgba(26, 35, 50, 0.16);
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: var(--text);
+  }
+
+  .branch:hover .panel,
+  .branch.active .panel {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #b-funk   .panel { left: 215px; top: -10px; }
+  #b-graph  .panel { left: 215px; top: -40px; }
+  #b-kurv   .panel { left: 215px; top: -165px; }
+  #b-abl    .panel { right: 215px; top: -10px; text-align: right; }
+  #b-int    .panel { right: 215px; top: -80px; text-align: right; }
+  #b-gleich .panel { right: 215px; top: -120px; text-align: right; }
+
+  .panel-title {
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #9a741e;
+    border-bottom: 2px solid #f2e7cb;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 8px; }
+    .panel { font-size: 12px; line-height: 1.65; }
+  }
+</style>
+</head>
+<body>
+<div class="viewport" id="viewport">
+  <div class="canvas" id="canvas">
+    <svg class="lines" id="svg-lines"></svg>
+
+    <div class="node center" id="center">ANALYSIS</div>
+
+    <div class="node branch" id="b-funk">
+      Funktionen
+      <div class="panel">
+        <div class="panel-title">Funktionen</div>
+        ganzrationale Funktionen<br>
+        Potenzfunktionen<br>
+        Exponentialfunktionen<br>
+        trigonometrische Funktionen<br>
+        gebrochen-rationale Funktionen<br>
+        Logarithmusfunktionen<br>
+        Wurzelfunktionen<br>
+        Umkehrfunktionen<br>
+        Funktionen aufstellen
+      </div>
+    </div>
+
+    <div class="node branch" id="b-graph">
+      Graphen
+      <div class="panel">
+        <div class="panel-title">Graphen</div>
+        Verschiebung<br>
+        Streckung<br>
+        Spiegelung<br>
+        charakteristische Eigenschaften
+      </div>
+    </div>
+
+    <div class="node branch" id="b-kurv">
+      Kurven untersuchen
+      <div class="panel">
+        <div class="panel-title">Kurven untersuchen</div>
+        Nullstellen · Achsenschnittpunkte<br>
+        Symmetrie · Extrempunkte<br>
+        Wendepunkte · Krümmungsverhalten<br>
+        Monotonie · Tangente / Normale<br>
+        Definitionsbereich · Wertemenge<br>
+        Asymptoten (senkrecht / waagerecht)<br>
+        Extremwertprobleme · Funktionenscharen
+      </div>
+    </div>
+
+    <div class="node branch" id="b-abl">
+      Ableiten
+      <div class="panel">
+        <div class="panel-title">Ableiten</div>
+        Summen- und Faktorregel<br>
+        Produktregel<br>
+        Kettenregel<br>
+        Potenzregel<br>
+        Änderungsrate<br>
+        Tangentensteigung<br>
+        grafisch Ableiten
+      </div>
+    </div>
+
+    <div class="node branch" id="b-int">
+      Integrieren
+      <div class="panel">
+        <div class="panel-title">Integrieren</div>
+        Integralfunktion<br>
+        Stammfunktionen bilden<br>
+        Lineare Substitution<br>
+        Hauptsatz der Differential- und<br>Integralrechnung<br>
+        Flächenberechnung · Summenbildung<br>
+        rekonstruierter Bestand<br>
+        Volumen von Rotationskörpern
+      </div>
+    </div>
+
+    <div class="node branch" id="b-gleich">
+      Gleichungen
+      <div class="panel">
+        <div class="panel-title">Gleichungen</div>
+        quadratische Gleichungen<br>
+        <span style="padding-left:14px;font-size:14px;">↳ pq- / abc-Formel</span><br>
+        Bruchgleichungen<br>
+        Potenzgleichungen<br>
+        Exponentialgleichungen<br>
+        trigonometrische Gleichungen<br>
+        <br>
+        <span style="font-weight:700">Methoden:</span><br>
+        Ausklammern · Nullprodukt · Substitution
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const BASE_W = 1100;
+  const BASE_H = 820;
+  const viewport = document.getElementById('viewport');
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('svg-lines');
+
+  function fitCanvas() {
+    const available = Math.max(320, window.innerWidth - 32);
+    const scale = Math.min(1, available / BASE_W);
+    canvas.style.transform = `scale(${scale})`;
+    viewport.style.width = `${BASE_W * scale}px`;
+    viewport.style.height = `${BASE_H * scale}px`;
+  }
+
+  function centerOf(el) {
+    return { x: el.offsetLeft + el.offsetWidth / 2, y: el.offsetTop + el.offsetHeight / 2 };
+  }
+
+  function edgePoint(el, c) {
+    const cx = el.offsetLeft + el.offsetWidth / 2;
+    const cy = el.offsetTop + el.offsetHeight / 2;
+    return { x: cx < c.x ? cx + el.offsetWidth / 2 : cx - el.offsetWidth / 2, y: cy };
+  }
+
+  function drawCurve(x1, y1, x2, y2) {
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#1a2332');
+    path.setAttribute('stroke-width', '2.5');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('opacity', '0.5');
+    path.setAttribute('marker-end', 'url(#arrow)');
+    svg.appendChild(path);
+  }
+
+  function drawLines() {
+    svg.innerHTML = '';
+    svg.setAttribute('viewBox', `0 0 ${BASE_W} ${BASE_H}`);
+
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = `
+      <marker id="arrow" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#1a2332" opacity="0.55"/>
+      </marker>`;
+    svg.appendChild(defs);
+
+    const center = document.getElementById('center');
+    const c = centerOf(center);
+    const lx = center.offsetLeft;
+    const rx = lx + center.offsetWidth;
+
+    ['b-funk', 'b-graph', 'b-kurv', 'b-abl', 'b-int', 'b-gleich'].forEach((id) => {
+      const el = document.getElementById(id);
+      const b = centerOf(el);
+      const edge = edgePoint(el, c);
+      const sx = b.x < c.x ? lx : rx;
+      drawCurve(sx, c.y, edge.x, b.y);
+    });
+  }
+
+  function wireBranchToggle() {
+    const branches = [...document.querySelectorAll('.branch')];
+    branches.forEach((branch) => {
+      branch.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const isActive = branch.classList.contains('active');
+        branches.forEach((b) => b.classList.remove('active'));
+        if (!isActive) branch.classList.add('active');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      branches.forEach((b) => b.classList.remove('active'));
+    });
+  }
+
+  fitCanvas();
+  drawLines();
+  wireBranchToggle();
+
+  window.addEventListener('resize', () => {
+    fitCanvas();
+    drawLines();
+  });
+})();
+</script>
+</body>
+</html>

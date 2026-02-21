@@ -100,39 +100,42 @@
     <main class="main-content">
         <!-- Left Sidebar: Table of Contents / Quick Actions -->
         <aside class="sidebar-left">
-            <div class="quick-actions">
-                <h3>Schnellzugriff</h3>
-                
-                <div class="action-item" onclick="navigateTo('topic', 'analysis')">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analysis</span>
+            <div class="control-panel">
+                <div class="panel-section">
+                    <p class="panel-title">Werkzeuge</p>
+                    <div class="quick-link-grid">
+                        <button class="quick-link-btn" onclick="navigateTo('home')">
+                            <i class="fas fa-home"></i>
+                            <span>Startseite</span>
+                        </button>
+                        <a
+                            class="quick-link-btn"
+                            href="https://www.geogebra.org/scientific?lang=de"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <i class="fas fa-calculator"></i>
+                            <span>Rechner</span>
+                        </a>
+                    </div>
                 </div>
-                
-                <div class="action-item" onclick="navigateTo('topic', 'geometrie')">
-                    <i class="fas fa-cube"></i>
-                    <span>Geometrie</span>
-                </div>
-                
-                <div class="action-item" onclick="navigateTo('topic', 'stochastik')">
-                    <i class="fas fa-dice"></i>
-                    <span>Stochastik</span>
-                </div>
-                
-                <div class="divider"></div>
-                
-                <a
-                    class="action-item"
-                    href="https://www.geogebra.org/scientific?lang=de"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <i class="fas fa-calculator"></i>
-                    <span>Rechner</span>
-                </a>
-                
-                <div class="action-item">
-                    <i class="fas fa-bookmark"></i>
-                    <span>Favoriten</span>
+
+                <div class="panel-section">
+                    <p class="panel-title">Mindmaps</p>
+                    <div class="quick-link-grid">
+                        <a class="quick-link-btn" href="mindmaps/analysis.html" target="_blank" rel="noopener">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>Analysis</span>
+                        </a>
+                        <a class="quick-link-btn" href="mindmaps/geometrie.html" target="_blank" rel="noopener">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>Geometrie</span>
+                        </a>
+                        <a class="quick-link-btn" href="mindmaps/stochastik.html" target="_blank" rel="noopener">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>Stochastik</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -206,7 +209,7 @@
             <!-- Expanded Content Area -->
             <div class="expanded-content" id="expanded-content">
                 <h2 id="expanded-title"></h2>
-                <p id="expanded-description"></p>
+                <div id="expanded-description"></div>
             </div>
 
         </div>

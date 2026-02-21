@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stochastik Mindmap</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+  :root {
+    --navy: #1a2332;
+    --mustard: #d4a845;
+    --gold: #e6b84a;
+    --cream: #faf8f4;
+    --panel-bg: #fffefb;
+    --text: #2b2f36;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: radial-gradient(circle at 20% 20%, #f7f2e6 0%, var(--cream) 45%, #f3eee7 100%);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    padding: 16px;
+    color: var(--text);
+  }
+
+  .viewport {
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1220px;
+  }
+
+  .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1200px;
+    height: 900px;
+    transform-origin: top left;
+  }
+
+  svg.lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    border-radius: 14px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .center {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 3px solid var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    left: 510px;
+    top: 360px;
+    box-shadow: 0 10px 30px rgba(26, 35, 50, 0.25);
+    background: var(--navy);
+    color: #fff;
+    cursor: default;
+  }
+
+  .branch {
+    width: 210px;
+    height: 62px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    border: 2px solid rgba(26, 35, 50, 0.85);
+    box-shadow: 0 4px 14px rgba(26, 35, 50, 0.12);
+    padding: 0 14px;
+    color: var(--navy);
+    background: linear-gradient(180deg, #fffefb 0%, #fff8ea 100%);
+  }
+
+  .branch:hover,
+  .branch.active {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 24px rgba(26, 35, 50, 0.18);
+    border-color: var(--mustard);
+  }
+
+  #b-baum      { left: 830px; top:  80px; }
+  #b-hypo      { left: 830px; top: 490px; }
+
+  #b-binom     { left: 160px; top:  80px; }
+  #b-normal    { left: 160px; top: 370px; }
+  #b-kombi     { left: 160px; top: 660px; }
+
+  .panel {
+    display: none;
+    opacity: 0;
+    position: absolute;
+    background: var(--panel-bg);
+    border: 1.5px solid #ead9af;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.8;
+    white-space: nowrap;
+    z-index: 30;
+    box-shadow: 0 14px 36px rgba(26, 35, 50, 0.16);
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: var(--text);
+  }
+
+  .branch:hover .panel,
+  .branch.active .panel {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #b-baum   .panel { left: 220px; top: -10px; }
+  #b-hypo   .panel { left: 220px; top: -120px; }
+
+  #b-binom  .panel { right: 220px; top: -10px; text-align: right; }
+  #b-normal .panel { right: 220px; top: -10px; text-align: right; }
+  #b-kombi  .panel { right: 220px; top: -60px; text-align: right; }
+
+  .panel-title {
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #9a741e;
+    border-bottom: 2px solid #f2e7cb;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 8px; }
+    .panel { font-size: 12px; line-height: 1.65; }
+  }
+</style>
+</head>
+<body>
+<div class="viewport" id="viewport">
+  <div class="canvas" id="canvas">
+    <svg class="lines" id="svg-lines"></svg>
+
+    <div class="node center" id="center">STOCHASTIK</div>
+
+    <div class="node branch" id="b-baum">
+      Baumdiagramme &<br>Vierfeldertafeln
+      <div class="panel">
+        <div class="panel-title">Baumdiagramme & Vierfeldertafeln</div>
+        Ereignis · Gegenereignis<br>
+        Ziehen mit Zurücklegen<br>
+        Ziehen ohne Zurücklegen<br>
+        1. Pfadregel<br>
+        2. Pfadregel<br>
+        bedingte Wahrscheinlichkeit<br>
+        stochastische Unabhängigkeit
+      </div>
+    </div>
+
+    <div class="node branch" id="b-hypo">
+      Hypothesentest
+      <div class="panel">
+        <div class="panel-title">Hypothesentest</div>
+        Nullhypothese formulieren<br>
+        Alternativhypothese<br>
+        Linksseitiger Test<br>
+        Rechtsseitiger Test<br>
+        Zweiseitiger Test<br>
+        Ablehnungsbereich<br>
+        Entscheidungsregel<br>
+        Irrtumswahrscheinlichkeit<br>
+        Signifikanzniveau<br>
+        Fehler 1. Art · Fehler 2. Art
+      </div>
+    </div>
+
+    <div class="node branch" id="b-binom">
+      Binomialverteilung
+      <div class="panel">
+        <div class="panel-title">Binomialverteilung</div>
+        Bernoulliexperiment<br>
+        Bernoullikette<br>
+        Bernoulliformel<br>
+        Histogramm<br>
+        Erwartungswert<br>
+        Standardabweichung<br>
+        Varianz
+      </div>
+    </div>
+
+    <div class="node branch" id="b-normal">
+      Normalverteilung
+      <div class="panel">
+        <div class="panel-title">Normalverteilung</div>
+        Dichtefunktion<br>
+        Verteilungsfunktion<br>
+        Glockenkurve<br>
+        Erwartungswert<br>
+        Standardabweichung
+      </div>
+    </div>
+
+    <div class="node branch" id="b-kombi">
+      Kombinatorik
+      <div class="panel">
+        <div class="panel-title">Kombinatorik</div>
+        Ziehen mit und ohne Zurücklegen<br>
+        Anordnungen mit und ohne<br>Berücksichtigung der Reihenfolge
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const BASE_W = 1200;
+  const BASE_H = 900;
+  const viewport = document.getElementById('viewport');
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('svg-lines');
+
+  function fitCanvas() {
+    const available = Math.max(320, window.innerWidth - 32);
+    const scale = Math.min(1, available / BASE_W);
+    canvas.style.transform = `scale(${scale})`;
+    viewport.style.width = `${BASE_W * scale}px`;
+    viewport.style.height = `${BASE_H * scale}px`;
+  }
+
+  function centerOf(el) {
+    return { x: el.offsetLeft + el.offsetWidth / 2, y: el.offsetTop + el.offsetHeight / 2 };
+  }
+
+  function edgePoint(el, c) {
+    const cx = el.offsetLeft + el.offsetWidth / 2;
+    const cy = el.offsetTop + el.offsetHeight / 2;
+    return { x: cx < c.x ? cx + el.offsetWidth / 2 : cx - el.offsetWidth / 2, y: cy };
+  }
+
+  function drawCurve(x1, y1, x2, y2) {
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#1a2332');
+    path.setAttribute('stroke-width', '2.5');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('opacity', '0.5');
+    path.setAttribute('marker-end', 'url(#arrow)');
+    svg.appendChild(path);
+  }
+
+  function drawLines() {
+    svg.innerHTML = '';
+    svg.setAttribute('viewBox', `0 0 ${BASE_W} ${BASE_H}`);
+
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = `
+      <marker id="arrow" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#1a2332" opacity="0.55"/>
+      </marker>`;
+    svg.appendChild(defs);
+
+    const center = document.getElementById('center');
+    const c = centerOf(center);
+    const lx = center.offsetLeft;
+    const rx = lx + center.offsetWidth;
+
+    ['b-baum', 'b-hypo', 'b-binom', 'b-normal', 'b-kombi'].forEach((id) => {
+      const el = document.getElementById(id);
+      const b = centerOf(el);
+      const edge = edgePoint(el, c);
+      const sx = b.x < c.x ? lx : rx;
+      drawCurve(sx, c.y, edge.x, b.y);
+    });
+  }
+
+  function wireBranchToggle() {
+    const branches = [...document.querySelectorAll('.branch')];
+    branches.forEach((branch) => {
+      branch.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const isActive = branch.classList.contains('active');
+        branches.forEach((b) => b.classList.remove('active'));
+        if (!isActive) branch.classList.add('active');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      branches.forEach((b) => b.classList.remove('active'));
+    });
+  }
+
+  fitCanvas();
+  drawLines();
+  wireBranchToggle();
+
+  window.addEventListener('resize', () => {
+    fitCanvas();
+    drawLines();
+  });
+})();
+</script>
+</body>
+</html>
