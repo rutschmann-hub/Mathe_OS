@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gesamt-Mindmap Mathematik</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap');
+
+  :root {
+    --mustard: #d4a845;
+    --mustard-strong: #c9982f;
+    --gold-soft: #f7e5b6;
+    --gold-bg: #fff7e6;
+    --cream: #fffaf0;
+    --text: #2f2a1f;
+    --muted: #6c6452;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    padding: 14px;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 14% 18%, rgba(212, 168, 69, 0.26) 0%, rgba(212, 168, 69, 0) 42%),
+      radial-gradient(circle at 86% 82%, rgba(212, 168, 69, 0.2) 0%, rgba(212, 168, 69, 0) 42%),
+      var(--cream);
+  }
+
+  .viewport {
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1320px;
+  }
+
+  .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1300px;
+    height: 860px;
+    transform-origin: top left;
+  }
+
+  svg.lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .node {
+    position: absolute;
+    border-radius: 16px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .center {
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    border: 3px solid var(--mustard-strong);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    left: 545px;
+    top: 325px;
+    color: #2f260f;
+    background: radial-gradient(circle at 30% 24%, #ffefc6 0%, #f2cd77 62%, #d8ad4a 100%);
+    box-shadow: 0 14px 34px rgba(201, 152, 47, 0.34);
+    cursor: default;
+  }
+
+  .branch {
+    width: 240px;
+    height: 70px;
+    font-size: 18px;
+    font-weight: 800;
+    border: 2px solid #ddb867;
+    box-shadow: 0 4px 14px rgba(201, 152, 47, 0.2);
+    padding: 0 14px;
+    color: #3c3020;
+    background: linear-gradient(180deg, #fffef8 0%, var(--gold-soft) 100%);
+  }
+
+  .branch:hover,
+  .branch.active {
+    transform: translateY(-2px) scale(1.03);
+    border-color: var(--mustard-strong);
+    box-shadow: 0 10px 24px rgba(201, 152, 47, 0.34);
+  }
+
+  #b-analysis  { left: 60px; top: 90px; }
+  #b-geometrie { left: 60px; top: 395px; }
+  #b-stoch     { left: 1000px; top: 245px; }
+
+  .panel {
+    display: none;
+    opacity: 0;
+    position: absolute;
+    background: var(--gold-bg);
+    border: 1.5px solid #e3c177;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 12.8px;
+    font-weight: 500;
+    line-height: 1.72;
+    white-space: nowrap;
+    z-index: 30;
+    box-shadow: 0 14px 34px rgba(201, 152, 47, 0.24);
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: #3b3327;
+    text-align: left;
+  }
+
+  .branch:hover .panel,
+  .branch.active .panel {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #b-analysis  .panel { left: 252px; top: -8px; }
+  #b-geometrie .panel { left: 252px; top: -118px; }
+  #b-stoch     .panel { right: 252px; top: -130px; text-align: right; }
+
+  .panel-title {
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+    color: #8a6516;
+    border-bottom: 2px solid #ead4a1;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+
+  .hint {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    font-size: 0.74rem;
+    color: var(--muted);
+    background: rgba(255, 248, 230, 0.9);
+    border: 1px solid #e8d2a3;
+    border-radius: 999px;
+    padding: 0.32rem 0.6rem;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 8px; }
+    .panel { font-size: 12px; line-height: 1.62; }
+    .hint { font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+<div class="viewport" id="viewport">
+  <div class="canvas" id="canvas">
+    <svg class="lines" id="svg-lines"></svg>
+
+    <div class="node center" id="center">MATHE OS</div>
+
+    <button class="node branch" id="b-analysis" type="button">
+      Analysis
+      <div class="panel">
+        <div class="panel-title">Analysis</div>
+        <strong>Funktionen:</strong> ganzrationale, Potenz-, Exponential-, trigonometrische, gebrochen-rationale, Logarithmus-, Wurzelfunktionen, Umkehrfunktionen, Funktionen aufstellen<br>
+        <strong>Graphen:</strong> Verschiebung, Streckung, Spiegelung, charakteristische Eigenschaften<br>
+        <strong>Kurven untersuchen:</strong> Nullstellen, Achsenschnittpunkte, Symmetrie, Extrempunkte, Wendepunkte, Krummungsverhalten, Monotonie, Tangente/Normale, Definitionsbereich, Wertemenge, Asymptoten, Extremwertprobleme, Funktionenscharen<br>
+        <strong>Ableiten:</strong> Summen-/Faktorregel, Produktregel, Kettenregel, Potenzregel, Änderungsrate, Tangentensteigung, grafisch ableiten<br>
+        <strong>Integrieren:</strong> Integralfunktion, Stammfunktionen, lineare Substitution, Hauptsatz, Flächenberechnung, rekonstruierter Bestand, Volumen von Rotationskörpern<br>
+        <strong>Gleichungen:</strong> quadratische (pq/abc), Bruch-, Potenz-, Exponential-, trigonometrische Gleichungen; Methoden: Ausklammern, Nullprodukt, Substitution
+      </div>
+    </button>
+
+    <button class="node branch" id="b-geometrie" type="button">
+      Geometrie
+      <div class="panel">
+        <div class="panel-title">Analytische Geometrie</div>
+        <strong>Vektoren:</strong> Rechnen mit Vektoren, Betrag, Skalarprodukt, Orthogonalität, Winkelberechnung, Flächenberechnung, Normalenvektor<br>
+        <strong>Punkte:</strong> Punkt-Probe, Mittelpunkt, Teilverhältnis<br>
+        <strong>Geraden:</strong> Parametergleichung, Lagebeziehungen (identisch, parallel, Schnittpunkt, windschief), Winkel<br>
+        <strong>Ebenen:</strong> Parameter-/Koordinaten-/Normalenform, HNF, Lagebeziehungen (parallel, Schnittgerade, identisch), Spurpunkte/Spurgerade<br>
+        <strong>LGS:</strong> Gauß-Verfahren, geometrische Interpretation<br>
+        <strong>Abstände:</strong> Punkt-Punkt, Punkt-Gerade, Punkt-Ebene, Gerade-Gerade, Ebene-Ebene<br>
+        <strong>Winkel:</strong> Gerade-Gerade, Gerade-Ebene, Ebene-Ebene<br>
+        <strong>Spiegelungen:</strong> an Punkt, Gerade, Ebene
+      </div>
+    </button>
+
+    <button class="node branch" id="b-stoch" type="button">
+      Stochastik
+      <div class="panel">
+        <div class="panel-title">Stochastik</div>
+        <strong>Baumdiagramme:</strong> Pfadregeln, Gegenwahrscheinlichkeit, bedingte Wahrscheinlichkeit, Unabhängigkeit, Vierfeldertafel, Satz von Bayes<br>
+        <strong>Hypothesentests:</strong> Null-/Alternativhypothese, Fehler 1./2. Art, Signifikanzniveau, Ablehnungsbereich, Entscheidungsregel<br>
+        <strong>Binomialverteilung:</strong> Bernoulli-Kette, Erwartungswert, Standardabweichung, kumulierte Wahrscheinlichkeiten, Sigma-Regeln<br>
+        <strong>Normalverteilung:</strong> Standardisierung, Dichtefunktion, z-Werte, Approximation der Binomialverteilung<br>
+        <strong>Kombinatorik:</strong> Variation/Kombination mit und ohne Wiederholung, Fakultät, Binomialkoeffizient
+      </div>
+    </button>
+  </div>
+</div>
+
+<p class="hint">Tippen/Klicken auf einen Ast für alle Themen pro Bereich</p>
+
+<script>
+(() => {
+  const BASE_W = 1300;
+  const BASE_H = 860;
+
+  const viewport = document.getElementById('viewport');
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('svg-lines');
+
+  function fitCanvas() {
+    const available = Math.max(320, window.innerWidth - 28);
+    const scale = Math.min(1, available / BASE_W);
+    canvas.style.transform = `scale(${scale})`;
+    viewport.style.width = `${BASE_W * scale}px`;
+    viewport.style.height = `${BASE_H * scale}px`;
+  }
+
+  function centerOf(el) {
+    return {
+      x: el.offsetLeft + el.offsetWidth / 2,
+      y: el.offsetTop + el.offsetHeight / 2
+    };
+  }
+
+  function edgePoint(el, c) {
+    const cx = el.offsetLeft + el.offsetWidth / 2;
+    const cy = el.offsetTop + el.offsetHeight / 2;
+    return { x: cx < c.x ? cx + el.offsetWidth / 2 : cx - el.offsetWidth / 2, y: cy };
+  }
+
+  function drawCurve(x1, y1, x2, y2) {
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#c9982f');
+    path.setAttribute('stroke-width', '3');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('opacity', '0.58');
+    path.setAttribute('marker-end', 'url(#arrow)');
+    svg.appendChild(path);
+  }
+
+  function drawLines() {
+    svg.innerHTML = '';
+    svg.setAttribute('viewBox', `0 0 ${BASE_W} ${BASE_H}`);
+
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = `
+      <marker id="arrow" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+        <polygon points="0 0, 7 2.5, 0 5" fill="#c9982f" opacity="0.62"/>
+      </marker>`;
+    svg.appendChild(defs);
+
+    const center = document.getElementById('center');
+    const c = centerOf(center);
+    const lx = center.offsetLeft;
+    const rx = lx + center.offsetWidth;
+
+    ['b-analysis', 'b-geometrie', 'b-stoch'].forEach((id) => {
+      const el = document.getElementById(id);
+      const b = centerOf(el);
+      const edge = edgePoint(el, c);
+      const sx = b.x < c.x ? lx : rx;
+      drawCurve(sx, c.y, edge.x, b.y);
+    });
+  }
+
+  function wireTapPanels() {
+    const branches = [...document.querySelectorAll('.branch')];
+    branches.forEach((branch) => {
+      branch.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const isActive = branch.classList.contains('active');
+        branches.forEach((b) => b.classList.remove('active'));
+        if (!isActive) branch.classList.add('active');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      branches.forEach((b) => b.classList.remove('active'));
+    });
+  }
+
+  fitCanvas();
+  drawLines();
+  wireTapPanels();
+
+  window.addEventListener('resize', () => {
+    fitCanvas();
+    drawLines();
+  });
+})();
+</script>
+</body>
+</html>

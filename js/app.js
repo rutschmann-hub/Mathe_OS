@@ -888,6 +888,12 @@ function showDetailContent(topic, subtopic, detailTopic) {
         return;
     }
 
+    if (topic === 'analysis' && detailTopic === 'Verkettung von Funktionen') {
+        showVerkettungseite();
+        updateFormulaCheatsheet('detail', 'verkettung');
+        return;
+    }
+
     // Standard-Fallback
     const topicsGrid = document.getElementById('topics-grid');
     topicsGrid.innerHTML = '';
@@ -1023,6 +1029,178 @@ function showAbleitungsseite() {
                         <span class="example-label">Beispiel:</span>
                         \\(f(x) = \\sin(x^2)\\)<br>
                         \\(f'(x) = \\cos(x^2) \\cdot 2x\\)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    `;
+
+    if (window.MathJax) {
+        MathJax.typesetPromise([topicsGrid]);
+    }
+}
+
+function showVerkettungseite() {
+    const topicsGrid = document.getElementById('topics-grid');
+    const expandedContent = document.getElementById('expanded-content');
+    expandedContent.classList.remove('show');
+
+    topicsGrid.innerHTML = `
+    <div class="detail-page">
+
+        <!-- Einführung -->
+        <section class="detail-section">
+            <h2 class="detail-heading">Verkettung von Funktionen</h2>
+            <p class="detail-intro">
+                Viele Funktionen lassen sich als Zusammensetzung einfacherer Funktionen verstehen.
+                Die Verkettung (Komposition) von Funktionen beschreibt, wie der Ausgabewert einer Funktion
+                direkt als Eingabewert einer anderen Funktion verwendet wird – ein fundamentales Konzept,
+                das besonders für die Kettenregel in der Differentialrechnung unverzichtbar ist.
+            </p>
+        </section>
+
+        <!-- Definition als Tabelle -->
+        <section class="detail-section">
+            <h3 class="detail-subheading">Definition</h3>
+            <div class="concept-table">
+                <div class="concept-row concept-header">
+                    <div class="concept-cell">Schaubild</div>
+                    <div class="concept-cell">Definition</div>
+                    <div class="concept-cell">Bedeutung im Kontext</div>
+                </div>
+
+                <div class="concept-row">
+                    <div class="concept-cell concept-cell-img">
+                        <svg viewBox="0 0 220 100" width="100%" style="max-height:130px;">
+                            <defs>
+                                <marker id="arr1" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+                                    <path d="M0,0 L0,7 L7,3.5 z" fill="#888"/>
+                                </marker>
+                            </defs>
+                            <rect x="5" y="35" width="38" height="28" rx="6" fill="#f0f4ff" stroke="#2c3e7a" stroke-width="1.5"/>
+                            <text x="24" y="54" text-anchor="middle" font-size="13" fill="#2c3e7a" font-family="monospace" font-weight="bold">x</text>
+                            <line x1="43" y1="49" x2="65" y2="49" stroke="#888" stroke-width="1.5" marker-end="url(#arr1)"/>
+                            <rect x="66" y="29" width="52" height="40" rx="6" fill="#fff8e7" stroke="#c8972a" stroke-width="1.8"/>
+                            <text x="92" y="47" text-anchor="middle" font-size="12" fill="#c8972a" font-family="monospace" font-weight="bold">g(x)</text>
+                            <text x="92" y="61" text-anchor="middle" font-size="9" fill="#c8972a">Innen</text>
+                            <line x1="118" y1="49" x2="140" y2="49" stroke="#888" stroke-width="1.5" marker-end="url(#arr1)"/>
+                            <rect x="141" y="29" width="72" height="40" rx="6" fill="#eaf7f0" stroke="#2a7a5c" stroke-width="1.8"/>
+                            <text x="177" y="47" text-anchor="middle" font-size="11" fill="#2a7a5c" font-family="monospace" font-weight="bold">f(g(x))</text>
+                            <text x="177" y="61" text-anchor="middle" font-size="9" fill="#2a7a5c">Außen</text>
+                            <text x="24" y="88" text-anchor="middle" font-size="9" fill="#999">Eingabe</text>
+                            <text x="177" y="88" text-anchor="middle" font-size="9" fill="#999">Ausgabe</text>
+                        </svg>
+                    </div>
+                    <div class="concept-cell">
+                        <div class="concept-label">Verkettung \\((f \\circ g)\\)</div>
+                        <div class="concept-formula">
+                            \\((f \\circ g)(x) = f(g(x))\\)
+                        </div>
+                    </div>
+                    <div class="concept-cell">
+                        <strong>Hintereinanderausführung</strong> der Funktionen \\(g\\) und \\(f\\)
+                        <br><br>
+                        <span class="concept-note">Zuerst wird \\(g(x)\\) berechnet, dann wird das Ergebnis als Argument in \\(f\\) eingesetzt.</span>
+                    </div>
+                </div>
+
+                <div class="concept-row">
+                    <div class="concept-cell concept-cell-img">
+                        <svg viewBox="0 0 220 105" width="100%" style="max-height:130px;">
+                            <defs>
+                                <marker id="arr2" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+                                    <path d="M0,0 L0,7 L7,3.5 z" fill="#888"/>
+                                </marker>
+                            </defs>
+                            <text x="110" y="22" text-anchor="middle" font-size="16" fill="#2c3e7a" font-family="monospace" font-weight="bold">f( g(x) )</text>
+                            <path d="M 72 26 Q 55 50 68 68" fill="none" stroke="#2a7a5c" stroke-width="1.5" marker-end="url(#arr2)"/>
+                            <text x="42" y="80" text-anchor="middle" font-size="10" fill="#2a7a5c" font-weight="600">Außen-</text>
+                            <text x="42" y="93" text-anchor="middle" font-size="10" fill="#2a7a5c" font-weight="600">funktion</text>
+                            <path d="M 143 26 Q 160 50 147 68" fill="none" stroke="#c8972a" stroke-width="1.5" marker-end="url(#arr2)"/>
+                            <text x="175" y="80" text-anchor="middle" font-size="10" fill="#c8972a" font-weight="600">Innen-</text>
+                            <text x="175" y="93" text-anchor="middle" font-size="10" fill="#c8972a" font-weight="600">funktion</text>
+                        </svg>
+                    </div>
+                    <div class="concept-cell">
+                        <div class="concept-label">Innen- &amp; Außenfunktion</div>
+                        <div class="concept-formula" style="font-size:0.88rem;">
+                            \\(h(x) = f(\\underbrace{g(x)}_{\\text{Innen}})\\)
+                        </div>
+                    </div>
+                    <div class="concept-cell">
+                        <strong>Innenfunktion</strong> \\(u = g(x)\\): wird zuerst ausgewertet
+                        <br><br>
+                        <strong>Außenfunktion</strong> \\(f(u)\\): erhält den Wert von \\(g\\) als Argument
+                        <br><br>
+                        <span class="concept-note">Achtung: \\(f \\circ g \\neq g \\circ f\\) — die Verkettung ist <em>nicht</em> kommutativ!</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Definitionsbereich -->
+        <section class="detail-section">
+            <h3 class="detail-subheading">Definitionsbereich der Verkettung</h3>
+            <div class="concept-table">
+                <div class="concept-row concept-header">
+                    <div class="concept-cell">Bedingung</div>
+                    <div class="concept-cell">Formel</div>
+                    <div class="concept-cell">Hinweis</div>
+                </div>
+                <div class="concept-row">
+                    <div class="concept-cell">
+                        <strong>Definitionsbereich</strong> von \\(f \\circ g\\)
+                    </div>
+                    <div class="concept-cell">
+                        <div class="concept-formula" style="font-size:0.88rem;">
+                            \\(D_{f \\circ g} = \\{\\, x \\in D_g \\mid g(x) \\in D_f \\,\\}\\)
+                        </div>
+                    </div>
+                    <div class="concept-cell">
+                        <span class="concept-note">Der Wertebereich von \\(g\\) muss im Definitionsbereich von \\(f\\) liegen — sonst ist die Verkettung an dieser Stelle nicht definiert.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Beispiele -->
+        <section class="detail-section">
+            <h3 class="detail-subheading">Beispiele</h3>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-card-title"><i class="fas fa-star"></i> Einfaches Beispiel</div>
+                    <div class="rule-card-formula" style="font-size:0.85rem;">
+                        \\(f(x) = x^2,\\quad g(x) = 3x+1\\)
+                    </div>
+                    <div class="rule-card-example">
+                        \\((f \\circ g)(x) = f(g(x))\\)<br>
+                        \\(= f(3x+1) = (3x+1)^2\\)<br>
+                        \\(= 9x^2 + 6x + 1\\)
+                    </div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-card-title"><i class="fas fa-link"></i> Mit Trigonometrie</div>
+                    <div class="rule-card-formula" style="font-size:0.85rem;">
+                        \\(f(x) = \\sin(x),\\quad g(x) = x^2\\)
+                    </div>
+                    <div class="rule-card-example">
+                        \\((f \\circ g)(x) = \\sin(x^2)\\)
+                        <br><br>
+                        <span class="example-label">Innen: \\(x^2\\) &ensp;|&ensp; Außen: \\(\\sin\\)</span>
+                    </div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-card-title"><i class="fas fa-exchange-alt"></i> Reihenfolge beachten</div>
+                    <div class="rule-card-formula" style="font-size:0.85rem;">
+                        \\(f(x) = \\sqrt{x},\\quad g(x) = x^2+1\\)
+                    </div>
+                    <div class="rule-card-example">
+                        \\((f \\circ g)(x) = \\sqrt{x^2+1}\\)<br>
+                        \\((g \\circ f)(x) = (\\sqrt{x})^2+1 = x+1\\)
+                        <br><br>
+                        <span class="example-label">\\(\\Rightarrow\\; f\\circ g \\neq g\\circ f\\)</span>
                     </div>
                 </div>
             </div>

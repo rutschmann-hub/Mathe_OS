@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kurztest: Geraden im Raum</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      chtml: { displayAlign: 'left', displayIndent: '1.5em' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+
+  <style>
+    /* ───── Reset & Base ───── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:        #faf8f4;
+      --white:        #ffffff;
+      --gray-bg:      #f5f3f0;
+      --border:       #e8e4de;
+      --navy:         #1a2332;
+      --navy-light:   #2c3e55;
+      --mustard:      #d4a845;
+      --mustard-dark: #b8922e;
+      --teal:         #3d7c7c;
+      --text:         #2c2c2c;
+      --text-muted:   #888888;
+
+      --radius-sm:    12px;
+      --radius-md:    20px;
+      --radius-lg:    28px;
+      --shadow-soft:  0 4px 20px rgba(26, 35, 50, 0.08);
+      --shadow-mid:   0 8px 30px rgba(26, 35, 50, 0.12);
+    }
+
+    body {
+      font-family: 'Source Sans Pro', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    /* ───── Header ───── */
+    .page-header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 80% 20%, rgba(212,168,69,0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .header-deco {
+      position: absolute;
+      font-family: 'Playfair Display', serif;
+      opacity: 0.07;
+      font-size: 5rem;
+      top: -0.5rem;
+      right: 2rem;
+      letter-spacing: 0.3em;
+      user-select: none;
+    }
+    .subject-tag {
+      display: inline-block;
+      background: var(--mustard);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.8rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.8rem;
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+    .header-sub {
+      color: rgba(255,255,255,0.65);
+      font-size: 0.9rem;
+    }
+
+    /* ───── Student Info Bar ───── */
+    .student-info {
+      background: var(--white);
+      border-bottom: 2px solid var(--mustard);
+      padding: 1rem 2rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .info-field {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .info-field strong {
+      color: var(--navy);
+      font-weight: 600;
+    }
+    .info-line {
+      display: inline-block;
+      width: 140px;
+      border-bottom: 1.5px solid var(--border);
+      height: 1.2em;
+    }
+    .total-badge {
+      margin-left: auto;
+      background: var(--mustard);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.35rem 1rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    /* ───── Main Layout ───── */
+    .main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* ───── Task Cards ───── */
+    .task-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+    .task-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--gray-bg);
+    }
+    .task-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .task-points {
+      background: var(--navy);
+      color: var(--mustard);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.05em;
+    }
+    .task-body {
+      padding: 1.4rem 1.6rem 1.6rem;
+    }
+    .task-body p {
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+    }
+    .task-body p:last-child { margin-bottom: 0; }
+
+    /* ───── Formula Box ───── */
+    .formula-box {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--mustard);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.2rem;
+      margin: 0.8rem 0;
+      font-size: 0.95rem;
+      overflow-x: auto;
+    }
+
+    /* ───── Sub-tasks ───── */
+    .subtask {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 0.7rem;
+      padding: 0.65rem 0.9rem;
+      background: var(--gray-bg);
+      border-radius: var(--radius-sm);
+      font-size: 0.93rem;
+    }
+    .subtask-label {
+      font-weight: 700;
+      color: var(--teal);
+      white-space: nowrap;
+      min-width: 2.2rem;
+    }
+    .subtask-pts {
+      margin-left: auto;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    /* ───── Hint ───── */
+    .hint {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 0.6rem;
+    }
+
+    /* ───── Answer Space ───── */
+    .answer-space {
+      margin-top: 1rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      height: 80px;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 27px,
+        var(--border) 27px,
+        var(--border) 28px
+      );
+      background-color: #fdfcfa;
+    }
+    .answer-space.tall  { height: 140px; }
+    .answer-space.short { height: 54px; }
+
+    /* ───── Scoring Tables ───── */
+    .scoring-section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft);
+      padding: 1.4rem 1.6rem 1.6rem;
+    }
+    .scoring-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--mustard);
+    }
+    .tables-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    table {
+      border-collapse: collapse;
+      font-size: 0.87rem;
+      flex: 1;
+      min-width: 200px;
+    }
+    th {
+      background: var(--navy);
+      color: var(--mustard);
+      font-weight: 700;
+      text-align: center;
+      padding: 0.5rem 0.8rem;
+      letter-spacing: 0.04em;
+    }
+    th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    th:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
+    td {
+      text-align: center;
+      padding: 0.45rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--gray-bg); }
+    .total-row td {
+      font-weight: 700;
+      background: var(--cream) !important;
+      color: var(--navy);
+      border-top: 2px solid var(--mustard);
+    }
+    .note-row-1 td { color: #2e7d32; }
+    .note-row-2 td { color: #558b2f; }
+    .note-row-3 td { color: #f57f17; }
+    .note-row-4 td { color: #e65100; }
+    .note-row-5 td { color: #c62828; }
+
+    /* ───── Print ───── */
+    @media print {
+      body { background: white; }
+      .page-header { background: var(--navy) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .task-card, .scoring-section { box-shadow: none; border-color: #ccc; }
+      .task-header { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .task-card { page-break-inside: avoid; }
+    }
+
+    /* ───── Responsive ───── */
+    @media (max-width: 600px) {
+      .page-header h1 { font-size: 1.5rem; }
+      .student-info { flex-direction: column; gap: 0.8rem; }
+      .total-badge { margin-left: 0; }
+      .tables-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="page-header">
+  <div class="header-deco">g h</div>
+  <div class="subject-tag">Analytische Geometrie</div>
+  <h1>Kurztest: Geraden im Raum</h1>
+  <p class="header-sub">Lage von Geraden &middot; Schnittpunkte &middot; Parameterform</p>
+</header>
+
+<!-- ══════════ STUDENT INFO ══════════ -->
+<div class="student-info">
+  <div class="info-field"><strong>Name:</strong> <span class="info-line"></span></div>
+  <div class="info-field"><strong>Klasse:</strong> <span class="info-line" style="width:80px"></span></div>
+  <div class="info-field"><strong>Datum:</strong> <span class="info-line" style="width:100px"></span></div>
+  <div class="total-badge">/ 15 Punkte</div>
+</div>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main">
+
+  <!-- ── Aufgabe 1 ── -->
+  <article class="task-card">
+    <div class="task-header">
+      <span class="task-title">Aufgabe 1</span>
+      <span class="task-points">4 Punkte</span>
+    </div>
+    <div class="task-body">
+      <p>Gegeben sind der Punkt $A(2 \mid {-1} \mid 3)$ und die Gerade $g$ mit:</p>
+      <div class="formula-box">
+        $$g\colon \vec{x} = \begin{pmatrix}1\\1\\0\end{pmatrix} + t \cdot \begin{pmatrix}2\\-4\\6\end{pmatrix}, \quad t \in \mathbb{R}$$
+      </div>
+
+      <div class="subtask">
+        <span class="subtask-label">a)</span>
+        <span>Überprüfe, ob der Punkt $A$ auf der Geraden $g$ liegt.</span>
+        <span class="subtask-pts">2 Pkt.</span>
+      </div>
+      <div class="answer-space"></div>
+
+      <div class="subtask" style="margin-top:0.9rem">
+        <span class="subtask-label">b)</span>
+        <span>Gib einen Punkt an, der auf $g$ liegt, und einen, der <em>nicht</em> auf $g$ liegt.</span>
+        <span class="subtask-pts">2 Pkt.</span>
+      </div>
+      <div class="answer-space short"></div>
+    </div>
+  </article>
+
+  <!-- ── Aufgabe 2 ── -->
+  <article class="task-card">
+    <div class="task-header">
+      <span class="task-title">Aufgabe 2</span>
+      <span class="task-points">3 Punkte</span>
+    </div>
+    <div class="task-body">
+      <p>Bestimme die fehlende Koordinate $a_2$, sodass der Punkt $P(3 \mid a_2 \mid 5)$ auf der Geraden $g$ liegt:</p>
+      <div class="formula-box">
+        $$g\colon \vec{x} = \begin{pmatrix}1\\-2\\3\end{pmatrix} + t \cdot \begin{pmatrix}1\\3\\1\end{pmatrix}, \quad t \in \mathbb{R}$$
+      </div>
+      <div class="answer-space tall"></div>
+    </div>
+  </article>
+
+  <!-- ── Aufgabe 3 ── -->
+  <article class="task-card">
+    <div class="task-header">
+      <span class="task-title">Aufgabe 3</span>
+      <span class="task-points">5 Punkte</span>
+    </div>
+    <div class="task-body">
+      <p>Bestimme die Lage der Geraden $g$ und $h$ zueinander. Berechne gegebenenfalls den Schnittpunkt.</p>
+      <div class="formula-box">
+        $$g\colon \vec{x} = \begin{pmatrix}2\\0\\1\end{pmatrix} + t \cdot \begin{pmatrix}1\\2\\-1\end{pmatrix}, \qquad h\colon \vec{x} = \begin{pmatrix}4\\6\\-1\end{pmatrix} + s \cdot \begin{pmatrix}2\\4\\-2\end{pmatrix}$$
+      </div>
+      <p class="hint">Tipp: Es gibt drei m&ouml;gliche Lagen (identisch &middot; parallel &middot; schneidend &middot; windschief).</p>
+
+      <div class="subtask">
+        <span class="subtask-label">①</span>
+        <span>Richtungsvektoren auf Parallelit&auml;t pr&uuml;fen</span>
+        <span class="subtask-pts">2 Pkt.</span>
+      </div>
+      <div class="subtask">
+        <span class="subtask-label">②</span>
+        <span>LGS aufstellen und Lage bestimmen</span>
+        <span class="subtask-pts">2 Pkt.</span>
+      </div>
+      <div class="subtask">
+        <span class="subtask-label">③</span>
+        <span>Lage benennen (ggf. Schnittpunkt angeben)</span>
+        <span class="subtask-pts">1 Pkt.</span>
+      </div>
+      <div class="answer-space tall"></div>
+    </div>
+  </article>
+
+  <!-- ── Aufgabe 4 ── -->
+  <article class="task-card">
+    <div class="task-header">
+      <span class="task-title">Aufgabe 4</span>
+      <span class="task-points">3 Punkte</span>
+    </div>
+    <div class="task-body">
+      <p>Bestimme $b_3$ so, dass $g$ und $h$ parallel sind. Untersuche anschlie&szlig;end, ob sie <em>identisch</em> oder <em>echt parallel</em> sind.</p>
+      <div class="formula-box">
+        $$g\colon \vec{x} = \begin{pmatrix}1\\0\\2\end{pmatrix} + t \cdot \begin{pmatrix}2\\-4\\b_3\end{pmatrix}, \qquad h\colon \vec{x} = \begin{pmatrix}3\\-4\\5\end{pmatrix} + s \cdot \begin{pmatrix}1\\-2\\3\end{pmatrix}$$
+      </div>
+
+      <div class="subtask">
+        <span class="subtask-label">①</span>
+        <span>$b_3$ bestimmen</span>
+        <span class="subtask-pts">1 Pkt.</span>
+      </div>
+      <div class="subtask">
+        <span class="subtask-label">②</span>
+        <span>Punkt aus $h$ in $g$ einsetzen &rarr; Lage benennen</span>
+        <span class="subtask-pts">2 Pkt.</span>
+      </div>
+      <div class="answer-space tall"></div>
+    </div>
+  </article>
+
+  <!-- ── Bepunktung ── -->
+  <section class="scoring-section">
+    <h2>Bepunktung &amp; Notenschl&uuml;ssel</h2>
+    <div class="tables-row">
+
+      <table>
+        <thead>
+          <tr><th>Aufgabe</th><th>Teilaufgabe</th><th>Punkte</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>a) Punkt pr&uuml;fen</td><td>2</td></tr>
+          <tr><td>1</td><td>b) Punkte angeben</td><td>2</td></tr>
+          <tr><td>2</td><td>Koordinate bestimmen</td><td>3</td></tr>
+          <tr><td>3</td><td>Richtungsvektoren</td><td>2</td></tr>
+          <tr><td>3</td><td>LGS &amp; Lage</td><td>2</td></tr>
+          <tr><td>3</td><td>Benennung / SP</td><td>1</td></tr>
+          <tr><td>4</td><td>$b_3$ bestimmen</td><td>1</td></tr>
+          <tr><td>4</td><td>Lagepr&uuml;fung</td><td>2</td></tr>
+          <tr class="total-row"><td colspan="2">Gesamt</td><td>15</td></tr>
+        </tbody>
+      </table>
+
+      <table>
+        <thead>
+          <tr><th>Note</th><th>Punkte</th><th>%</th></tr>
+        </thead>
+        <tbody>
+          <tr class="note-row-1"><td>1</td><td>14 &ndash; 15</td><td>&ge; 93&nbsp;%</td></tr>
+          <tr class="note-row-2"><td>2</td><td>12 &ndash; 13</td><td>&ge; 80&nbsp;%</td></tr>
+          <tr class="note-row-3"><td>3</td><td>9 &ndash; 11</td><td>&ge; 60&nbsp;%</td></tr>
+          <tr class="note-row-4"><td>4</td><td>6 &ndash; 8</td><td>&ge; 40&nbsp;%</td></tr>
+          <tr class="note-row-5"><td>5</td><td>&lt; 6</td><td>&lt; 40&nbsp;%</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
