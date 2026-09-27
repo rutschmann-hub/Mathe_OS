@@ -1,81 +1,58 @@
-# 🚀 Setup-Anleitung für GitHub
+# 🚀 Setup & Arbeitsablauf
 
-## 📁 Neue Dateistruktur
+Live-Seite: https://rutschmann-hub.github.io/Mathe_OS/ (GitHub Pages, Branch `main`)
+
+## 📁 Dateistruktur
 
 ```
 /
-├── index.html           (Hauptdatei - 150 Zeilen)
+├── index.html                  Hauptseite (Layout, Navigation, Sidebars)
 ├── css/
-│   └── styles.css      (Alle Styles - 450 Zeilen)
+│   └── styles.css              Alle Styles (inkl. Responsive/iPad)
 ├── js/
-│   ├── app.js          (Hauptfunktionen - 300 Zeilen)
-│   └── mathjax-config.js (MathJax Setup - 10 Zeilen)
-└── SETUP.md            (Diese Anleitung)
+│   ├── app.js                  Themenstruktur (topicData), Navigation, Suche, Detailseiten
+│   └── mathjax-config.js       MathJax-Einstellungen
+├── img/                        Abbildungen für Detailseiten
+├── mindmaps/
+│   ├── analysis.html           Interaktive Mindmaps (eigenständige Seiten)
+│   ├── geometrie.html
+│   ├── stochastik.html
+│   └── gesamt.html
+├── kurztests/
+│   └── geraden-im-raum.html    Kurztest Analytische Geometrie
+├── CLAUDE.md                   Coding-Richtlinien für Claude Code
+└── SETUP.md                    Diese Anleitung
 ```
 
-## 📋 GitHub Upload-Anleitung
+## 💻 Lokal ansehen
 
-### Variante A: Über GitHub Website (einfacher)
-
-1. **Gehe zu deinem Repository: github.com/rutschmann-hub/Mathe_OS**
-
-2. **Lösche die alte index.html:**
-   - Klick auf `index.html`
-   - Klick auf 🗑️ (Delete this file)
-   - Commit the change
-
-3. **Lade die neuen Dateien hoch:**
-   - **"Add file" → "Upload files"**
-   - Ziehe alle 4 Dateien gleichzeitig rein:
-     - `index.html`
-     - `css/styles.css` 
-     - `js/app.js`
-     - `js/mathjax-config.js`
-   - **"Commit changes"**
-
-### Variante B: Mit Git (falls du es lokal hast)
+Im Projektordner einen einfachen Webserver starten und im Browser öffnen:
 
 ```bash
-# Repository klonen (falls noch nicht gemacht)
-git clone https://github.com/rutschmann-hub/Mathe_OS.git
-cd Mathe_OS
+python3 -m http.server 8080
+```
 
-# Alte Datei löschen
-rm index.html
+Dann http://localhost:8080 aufrufen. (Direktes Öffnen der `index.html` per Doppelklick kann bei Bildern/MathJax Probleme machen.)
 
-# Neue Struktur erstellen
-mkdir -p css js
+## 📤 Änderungen veröffentlichen
 
-# Dateien kopieren (von deinem Download-Ordner)
-cp ~/Downloads/index.html .
-cp ~/Downloads/styles.css css/
-cp ~/Downloads/app.js js/
-cp ~/Downloads/mathjax-config.js js/
-
-# Hochladen
+```bash
 git add .
-git commit -m "Refactor: Split into separate CSS/JS files"
+git commit -m "Kurze Beschreibung der Änderung"
 git push origin main
 ```
 
-## ✅ Vorteile der neuen Struktur
+GitHub Pages baut die Seite danach automatisch neu – nach **1–3 Minuten** ist die Änderung online.
 
-- **Übersichtlich:** Jede Datei hat einen klaren Zweck
-- **Wartbar:** CSS und JS sind getrennt editierbar
-- **Professionell:** Industriestandard für Webentwicklung
-- **Erweiterbar:** Neue Dateien einfach hinzufügbar
+## 🔧 Wo ändere ich was?
 
-## 🎯 Nach dem Upload
+- **Neues Thema / Unterthema:** Eintrag in `topicData` in `js/app.js`
+- **Eigene Detailseite:** Funktion `show…seite()` in `js/app.js` anlegen und in `showDetailContent()` einhängen
+- **Bilder:** in `img/` ablegen, im HTML mit `img/Dateiname.png` einbinden
+- **Design:** `css/styles.css`
+- **Mindmaps / Kurztests:** jeweilige HTML-Datei in `mindmaps/` bzw. `kurztests/`; Verlinkung in `index.html`
+- **Formeln:** LaTeX mit `\( … \)` (inline) oder `\[ … \]` (abgesetzt) – in JS-Template-Strings Backslashes verdoppeln: `\\( … \\)`
 
-1. **Warte 2-3 Minuten** (GitHub Pages Build)
-2. **Teste:** https://rutschmann-hub.github.io/Mathe_OS
-3. **Funktioniert genauso** wie vorher, nur sauberer!
+## 🔗 URLs & Navigation
 
-## 🔧 Für zukünftige Änderungen
-
-- **Design ändern:** Nur `css/styles.css` bearbeiten
-- **Funktionen hinzufügen:** Nur `js/app.js` bearbeiten  
-- **Inhalte ändern:** Nur `index.html` bearbeiten
-- **Mathe-Formeln:** MathJax ist bereits konfiguriert
-
-Viel einfacher zu verwalten! 🎉
+Jede Seite hat eine eigene Adresse im Hash, z. B. `#analysis/Grundlagen%20der%20Differenzialrechnung/Kettenregel`. Links lassen sich so direkt teilen, und die Zurück-/Vor-Tasten des Browsers funktionieren.
