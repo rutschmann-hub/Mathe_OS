@@ -935,6 +935,10 @@ function showDetailContent(topic, subtopic, detailTopic) {
         updateFormulaCheatsheet('detail', 'extremwertprobleme');
         return;
     }
+    if (topic === 'analysis' && detailTopic === 'Funktionsterm und Graph') {
+        showFunktionstermGraphseite();
+        return;
+    }
 
     // Standard-Fallback
     const topicsGrid = document.getElementById('topics-grid');
@@ -1082,6 +1086,33 @@ function showAbleitungsseite() {
     if (window.MathJax && MathJax.typesetPromise) {
         MathJax.typesetPromise([topicsGrid]);
     }
+}
+
+function showFunktionstermGraphseite() {
+    const topicsGrid = document.getElementById('topics-grid');
+    const expandedContent = document.getElementById('expanded-content');
+    expandedContent.classList.remove('show');
+
+    topicsGrid.innerHTML = `
+    <div class="detail-page">
+        <section class="detail-section">
+            <h2 class="detail-heading">Funktionsterm und Graph</h2>
+            <p class="detail-intro">
+                Eine Funktion ist wie eine Maschine: Du gibst einen x-Wert hinein, die Maschine rechnet
+                mit dem Funktionsterm und gibt den Funktionswert f(x) aus. Jedes Wertepaar (x | f(x))
+                ist ein Punkt des Graphen. Probiere es mit der Funktionsmaschine aus.
+            </p>
+            <a class="quick-link-btn" href="werkzeuge/funktionsmaschine.html" target="_blank" rel="noopener"
+               style="display:inline-flex;margin-top:12px;">
+                <i class="fas fa-cogs"></i>
+                <span>Funktionsmaschine im neuen Fenster öffnen</span>
+            </a>
+        </section>
+        <section class="detail-section">
+            <iframe src="werkzeuge/funktionsmaschine.html" title="Funktionsmaschine"
+                    style="width:100%;height:820px;border:0;border-radius:12px;" loading="lazy"></iframe>
+        </section>
+    </div>`;
 }
 
 function showVerkettungseite() {
