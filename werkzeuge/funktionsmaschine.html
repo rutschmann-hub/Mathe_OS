@@ -71,7 +71,7 @@ h1{font-size:1.05rem} h2{font-size:.95rem}
 .hint{font-size:.78rem;color:var(--muted);text-align:center}
 
 /* Trichter (flach) + Maschine */
-.mwrap{position:relative;width:100%;max-width:520px;padding-top:88px}
+.mwrap{position:relative;width:100%;max-width:520px;padding-top:88px;margin-bottom:42px}
 .funnel{position:absolute;top:0;left:calc(50% - 72px);width:144px;height:103px;pointer-events:none}
 .funnel svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .funnel .back{z-index:5} .funnel .front{z-index:30}
@@ -109,10 +109,10 @@ h1{font-size:1.05rem} h2{font-size:.95rem}
 .machine.working .progress{opacity:1}
 .machine.working .progress span{animation:run .8s ease-in-out infinite}
 @keyframes run{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
-.mouth{position:absolute;left:50%;bottom:-11px;width:64px;height:12px;margin-left:-32px;background:var(--primary-d);
-  clip-path:polygon(0 0,100% 0,85% 100%,15% 100%);border-radius:0 0 6px 6px}
+/* gebogenes Ausgaberohr: verlässt die Maschine rechts unten und mündet mittig über dem Ergebnis */
+.pipe{position:absolute;top:100%;left:calc(50% - 20px);width:150px;height:50px;overflow:visible;pointer-events:none}
 
-.result{margin-top:10px;min-height:58px;width:100%;max-width:440px;display:flex;align-items:center;justify-content:center;gap:4px 16px;flex-wrap:wrap;
+.result{margin-top:0;min-height:58px;width:100%;max-width:440px;display:flex;align-items:center;justify-content:center;gap:4px 16px;flex-wrap:wrap;
   padding:8px 16px;border-radius:var(--r-md);background:var(--soft);border:1px solid var(--line)}
 .outbig{font-size:1.5rem;font-weight:600;text-align:center}
 .outbig.empty{font-size:.9rem;font-weight:500;color:var(--muted)}
@@ -234,8 +234,15 @@ h1{font-size:1.05rem} h2{font-size:.95rem}
           <div class="calc" id="calc" aria-live="polite"></div>
           <div class="mhelp">Erlaubt: + − · / ^ ( ) sowie sqrt, sin, cos, tan, ln, exp, abs, pi, e</div>
           <div class="progress" aria-hidden="true"><span></span></div>
-          <div class="mouth" id="mouthOut" aria-hidden="true"></div>
         </div>
+        <svg class="pipe" id="pipe" viewBox="0 0 150 50" aria-hidden="true">
+          <path d="M110 0 C110 30 20 20 20 50" fill="none" stroke="#1d4ed8" stroke-width="18"/>
+          <path d="M110 0 C110 30 20 20 20 50" fill="none" stroke="#3b82f6" stroke-width="12"/>
+          <path d="M105 2 C105 26 17 16 15 46" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle id="blob" r="5" fill="#fff" opacity="0"/>
+          <rect x="97" y="-2" width="26" height="6" rx="2" fill="#1e40af"/>
+          <rect x="7" y="45" width="26" height="6" rx="2" fill="#1e40af"/>
+        </svg>
       </div>
 
       <div class="result" id="outCard" aria-live="polite">
@@ -797,10 +804,18 @@ async function dropIntoFunnel(x, speed, rejected){
   const fit = Math.min(0.85, (150*k) / w);
   const hoverY = Math.max(2, rimY - 26*k);
 
-  await card.animate([
-    { transform: tr(sx, sy, 1) },
-    { transform: tr(rimX, hoverY, fit) }
-  ], { duration: 600*speed, easing:"cubic-bezier(.3,.7,.4,1)", fill:"forwards" }).finished;
+  // Karte schwebt in einem Bogen heran und pendelt dabei wie ein Blatt Papier
+  const cx = (sx + rimX) / 2 + 70, cy = Math.max(2, Math.min(sy, hoverY) - 40);
+  const frames = [];
+  for (let i = 0, N = 16; i <= N; i++){
+    const t = i / N, u = 1 - t;
+    const px = u*u*sx + 2*u*t*cx + t*t*rimX + Math.sin(t*Math.PI*3) * 10 * u;
+    const py = u*u*sy + 2*u*t*cy + t*t*hoverY;
+    const rot = Math.sin(t*Math.PI*3 + .6) * 12 * u;
+    const sc = 1 + (fit - 1) * t + .06 * Math.sin(t*Math.PI);
+    frames.push({ transform: tr(px, py, sc, rot) });
+  }
+  await card.animate(frames, { duration: 1000*speed, easing:"ease-in-out", fill:"forwards" }).finished;
 
   if (rejected){
     card.classList.replace("in", "bad");
@@ -856,14 +871,23 @@ async function processOne(x, more){
     await sleep(750*speed);
     machine.classList.remove("working");
 
-    const o1 = rectIn($("mouthOut")), o2 = rectIn($("outBig"));
+    // Leuchtpunkt gleitet durch die Rohrkurve, dann kommt die y-Karte heraus
+    const B = t => { const u = 1 - t; return [u*u*u*110 + 3*u*u*t*110 + 3*u*t*t*20 + t*t*t*20,
+                                              3*u*u*t*30 + 3*u*t*t*20 + t*t*t*50]; };
+    const blobFrames = [];
+    for (let i = 0; i <= 12; i++){
+      const [bx, by] = B(i / 12);
+      blobFrames.push({ transform:`translate(${bx}px, ${by}px)`, opacity: i === 0 ? 0 : i === 12 ? .4 : 1 });
+    }
+    await $("blob").animate(blobFrames, { duration:480*speed, easing:"ease-in" }).finished;
+
+    const pr = rectIn($("pipe")), o2 = rectIn($("outBig"));
     const oc = makeFly("out", "y = " + fmt(y));
     const ow = oc.offsetWidth, oh = oc.offsetHeight;
     await oc.animate([
-      { transform: tr(o1.cx - ow/2, o1.cy - oh/2 - 14, .4), opacity:0 },
-      { transform: tr(o1.cx - ow/2, o1.cy - oh/2, .7), opacity:1, offset:.25 },
+      { transform: tr(pr.x + 20 - ow/2, pr.y + 46 - oh/2, .35), opacity:0 },
       { transform: tr(o2.cx - ow/2, o2.cy - oh/2, 1), opacity:1 }
-    ], { duration:550*speed, easing:"ease-out", fill:"forwards" }).finished;
+    ], { duration:380*speed, easing:"cubic-bezier(.2,.8,.3,1)", fill:"forwards" }).finished;
     oc.remove();
   }
 
