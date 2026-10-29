@@ -59,10 +59,15 @@
 
   /* Inhalte */
   .intro { font-size: 1.1rem; line-height: 1.65; margin: -16px 0 28px; }
-  .merk { border-radius: 16px; background: var(--k-soft); padding: 22px 24px; margin-bottom: 8px; }
-  .merk .lbl { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--k); }
-  .merk .f { font-size: 1.15rem; overflow-x: auto; overflow-y: hidden; margin: 6px 0 2px; }
-  .merk p { margin: 0; font-size: .93rem; color: var(--muted); }
+  .merk { position: relative; border: 1.5px solid color-mix(in srgb, var(--k) 35%, transparent); border-radius: 20px;
+    background: var(--k-soft); padding: 30px 28px 20px; margin: 18px 0 8px; text-align: center; }
+  .merk .lbl { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: var(--k); color: var(--bg);
+    font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 3px 12px; border-radius: 99px; }
+  .merk .f { font-size: 1.15rem; overflow-x: auto; overflow-y: hidden; }
+  .merk .f mjx-container[display="true"] { margin: 4px 0 !important; }
+  .merk p { margin: 14px auto 0; padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--k) 20%, transparent);
+    max-width: 52ch; font-size: .93rem; color: var(--muted); line-height: 1.6; }
+  .merk .regel { color: var(--muted); font-size: 78%; }
   .sec .body { font-size: .98rem; line-height: 1.65; }
   .sec .body p { color: var(--text); margin: 0 0 .7rem; }
   details { border-radius: 12px; }
@@ -124,7 +129,7 @@
   .grafiken figcaption { font-size: .85rem; color: var(--muted); margin-top: -8px; }
 
   @media (max-width: 640px) {
-    .merk { padding: 18px 16px; } .merk .f { font-size: .95rem; }
+    .merk { padding: 26px 14px 16px; } .merk .f { font-size: .95rem; }
     .wrap { padding: 0 16px; }
     .choose { grid-template-columns: 1fr; }
     .kap > a { grid-template-columns: 2.6rem 1fr 1rem; } .kap .n { display: none; }

@@ -174,7 +174,7 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Ableiten über den Grenzwert ist mühsam. Mit wenigen Regeln geht es schnell – und leitet man die Ableitung noch einmal ab, erhält man <b>höhere Ableitungen</b> \(f'',\, f''',\, \dots\)`,
     merk: {
-      formel: String.raw`\begin{aligned} (x^r)' &= r\,x^{r-1} && \text{Potenzregel} \\ (c\cdot g)' &= c\cdot g' && \text{Faktorregel} \\ (g + h)' &= g' + h' && \text{Summenregel} \\ (\sin x)' &= \cos x \\ (\cos x)' &= -\sin x \end{aligned}`,
+      formel: String.raw`\begin{aligned} (x^r)' &= r\,x^{r-1} &&\class{regel}{\text{Potenzregel}} \\ (c\cdot g)' &= c\cdot g' &&\class{regel}{\text{Faktorregel}} \\ (g + h)' &= g' + h' &&\class{regel}{\text{Summenregel}} \\ (\sin x)' &= \cos x \\ (\cos x)' &= -\sin x \end{aligned}`,
       text: String.raw`Gilt auch für Wurzeln und Brüche: \(\sqrt{x} = x^{\frac12}\), \(\frac{1}{x} = x^{-1}\).`,
     },
     beispiel: {
@@ -485,8 +485,8 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Beschreibt \(f(t)\) eine Größe im Lauf der Zeit, sagt die Ableitung, wie schnell sie sich gerade ändert. Mit den bekannten Werkzeugen findest du größte Werte und Zeitpunkte stärkster Änderung.`,
     merk: {
-      formel: String.raw`\begin{aligned} \text{Änderungsrate:}&\quad f'(t) \\ \text{größter Wert:}&\quad f'(t) = 0,\ \text{Ränder prüfen} \\ \text{stärkste Änderung:}&\quad f''(t) = 0 \end{aligned}`,
-      text: String.raw`Einheit von \(f'(t)\): Größe pro Zeit, z. B. m/s. Zum Schluss immer einen Antwortsatz mit Einheit formulieren.`,
+      formel: String.raw`\begin{aligned} \text{Änderungsrate:}&\quad f'(t) \\ \text{größter Wert:}&\quad f'(t) = 0 \\ \text{stärkste Änderung:}&\quad f''(t) = 0 \end{aligned}`,
+      text: String.raw`Beim größten Wert auch die Ränder prüfen. Einheit von \(f'(t)\): Größe pro Zeit, z. B. m/s. Zum Schluss immer einen Antwortsatz mit Einheit formulieren.`,
     },
     beispiel: {
       aufgabe: String.raw`Die Temperatur in einem Gewächshaus wird durch \(T(t) = -0{,}02t^3 + 0{,}3t^2 + 12\) beschrieben (\(t\) in Stunden nach 6 Uhr, \(T\) in °C, \(0 \le t \le 12\)). Wann ist es am wärmsten, wann steigt die Temperatur am stärksten?`,
