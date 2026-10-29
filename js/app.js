@@ -1,7 +1,7 @@
 // Navigation, Seitenaufbau, Zufallsaufgaben und Selbsttest
 const $ = s => document.querySelector(s);
 
-// Routen: #/  ·  #/bf  ·  #/bf/III (Kapitel aufgeklappt)  ·  #/bf/III/3 (Thema)  ·  #/bf/III/g1 (GFS)
+// Routen: #/  ·  #/bf  ·  #/bf/III (Kapitel aufgeklappt)  ·  #/bf/III/3 (Thema)
 function route() {
   const [kurs, kap, thema] = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
   document.body.dataset.kurs = kurs || '';
@@ -35,7 +35,6 @@ function kursSeite(kurs, offen) {
         <span class="n">${c.u.length} Themen</span><span class="chev">›</span></a>
       <ul class="units">
         ${c.u.map((t, i) => `<li><a href="#/${kurs}/${c.nr}/${i + 1}"><b>${i + 1}</b>${t}</a></li>`).join('')}
-        ${c.gfs.length ? `<li class="gfs-label">Vertiefung · GFS</li>` + c.gfs.map((t, i) => `<li class="gfs"><a href="#/${kurs}/${c.nr}/g${i + 1}"><b>+</b>${t}</a></li>`).join('') : ''}
       </ul></div>`;
   }).join('');
   return `<div class="crumb"><a href="#/">Start</a></div>
@@ -44,17 +43,15 @@ function kursSeite(kurs, offen) {
 
 function themaSeite(kurs, kapNr, thema) {
   const c = KURSE[kurs].kapitel.find(c => c.nr === kapNr);
-  const gfs = thema.startsWith('g');
-  const i = parseInt(thema.replace('g', '')) - 1;
-  const titel = (gfs ? c.gfs : c.u)[i];
+  const i = parseInt(thema) - 1;
+  const titel = c && c.u[i];
   if (!titel) return kursSeite(kurs, kapNr);
   const g = gegenstueck(kurs, titel);
-  const liste = gfs ? c.gfs : c.u, pre = gfs ? 'g' : '';
-  const nav = (j, lbl) => liste[j] ? `<a href="#/${kurs}/${c.nr}/${pre}${j + 1}"><small>${lbl}</small><b>${liste[j]}</b></a>` : '<span></span>';
+  const nav = (j, lbl) => c.u[j] ? `<a href="#/${kurs}/${c.nr}/${j + 1}"><small>${lbl}</small><b>${c.u[j]}</b></a>` : '<span></span>';
   return `<div class="crumb"><a href="#/">Start</a> / <a href="#/${kurs}">${KURSE[kurs].name}</a> / <a href="#/${kurs}/${c.nr}">${c.nr} ${c.titel}</a></div>
     <h1>${titel}</h1>
-    <div class="meta"><span>${gfs ? 'Vertiefung (GFS-Thema)' : `Kapitel ${c.nr} · Abschnitt ${i + 1}`}</span>
-      ${g ? `<a href="#/${g.kurs}/${g.kap}/${g.art === 'gfs' ? 'g' : ''}${g.nr}">Auch im ${KURSE[g.kurs].name} →</a>` : ''}</div>
+    <div class="meta"><span>Kapitel ${c.nr} · Abschnitt ${i + 1}</span>
+      ${g ? `<a href="#/${g.kurs}/${g.kap}/${g.nr}">Auch im ${KURSE[g.kurs].name} →</a>` : ''}</div>
     ${INHALTE[titel] ? inhalt(INHALTE[titel], kurs) : `
     <section class="sec"><h2>Erklärung</h2><p>Noch kein Material – hier kommt dein Input hin.</p></section>
     ${videoSek(null)}
@@ -69,11 +66,12 @@ function inhalt(x, kurs) {
   return `<p class="intro">${x.kurz}</p>
     <div class="merk"><div class="lbl">Merke</div><div class="f">\\[${x.merk.formel}\\]</div><p>${x.merk.text}</p></div>
     <section class="sec"><h2>Erklärung</h2><div class="body">
+      ${x.erklaerung || ''}
       <p><b>Beispiel:</b> ${x.beispiel.aufgabe}</p>
       <details><summary>Lösung Schritt für Schritt</summary><div class="inner"><ol class="steps">${x.beispiel.schritte.map(s => `<li>${s}</li>`).join('')}</ol></div></details>
       <div class="fehler">${x.fehler}</div></div></section>
     ${videoSek(x.video)}
-    <section class="sec"><h2>Übungen</h2><p style="margin-bottom:6px">Leite ab bzw. löse. Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
+    <section class="sec"><h2>Übungen</h2><p style="margin-bottom:6px">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
       ${ue.map((u, i) => `<div class="ue"><span class="nr">${i + 1}</span><div>${u.aufgabe}<span class="lvl">${'●'.repeat(u.niveau)}</span>${u.kurs === 'lk' ? '<span class="tag-lk">LK</span>' : ''}</div>
         <details><summary>Lösung</summary><div class="inner">${u.loesung}</div></details></div>`).join('')}</section>
     ${x.generator ? `<section class="sec"><h2>Weiter üben</h2><p>Zufallsaufgaben – so viele du willst. Stufe wählen, dann „Neue Aufgabe“.</p>
@@ -122,9 +120,19 @@ document.addEventListener('click', e => {
     $('#score').textContent = `${[...done].filter(d => d.dataset.ok === 'true').length} von ${done.length} richtig.`;
 });
 
-function typeset(el) { if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([el]); }
+function typeset(el) { return window.MathJax && MathJax.typesetPromise ? MathJax.typesetPromise([el]) : Promise.resolve(); }
+
+// Merkformeln, die auf schmalen Bildschirmen zu breit sind, verkleinern (höchstens auf 70 %)
+function passend() {
+  document.querySelectorAll('.merk .f').forEach(f => {
+    f.style.fontSize = '';
+    const r = f.clientWidth / f.scrollWidth;
+    if (r < 1) f.style.fontSize = Math.max(r, .7) * parseFloat(getComputedStyle(f).fontSize) + 'px';
+  });
+}
+addEventListener('resize', passend);
 const _route = route;
-route = function () { stufe = 1; _route(); neueAufgabe(); typeset($('#main')); };
+route = function () { stufe = 1; _route(); neueAufgabe(); typeset($('#main')).then(passend); };
 
 function themeToggle() {
   const r = document.documentElement;

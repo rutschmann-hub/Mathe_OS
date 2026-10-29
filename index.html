@@ -19,10 +19,11 @@
 </div>
 
 <script>window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
-  chtml: { fontURL: 'vendor/mathjax/output/chtml/fonts/woff-v2' }, options: { enableMenu: false }, startup: { typeset: false, ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(() => MathJax.typesetPromise([document.getElementById('main')])); } } };</script>
+  chtml: { fontURL: 'vendor/mathjax/output/chtml/fonts/woff-v2' }, options: { enableMenu: false }, startup: { typeset: false, ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(() => typeof route === 'function' && route()); } } };</script>
 <script async src="vendor/mathjax/tex-chtml.js"></script>
 <script src="js/buecher.js"></script>
 <script src="js/inhalte.js"></script>
+<script src="js/inhalte/kapitel-1.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

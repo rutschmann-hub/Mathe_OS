@@ -44,8 +44,6 @@
   .units a { display: flex; gap: .8rem; padding: 7px 0; text-decoration: none; color: var(--muted); font-size: .97rem; }
   .units a:hover { color: var(--text); }
   .units a b { font-weight: 600; min-width: 1.2rem; color: var(--k); opacity: .8; }
-  .units .gfs-label { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 12px 0 2px; opacity: .8; }
-  .units .gfs a { font-size: .9rem; }
 
   /* Themenseite */
   .meta { display: flex; flex-wrap: wrap; gap: .5rem 1rem; font-size: .88rem; color: var(--muted); margin-bottom: 40px; }
@@ -110,7 +108,23 @@
   .stufen .neu { margin-left: auto; letter-spacing: 0; color: var(--text); font-weight: 600; }
   .gen-a { font-size: 1.1rem; margin-bottom: 6px; overflow-x: auto; }
 
+  /* Eigene Graphen */
+  .graph { display: block; width: 100%; max-width: 380px; margin: 6px 0 14px; color: var(--muted); }
+  .graph .gr { stroke: var(--line); stroke-width: .6; }
+  .graph .ax { stroke: var(--muted); stroke-width: 1.1; }
+  .graph path { fill: none; stroke-width: 2.2; stroke-linecap: round; }
+  .graph .k1 { stroke: var(--k); fill: var(--k); } .graph path.k1 { fill: none; }
+  .graph .k2 { stroke: #e5484d; fill: #e5484d; } .graph path.k2 { fill: none; }
+  .graph .k3 { stroke: #16a34a; fill: #16a34a; } .graph path.k3 { fill: none; stroke-dasharray: 5 4; }
+  .graph text { font-size: 12px; fill: currentColor; stroke: none; }
+  .graph text.lbl { font-weight: 600; }
+  .graph circle { fill: var(--text); }
+  .grafiken { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-bottom: 14px; }
+  .grafiken figure { margin: 0; flex: 1 1 220px; }
+  .grafiken figcaption { font-size: .85rem; color: var(--muted); margin-top: -8px; }
+
   @media (max-width: 640px) {
+    .merk { padding: 18px 16px; } .merk .f { font-size: .95rem; }
     .wrap { padding: 0 16px; }
     .choose { grid-template-columns: 1fr; }
     .kap > a { grid-template-columns: 2.6rem 1fr 1rem; } .kap .n { display: none; }

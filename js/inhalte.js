@@ -1,98 +1,63 @@
-// Eigene Inhalte – unabhängig vom Buch. Schlüssel = Thementitel.
+// Eigene Inhalte – unabhängig vom Buch. Schlüssel = Thementitel aus buecher.js.
 // Gleichnamige Themen in BF und LK teilen sich automatisch dieses Material.
 // kurs: 'bf' | 'lk' → Baustein nur in diesem Kurs zeigen (ohne Angabe: beide).
+// Die Themen selbst stehen in js/inhalte/kapitel-*.js.
+const INHALTE = {};
+
 // ---- Helfer für Zufallsaufgaben ----
 const zuf = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const wahl = arr => arr[Math.floor(Math.random() * arr.length)];
 const nichtNull = (min, max) => { let z; do z = zuf(min, max); while (z === 0); return z; };
 // Koeffizient vor Variable: 1 → "", -1 → "-"
 const koef = a => a === 1 ? '' : a === -1 ? '-' : String(a);
-// Lineares Glied a·x + b als LaTeX
-function lin(a, b) {
-  let s = a === 0 ? '' : koef(a) + 'x';
-  if (b !== 0) s += s ? (b > 0 ? ' + ' + b : ' - ' + (-b)) : String(b);
+// x hoch n als LaTeX
+const pot = n => n === 1 ? 'x' : `x^{${n}}`;
+const ggt = (a, b) => b ? ggt(b, a % b) : Math.abs(a);
+// gekürzter Bruch z/n als LaTeX
+function bruch(z, n) {
+  if (n < 0) { z = -z; n = -n; }
+  const g = ggt(z, n); z /= g; n /= g;
+  return n === 1 ? String(z) : `${z < 0 ? '-' : ''}\\frac{${Math.abs(z)}}{${n}}`;
+}
+// Summe aus [Koeffizient, Term] als LaTeX, z. B. [[3,'x^{2}'],[-2,'x'],[5,'']] → 3x^{2} - 2x + 5
+function summe(teile) {
+  const s = teile.filter(([c]) => c !== 0).map(([c, t], i) => {
+    const betrag = t ? koef(Math.abs(c)) + t : String(Math.abs(c));
+    return i === 0 ? (c < 0 ? '-' : '') + betrag : (c < 0 ? ' - ' : ' + ') + betrag;
+  }).join('');
   return s || '0';
 }
-const ex = c => `e^{${koef(c)}x}`;
+// Zahl in Klammern, falls negativ
+const kl = z => z < 0 ? `(${z})` : String(z);
+// Dezimalzahl mit Komma für LaTeX
+const dez = z => String(+z.toFixed(4)).replace('.', '{,}');
 
-const INHALTE = {
-  'Produktregel': {
-    video: null, // z. B. { url: 'https://…', titel: 'Produktregel in 5 Minuten' }
+// ---- Selbstprüfung der Generatoren ----
+// Generatoren geben optional pruef: [[behauptet, unabhängig berechnet], …] zurück;
+// tools/pruefe-generatoren.js testet damit jede Zufallsaufgabe numerisch.
+const ableitung = (f, x, h = 1e-5) => (f(x + h) - f(x - h)) / (2 * h);
+const abl2 = (f, x, h = 1e-3) => (f(x + h) - 2 * f(x) + f(x - h)) / (h * h);
+const pruefAbl = (f, df, xs = [0.7, 1.3, 2.1]) => xs.map(x => [df(x), ableitung(f, x)]);
 
-    // Zufallsaufgaben je Stufe: liefert { aufgabe, schritte[] } (LaTeX)
-    generator: {
-      1: () => {
-        const a = zuf(1, 5), n = zuf(2, 4);
-        const u = `${koef(a)}x^{${n}}`, du = `${a * n}x${n - 1 > 1 ? `^{${n - 1}}` : ''}`;
-        return { aufgabe: `f(x) = ${u}\\cdot e^x`,
-          schritte: [`u = ${u},\\; u' = ${du},\\; v = e^x,\\; v' = e^x`,
-                     `f'(x) = ${du}\\cdot e^x + ${u}\\cdot e^x`,
-                     `f'(x) = (${u} + ${du})\\,e^x`] };
-      },
-      2: () => {
-        const a = nichtNull(-4, 4), b = nichtNull(-5, 5), c = wahl([-2, -1, 2, 3]);
-        return { aufgabe: `f(x) = (${lin(a, b)})\\cdot ${ex(c)}`,
-          schritte: [`u = ${lin(a, b)},\\; u' = ${a},\\; v = ${ex(c)},\\; v' = ${c}\\,${ex(c)}`,
-                     `f'(x) = ${a}\\cdot ${ex(c)} + (${lin(a, b)})\\cdot ${c < 0 ? `(${c})` : c}\\,${ex(c)}`,
-                     `f'(x) = (${lin(a * c, a + b * c)})\\,${ex(c)}`] };
-      },
-      3: () => {
-        const a = nichtNull(-3, 3), b = nichtNull(-4, 4), c = wahl([-2, -1, 1, 2]);
-        const m = a + b * c;
-        return { aufgabe: `\\text{Tangente an } f(x) = (${lin(a, b)})\\cdot ${ex(c)} \\text{ im Punkt } P(0\\mid f(0))`,
-          schritte: [`f(0) = ${b}`,
-                     `f'(x) = (${lin(a * c, m)})\\,${ex(c)} \\;\\Rightarrow\\; f'(0) = ${m}`,
-                     `t:\\; y = ${lin(m, b)}`] };
-      },
-    },
-  },
-};
-
-Object.assign(INHALTE['Produktregel'], {
-    kurz: 'Wie leitet man ein Produkt zweier Funktionen ab, zum Beispiel \\(x^2 \\cdot e^x\\)? Faktorweise ableiten funktioniert nicht – dafür gibt es die Produktregel.',
-
-    merk: {
-      formel: String.raw`f(x) = u(x)\cdot v(x) \quad\Longrightarrow\quad f'(x) = u'(x)\cdot v(x) + u(x)\cdot v'(x)`,
-      text: 'Kurz: \\((u\\cdot v)\' = u\'v + uv\'\\) – „erster Faktor abgeleitet mal zweiter, plus erster mal zweiter abgeleitet“.',
-    },
-
-    beispiel: {
-      aufgabe: String.raw`Leite \(f(x) = x^2\cdot e^x\) ab.`,
-      schritte: [
-        String.raw`Faktoren festlegen: \(u(x) = x^2,\; v(x) = e^x\)`,
-        String.raw`Einzeln ableiten: \(u'(x) = 2x,\; v'(x) = e^x\)`,
-        String.raw`Einsetzen: \(f'(x) = 2x\cdot e^x + x^2\cdot e^x\)`,
-        String.raw`Ausklammern: \(f'(x) = (x^2 + 2x)\,e^x = x(x+2)\,e^x\)`,
-      ],
-    },
-
-    fehler: String.raw`<b>Typischer Fehler:</b> \((u\cdot v)' = u'\cdot v'\) – falsch!
-      Gegenbeispiel: \((x\cdot x)' = (x^2)' = 2x\), aber \(1\cdot 1 = 1\).`,
-
-    uebungen: [
-      { niveau: 1, aufgabe: String.raw`\(f(x) = x\cdot e^x\)`,
-        loesung: String.raw`\(f'(x) = 1\cdot e^x + x\cdot e^x = (1+x)\,e^x\)` },
-      { niveau: 1, aufgabe: String.raw`\(f(x) = x^3\cdot\sin(x)\)`,
-        loesung: String.raw`\(f'(x) = 3x^2\sin(x) + x^3\cos(x)\)` },
-      { niveau: 2, aufgabe: String.raw`\(f(x) = (2x+1)\cdot e^x\)`,
-        loesung: String.raw`\(f'(x) = 2e^x + (2x+1)e^x = (2x+3)\,e^x\)` },
-      { niveau: 2, aufgabe: String.raw`\(f(x) = x^2\cdot e^{-x}\)`,
-        loesung: String.raw`\(v(x) = e^{-x},\; v'(x) = -e^{-x}\)<br>\(f'(x) = 2x\,e^{-x} - x^2 e^{-x} = x(2-x)\,e^{-x}\)` },
-      { niveau: 3, aufgabe: String.raw`Bestimme die Gleichung der Tangente an den Graphen von \(f(x) = x\cdot e^x\) im Punkt \(P(0\mid f(0))\).`,
-        loesung: String.raw`\(f(0) = 0\), \(f'(x) = (1+x)e^x\), also \(f'(0) = 1\).<br>Tangente: \(y = 1\cdot(x-0) + 0 = x\)` },
-      { niveau: 3, kurs: 'lk', aufgabe: String.raw`\(f(x) = x\cdot e^{x^2}\) &nbsp;<span class="hint">Produkt- und Kettenregel</span>`,
-        loesung: String.raw`\(u = x,\; v = e^{x^2},\; v' = 2x\,e^{x^2}\)<br>\(f'(x) = e^{x^2} + x\cdot 2x\,e^{x^2} = (1+2x^2)\,e^{x^2}\)` },
-    ],
-
-    test: [
-      { frage: String.raw`Was ist die Ableitung von \(f(x) = x\cdot\sin(x)\)?`,
-        optionen: [String.raw`\(\cos(x)\)`, String.raw`\(\sin(x) + x\cos(x)\)`, String.raw`\(x\cos(x)\)`, String.raw`\(\sin(x)\cdot\cos(x)\)`],
-        richtig: 1, erklaerung: String.raw`\(u' v + u v' = 1\cdot\sin(x) + x\cdot\cos(x)\)` },
-      { frage: String.raw`\(f(x) = x^2\cdot e^x\). Welchen Wert hat \(f'(0)\)?`,
-        optionen: ['0', '1', '2'],
-        richtig: 0, erklaerung: String.raw`\(f'(x) = x(x+2)\,e^x\), also \(f'(0) = 0\).` },
-      { frage: 'Bei welcher Funktion brauchst du die Produktregel?',
-        optionen: [String.raw`\(f(x) = 5\cdot e^x\)`, String.raw`\(f(x) = e^x + x\)`, String.raw`\(f(x) = x\cdot e^x\)`],
-        richtig: 2, erklaerung: 'Nur hier werden zwei Funktionen von \\(x\\) multipliziert. Ein konstanter Faktor wie 5 bleibt einfach stehen.' },
-    ],
-});
+// ---- Eigene Graphen als SVG ----
+// graph({ x: [-3, 3], y: [-2, 4], kurven: [{ f, kl: 'k1', label }], punkte: [{ x, y, label }] })
+function graph({ x: [x0, x1], y: [y0, y1], kurven = [], punkte = [], hoehe = Math.round(320 * (y1 - y0) / (x1 - x0)) }) {
+  const W = 320, H = hoehe, X = x => (x - x0) / (x1 - x0) * W, Y = y => H - (y - y0) / (y1 - y0) * H;
+  let s = '';
+  for (let x = Math.ceil(x0); x <= x1; x++) s += `<line class="gr" x1="${X(x)}" y1="0" x2="${X(x)}" y2="${H}"/>`;
+  for (let y = Math.ceil(y0); y <= y1; y++) s += `<line class="gr" x1="0" y1="${Y(y)}" x2="${W}" y2="${Y(y)}"/>`;
+  s += `<line class="ax" x1="0" y1="${Y(0)}" x2="${W}" y2="${Y(0)}"/><line class="ax" x1="${X(0)}" y1="0" x2="${X(0)}" y2="${H}"/>`;
+  s += `<text x="${W - 8}" y="${Y(0) - 6}">x</text><text x="${X(0) + 6}" y="12">y</text>`;
+  for (const k of kurven) {
+    let d = '', neu = true;
+    for (let i = 0; i <= 300; i++) {
+      const x = x0 + (x1 - x0) * i / 300, y = k.f(x);
+      if (!isFinite(y) || y < y0 - (y1 - y0) || y > y1 + (y1 - y0)) { neu = true; continue; }
+      d += `${neu ? 'M' : 'L'}${X(x).toFixed(1)},${Y(y).toFixed(1)}`; neu = false;
+    }
+    s += `<path class="${k.kl || 'k1'}" d="${d}"/>`;
+    if (k.label) s += `<text class="${k.kl || 'k1'} lbl" x="${X(k.lx)}" y="${Y(k.f(k.lx)) - 8}">${k.label}</text>`;
+  }
+  for (const p of punkte) s += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="3.5"/>` + (p.label ? `<text x="${X(p.x) + 6}" y="${Y(p.y) + 16}">${p.label}</text>` : '');
+  return `<svg class="graph" viewBox="0 0 ${W} ${H}" role="img">${s}</svg>`;
+}

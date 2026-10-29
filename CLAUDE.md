@@ -8,6 +8,8 @@ Lernseite Mathematik Kursstufe BW, getrennt nach Basisfach (BF) und Leistungsfac
 - **Keine Inhalte aus den Büchern** übernehmen: keine Abbildungen, Texte, Aufgaben oder Lösungen. Alle Inhalte und Grafiken selbst erstellen.
 - **Nichts von fremden Servern laden** (Datenschutz): Schriften und Bibliotheken nur aus `vendor/`.
 - Inhalte entstehen Thema für Thema gemeinsam mit dem Nutzer; Mathematik jeder Aufgabe nachrechnen.
+- **Vorwissen beachten:** Aufgaben nur mit Funktionen und Regeln, die bis zu diesem Abschnitt im jeweiligen Kurs eingeführt sind (z. B. e-Funktion erst in Kapitel II, Kettenregel nur im LK, im BF nur lineare Verkettung).
+- Zufallsaufgaben liefern `pruef`-Paare; nach Änderungen `node tools/pruefe-inhalte.js` ausführen.
 
 ## Coding-Richtlinien (nach Karpathy)
 
