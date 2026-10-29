@@ -1,5 +1,14 @@
 # CLAUDE.md
 
+## Projekt
+
+Lernseite Mathematik Kursstufe BW, getrennt nach Basisfach (BF) und Leistungsfach (LK). Aufbau siehe `SETUP.md`.
+
+- **Gliederung** (`js/buecher.js`) folgt wortgleich den Inhaltsverzeichnissen von Lambacher Schweizer Kursstufe Basisfach bzw. Leistungsfach BW (Klett). Keine eigenen Zuordnungen zwischen BF und LK erfinden – Abweichungen nur nach Blick ins Buch (Scans im MatheNavigator-Ordner).
+- **Keine Inhalte aus den Büchern** übernehmen: keine Abbildungen, Texte, Aufgaben oder Lösungen. Alle Inhalte und Grafiken selbst erstellen.
+- **Nichts von fremden Servern laden** (Datenschutz): Schriften und Bibliotheken nur aus `vendor/`.
+- Inhalte entstehen Thema für Thema gemeinsam mit dem Nutzer; Mathematik jeder Aufgabe nachrechnen.
+
 ## Coding-Richtlinien (nach Karpathy)
 
 Verhaltensregeln gegen typische LLM-Coding-Fehler, abgeleitet aus [Andrej Karpathys Beobachtungen](https://x.com/karpathy/status/2015883857489522876).

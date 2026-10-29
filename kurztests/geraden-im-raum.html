@@ -6,9 +6,7 @@
   <title>Kurztest: Geraden im Raum</title>
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link href="../vendor/fonts/kurztest.css" rel="stylesheet" />
 
   <!-- MathJax -->
   <script>
@@ -18,10 +16,10 @@
         displayMath: [['$$', '$$'], ['\\[', '\\]']]
       },
       options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
-      chtml: { displayAlign: 'left', displayIndent: '1.5em' }
+      chtml: { displayAlign: 'left', displayIndent: '1.5em', fontURL: '../vendor/mathjax/output/chtml/fonts/woff-v2' }
     };
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+  <script src="../vendor/mathjax/tex-chtml.js" id="MathJax-script" async></script>
 
   <style>
     /* ───── Reset & Base ───── */

@@ -1,58 +1,53 @@
-# 🚀 Setup & Arbeitsablauf
+# Setup & Arbeitsablauf
 
 Live-Seite: https://rutschmann-hub.github.io/Mathe_OS/ (GitHub Pages, Branch `main`)
 
-## 📁 Dateistruktur
+## Dateistruktur
 
 ```
 /
-├── index.html                  Hauptseite (Layout, Navigation, Sidebars)
+├── index.html              Seitengerüst (lädt CSS, MathJax und die Skripte)
 ├── css/
-│   └── styles.css              Alle Styles (inkl. Responsive/iPad)
+│   ├── base.css            Farben, Schrift, Hell/Dunkel
+│   └── site.css            Layout und Bausteine (Merkkasten, Übungen, Selbsttest …)
 ├── js/
-│   ├── app.js                  Themenstruktur (topicData), Navigation, Suche, Detailseiten
-│   └── mathjax-config.js       MathJax-Einstellungen
-├── img/                        Abbildungen für Detailseiten
-├── mindmaps/
-│   ├── analysis.html           Interaktive Mindmaps (eigenständige Seiten)
-│   ├── geometrie.html
-│   ├── stochastik.html
-│   └── gesamt.html
-├── kurztests/
-│   └── geraden-im-raum.html    Kurztest Analytische Geometrie
-├── CLAUDE.md                   Coding-Richtlinien für Claude Code
-└── SETUP.md                    Diese Anleitung
+│   ├── buecher.js          Gliederung Basisfach / Leistungsfach (nach den Inhaltsverzeichnissen)
+│   ├── inhalte.js          Eigene Inhalte pro Thema
+│   └── app.js              Navigation, Seitenaufbau, Zufallsaufgaben, Selbsttest
+├── vendor/                 Lokale Kopien von MathJax, KaTeX und Schriften (mit Lizenzen)
+├── werkzeuge/              Eigenständige Werkzeuge (z. B. Funktionsmaschine)
+└── kurztests/              Eigenständige Kurztests
 ```
 
-## 💻 Lokal ansehen
+Die Seite lädt nichts von fremden Servern – alle Schriften und Bibliotheken liegen in `vendor/`.
 
-Im Projektordner einen einfachen Webserver starten und im Browser öffnen:
+## Lokal ansehen
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Dann http://localhost:8080 aufrufen. (Direktes Öffnen der `index.html` per Doppelklick kann bei Bildern/MathJax Probleme machen.)
+Dann http://localhost:8080 öffnen.
 
-## 📤 Änderungen veröffentlichen
+## Adressen
+
+- `#/` Start · `#/bf` bzw. `#/lk` Kurs · `#/lk/III` Kapitel aufgeklappt
+- `#/lk/I/4` Thema (Kapitel I, Abschnitt 4) · `#/bf/III/g2` GFS-Thema
+
+Jede Adresse lässt sich direkt teilen oder in itslearning verlinken.
+
+## Inhalte ergänzen
+
+Inhalte stehen in `js/inhalte.js`, Schlüssel ist der Thementitel aus `js/buecher.js`.
+Gleichnamige Themen in Basisfach und Leistungsfach teilen sich das Material automatisch.
+Bausteine mit `kurs: 'lk'` bzw. `kurs: 'bf'` erscheinen nur in diesem Kurs.
+
+## Veröffentlichen
 
 ```bash
 git add .
-git commit -m "Kurze Beschreibung der Änderung"
+git commit -m "Kurze Beschreibung"
 git push origin main
 ```
 
-GitHub Pages baut die Seite danach automatisch neu – nach **1–3 Minuten** ist die Änderung online.
-
-## 🔧 Wo ändere ich was?
-
-- **Neues Thema / Unterthema:** Eintrag in `topicData` in `js/app.js`
-- **Eigene Detailseite:** Funktion `show…seite()` in `js/app.js` anlegen und in `showDetailContent()` einhängen
-- **Bilder:** in `img/` ablegen, im HTML mit `img/Dateiname.png` einbinden
-- **Design:** `css/styles.css`
-- **Mindmaps / Kurztests:** jeweilige HTML-Datei in `mindmaps/` bzw. `kurztests/`; Verlinkung in `index.html`
-- **Formeln:** LaTeX mit `\( … \)` (inline) oder `\[ … \]` (abgesetzt) – in JS-Template-Strings Backslashes verdoppeln: `\\( … \\)`
-
-## 🔗 URLs & Navigation
-
-Jede Seite hat eine eigene Adresse im Hash, z. B. `#analysis/Grundlagen%20der%20Differenzialrechnung/Kettenregel`. Links lassen sich so direkt teilen, und die Zurück-/Vor-Tasten des Browsers funktionieren.
+Nach 1–3 Minuten ist die Änderung online.
