@@ -69,8 +69,7 @@ function inhalt(x, kurs) {
   return `<p class="intro">${x.kurz}</p>
     <div class="merk"><div class="lbl">Merke</div><div class="f">\\[${x.merk.formel}\\]</div><p>${x.merk.text}</p></div>
     <section class="sec"><h2>Erklärung</h2><div class="body">
-      <details><summary>${x.warum.titel}</summary><div class="inner">${x.warum.html}</div></details>
-      <p style="margin-top:14px"><b>Beispiel:</b> ${x.beispiel.aufgabe}</p>
+      <p><b>Beispiel:</b> ${x.beispiel.aufgabe}</p>
       <details><summary>Lösung Schritt für Schritt</summary><div class="inner"><ol class="steps">${x.beispiel.schritte.map(s => `<li>${s}</li>`).join('')}</ol></div></details>
       <div class="fehler">${x.fehler}</div></div></section>
     ${videoSek(x.video)}

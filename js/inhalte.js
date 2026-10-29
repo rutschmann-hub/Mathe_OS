@@ -56,15 +56,6 @@ Object.assign(INHALTE['Produktregel'], {
       text: 'Kurz: \\((u\\cdot v)\' = u\'v + uv\'\\) – „erster Faktor abgeleitet mal zweiter, plus erster mal zweiter abgeleitet“.',
     },
 
-    warum: {
-      titel: 'Warum gilt die Produktregel?',
-      html: String.raw`<p>Stell dir \(u\cdot v\) als Fläche eines Rechtecks mit den Seiten \(u\) und \(v\) vor.
-        Wächst \(u\) um \(\Delta u\) und \(v\) um \(\Delta v\), kommen drei Streifen hinzu:</p>
-        <p>\[\Delta(u\cdot v) = \Delta u\cdot v + u\cdot\Delta v + \Delta u\cdot\Delta v\]</p>
-        <p>Teilt man durch \(\Delta x\) und lässt \(\Delta x \to 0\) gehen, verschwindet das kleine Eckstück
-        \(\Delta u\cdot\Delta v\) – übrig bleibt \(u'v + uv'\).</p>`,
-    },
-
     beispiel: {
       aufgabe: String.raw`Leite \(f(x) = x^2\cdot e^x\) ab.`,
       schritte: [
