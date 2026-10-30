@@ -197,7 +197,7 @@
   .lab-svg text.name { font-size: 15px; font-style: italic; font-weight: 600; fill: var(--text); }
   .lab-svg .kurve.abl { stroke: var(--k); }
   .lab-svg text.vz { font-size: 16px; font-weight: 700; } .lab-svg text.vz.kp { fill: var(--pos); } .lab-svg text.vz.kn { fill: var(--neg); }
-  .lab-new { border-collapse: collapse; margin-left: auto; font-size: .85rem; }
+  .lab-new { border-collapse: separate; border-spacing: 0; margin-left: auto; font-size: .85rem; border: 1.5px solid color-mix(in srgb, var(--k) 35%, transparent); border-radius: 12px; padding: 4px 8px; }
   .labor:not([data-weg="new"]) .lab-new { display: none; }
   .lab-new th, .lab-new td { width: 2.2em; text-align: center; padding: 2px 0; }
   .lab-new th { text-align: left; color: var(--text); }

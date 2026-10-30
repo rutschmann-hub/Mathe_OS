@@ -71,12 +71,12 @@ const LABOR_ART = {
 
 function laborSek({ modus, f }) {
   return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansicht wählen und den Punkt mit dem Schieberegler über die x-Achse bewegen.</p>
-    <div class="labor" id="labor" data-modus="${modus}" data-w="10" data-weg="regler" data-schritt="1">
+    <div class="labor" id="labor" data-modus="${modus}" data-w="10" data-weg="new" data-schritt="1">
       <label class="lab-f">\\(f(x) =\\) <input id="labF" value="${f}" spellcheck="false" autocomplete="off" autocapitalize="off"></label>
       <div class="lab-bsp">${['x^2', 'x^3-3x', '0,25x^4-2x^2', 'sin(x)', '√x'].map(b => `<button data-f="${b}">${b}</button>`).join('')}</div>
       <div class="stufen">${Object.entries(LABOR_MODI).map(([m, n]) => `<button data-modus="${m}" class="${m === modus ? 'on' : ''}">${n}</button>`).join('')}</div>
       <div class="stufen lab-zoom"><span>Ausschnitt</span>${[10, 5, 2].map(w => `<button data-w="${w}" class="${w === 10 ? 'on' : ''}">−${w} bis ${w}</button>`).join('')}</div>
-      <div class="stufen lab-weg"><button data-weg="regler" class="on">Mit Schieberegler</button><button data-weg="new">Markante Stellen (NEW)</button>
+      <div class="stufen lab-weg"><button data-weg="new" class="on">Markante Stellen (NEW)</button><button data-weg="regler">Mit Schieberegler</button>
         <table class="lab-new"><tr><th><i>f</i></th><td>N</td><td class="e">E</td><td class="w">W</td><td></td></tr>
           <tr><th><i>f′</i></th><td></td><td class="e">N</td><td class="w">E</td><td>W</td></tr></table></div>
       <div class="stufen lab-schritte">${['Stellen markieren', 'Übertragen', 'f′ zeichnen'].map((t, i) => `<button data-schritt="${i + 1}" class="${i ? '' : 'on'}">${i + 1} · ${t}</button>`).join('')}</div>
