@@ -99,7 +99,7 @@ Object.assign(INHALTE, {
   // ===== Basisfach I.1 =====
   'Ableitung und Tangente': {
     video: null,
-    labor: { modus: 'steigung', f: 'x^2' },
+    labor: { f: 'x^2' },
     kurz: String.raw`Wie schnell ändert sich eine Größe – nicht im Durchschnitt, sondern genau in einem Moment? Die Ableitung beantwortet das: Sie ist die <b>momentane Änderungsrate</b> und zugleich die <b>Steigung der Tangente</b> an den Graphen.`,
     merk: {
       zeilen: [
@@ -341,7 +341,7 @@ Object.assign(INHALTE, {
   // ===== Basisfach I.5 · Leistungsfach I.5 =====
   'Monotonie und Krümmung': {
     video: null,
-    labor: { modus: 'monotonie', f: 'x^3-3x' },
+    labor: { f: 'x^3-3x' },
     kurz: String.raw`Steigt oder fällt der Graph – und wie ist er gebogen? Das Vorzeichen von \(f'\) verrät die <b>Monotonie</b>, das Vorzeichen von \(f''\) die <b>Krümmung</b>.`,
     merk: {
       zeilen: [
@@ -431,7 +431,7 @@ Object.assign(INHALTE, {
   // ===== Basisfach I.6 · Leistungsfach I.6 =====
   'Extrem- und Wendepunkte': {
     video: null,
-    labor: { modus: 'monotonie', f: '0,25x^4-2x^2' },
+    labor: { f: '0,25x^4-2x^2' },
     kurz: String.raw`Hoch- und Tiefpunkte sind die Stellen, an denen der Graph von Steigen auf Fallen umschaltet (oder umgekehrt). An einem <b>Wendepunkt</b> wechselt die Krümmung – dort ist der Graph am steilsten oder am flachsten.`,
     merk: {
       zeilen: [
@@ -613,7 +613,7 @@ Object.assign(INHALTE, {
   // ===== Leistungsfach I.1 =====
   'Ableitung und Ableitungsregeln': {
     video: null,
-    labor: { modus: 'steigung', f: 'x^2' },
+    labor: { f: 'x^2' },
     kurz: String.raw`Die Ableitung \(f'(a)\) ist der Grenzwert der Differenzenquotienten: die <b>momentane Änderungsrate</b> von \(f\) an der Stelle \(a\) – geometrisch die Steigung der Tangente. Mit Regeln lassen sich Ableitungen schnell berechnen.`,
     merk: {
       zeilen: [
@@ -791,7 +791,7 @@ Object.assign(INHALTE, {
   // ===== Leistungsfach I.7 =====
   'Tangente und Normale': {
     video: null,
-    labor: { modus: 'steigung', f: '0,5x^2-1' },
+    labor: { f: '0,5x^2-1' },
     kurz: String.raw`Die <b>Tangente</b> schmiegt sich im Punkt \(P\) an den Graphen an. Die <b>Normale</b> steht in \(P\) senkrecht auf der Tangente.`,
     merk: {
       zeilen: [

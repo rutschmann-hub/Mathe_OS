@@ -157,8 +157,7 @@
 
 /* Ausprobieren: interaktiver Graph */
   .labor { margin-top: 12px; padding: 18px 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line);
-    --pos: #16a34a; --neg: #e5484d; }
-  .labor[data-modus="kruemmung"] { --pos: #2563eb; --neg: #ea8a0b; }
+    --pos: #16a34a; --neg: #e5484d; --li: #2563eb; --re: #ea8a0b; }
   .lab-f { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
   .lab-f math-field { flex: 1; min-width: 0; font-size: 1.35rem; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: .3rem .7rem;
     --caret-color: var(--k); --selection-background-color: var(--k-soft); --contains-highlight-background-color: transparent; }
@@ -179,6 +178,7 @@
   .lab-svg .kurve { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
   .lab-svg .kurve.k0 { stroke: var(--text); } .lab-svg .kurve.kp { stroke: var(--pos); } .lab-svg .kurve.kn { stroke: var(--neg); } .lab-svg .kurve.kz { stroke: var(--muted); }
   .lab-svg .band.kp { fill: var(--pos); opacity: .07; } .lab-svg .band.kn { fill: var(--neg); opacity: .07; } .lab-svg .band.kz { fill: none; }
+  .lab-svg .band.kl { fill: var(--li); opacity: .09; } .lab-svg .band.kr { fill: var(--re); opacity: .09; }
   .lab-svg .tangente { stroke: var(--k); stroke-width: 1.6; }
   .lab-svg .dreieck { fill: none; stroke: var(--k); stroke-width: 1.6; stroke-dasharray: 4 3; }
   .lab-svg .hilfs { stroke: var(--muted); stroke-dasharray: 3 3; }
@@ -186,16 +186,16 @@
   .lab-svg .wechsel { fill: var(--surface); stroke: var(--text); stroke-width: 2; }
   #labX { display: block; width: 100%; margin: 10px 0 4px; accent-color: var(--k); }
   .lab-info { font-size: .93rem; color: var(--muted); line-height: 1.6; min-height: 1.6em; }
-  .lab-info b.kp { color: var(--pos); } .lab-info b.kn { color: var(--neg); }
+  .lab-info b.kp { color: var(--pos); } .lab-info b.kn { color: var(--neg); } .lab-info b.kl { color: var(--li); } .lab-info b.kr { color: var(--re); }
   .lab-liste { list-style: none; padding: 0; margin: 8px 0 0; }
   .lab-liste i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; background: var(--muted); }
-  .lab-liste i.kp { background: var(--pos); } .lab-liste i.kn { background: var(--neg); }
+  .lab-liste i.kp { background: var(--pos); } .lab-liste i.kn { background: var(--neg); } .lab-liste i.kl { background: var(--li); } .lab-liste i.kr { background: var(--re); }
   .lab-fehler { color: var(--neg); }
-  .lab-zoom { align-items: center; }
-  .lab-zoom span { font-size: .8rem; color: var(--muted); margin-right: 4px; }
-  .lab-zoom button { letter-spacing: 0; font-size: .8rem; padding: .25rem .7rem; }
-  .labor:not([data-modus="ableiten"]) .lab-weg, .labor:not([data-modus="ableiten"]) .lab-schritte, .labor:not([data-weg="new"]) .lab-schritte,
-  .labor[data-modus="ableiten"][data-weg="new"] #labX { display: none; }
+  .lab-zoom { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: .82rem; color: var(--muted); }
+  .lab-zoom input { flex: 1; min-width: 0; accent-color: var(--k); }
+  .lab-zoom #labWText { min-width: 6.5em; text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+  .labor:not([data-modi="ableiten"]) .lab-weg, .labor:not([data-modi="ableiten"]) .lab-schritte, .labor:not([data-weg="new"]) .lab-schritte,
+  .labor[data-modi="ableiten"][data-weg="new"] #labX { display: none; }
   .lab-weg { align-items: center; }
   .lab-weg button, .lab-schritte button { letter-spacing: 0; font-size: .8rem; padding: .25rem .7rem; }
   #labGraph .lab-svg + .lab-svg { margin-top: 10px; }

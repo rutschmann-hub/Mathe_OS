@@ -1,5 +1,5 @@
 // Ausprobieren: eigene Funktion eingeben und Steigung, Monotonie oder Krümmung am Graphen erkunden.
-// Im Thema einschalten mit  labor: { modus: 'steigung' | 'monotonie' | 'kruemmung', f: 'x^3-3x' }
+// Im Thema einschalten mit  labor: { f: 'x^3-3x' }
 
 // Term wie im Taschenrechner → JS-Funktion mit LaTeX-Darstellung (f.tex).
 // Erlaubt: + - * / ^ ( ), 2x, 0,5x, x², sin cos tan √ sqrt root(n)(x) ln exp abs, pi, e
@@ -94,14 +94,14 @@ if (window.MathfieldElement) MathfieldElement.soundsDirectory = null;
 // Eingabe als Text für termFunktion, z. B. x^3-3x oder sqrt(x)
 const labTerm = () => $('#labF').getValue('ascii-math');
 
-function laborSek({ modus, f }) {
+function laborSek({ f }) {
   return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansicht wählen und den Punkt mit dem Schieberegler über die x-Achse bewegen.</p>
-    <div class="labor" id="labor" data-modus="${modus}" data-w="10" data-weg="new" data-schritt="1">
+    <div class="labor" id="labor" data-modi="" data-w="10" data-weg="new" data-schritt="1">
       <div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
       <details class="lab-bsp"><summary>Beispiele</summary>
         ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</details>
-      <div class="stufen">${Object.entries(LABOR_MODI).map(([m, n]) => `<button data-modus="${m}" class="${m === modus ? 'on' : ''}">${n}</button>`).join('')}</div>
-      <div class="stufen lab-zoom"><span>Ausschnitt</span>${[10, 5, 2].map(w => `<button data-w="${w}" class="${w === 10 ? 'on' : ''}">−${w} bis ${w}</button>`).join('')}</div>
+      <div class="stufen">${Object.entries(LABOR_MODI).map(([m, n]) => `<button data-modus="${m}" aria-pressed="false">${n}</button>`).join('')}</div>
+      <label class="lab-zoom"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="10"><span id="labWText">−10 bis 10</span></label>
       <div class="stufen lab-weg"><button data-weg="new" class="on">Markante Stellen (NEW)</button><button data-weg="regler">Mit Schieberegler</button>
         <table class="lab-new"><tr><th><i>f</i></th><td>N</td><td class="e">E</td><td class="w">W</td><td></td></tr>
           <tr><th><i>f′</i></th><td></td><td class="e">N</td><td class="w">E</td><td>W</td></tr></table></div>
@@ -122,7 +122,7 @@ function laborZeichnen() {
   let f;
   try { f = termFunktion(labTerm()); }
   catch (e) { $('#labInfo').innerHTML = `<span class="lab-fehler">${e}</span>`; return; }
-  const modus = box.dataset.modus, w = +box.dataset.w, x0 = +$('#labX').value;
+  const modi = box.dataset.modi.split(' '), an = m => modi.includes(m), w = +box.dataset.w, x0 = +$('#labX').value;
   let W = $('#labGraph').clientWidth;
   const N = 600;
   const trig = /sin|cos|tan/i.test(labTerm());
@@ -170,14 +170,16 @@ function laborZeichnen() {
     }
     return d;
   };
-  const cls = k => k === 1 ? 'kp' : k === -1 ? 'kn' : 'kz';
-  const baender = (ber, S) => ber.filter(b => !isNaN(b.k)).map(b => `<rect class="band ${cls(b.k)}" x="${X(b.xa)}" y="0" width="${X(b.xb) - X(b.xa)}" height="${S.H}"/>`).join('');
+  // Farben: Monotonie grün/rot, Krümmung blau/orange
+  const cls = k => k === 1 ? 'kp' : k === -1 ? 'kn' : 'kz', clsK = k => k === 1 ? 'kl' : k === -1 ? 'kr' : 'kz';
+  const baender = (ber, S, c = cls) => ber.filter(b => !isNaN(b.k)).map(b => `<rect class="band ${c(b.k)}" x="${X(b.xa)}" y="0" width="${X(b.xb) - X(b.xa)}" height="${S.H}"/>`).join('');
   const senkrecht = (x, S) => `<line class="hilfs" x1="${X(x)}" y1="0" x2="${X(x)}" y2="${S.H}"/>`;
   const marke = (x, y, S, t) => `<circle class="wechsel" cx="${X(x)}" cy="${S.Y(y)}" r="5"/><text class="lbl" x="${X(x)}" y="${S.Y(y) - 10}" text-anchor="middle">${t}</text>`;
 
-  // Raster: Kästchen 1 (bei −2 bis 2: 0,5), beschriftet jede bzw. jede zweite Einheit; trigonometrisch auf der x-Achse Vielfache von π/2
+  // Raster: Kästchen 1 (kleiner Ausschnitt: 0,5), beschriftet je nach Ausschnitt; trigonometrisch auf der x-Achse Vielfache von π/2
+  const randFrei = x => Math.abs(X(x) - W / 2) < W / 2 - 16;
   const svg = (S, name, unten, oben) => {
-    const { lo, hi, H, Y } = S, g = w === 2 ? .5 : 1, ls = w === 10 ? 2 : 1, gx = trig ? Math.PI / (w === 2 ? 4 : 2) : g;
+    const { lo, hi, H, Y } = S, g = w <= 3 ? .5 : 1, ls = w > 6 ? 2 : w > 3 ? 1 : .5, gx = trig ? Math.PI / (w <= 3 ? 4 : 2) : g;
     const yAchse = X(0), xAchse = Math.min(Math.max(Y(0), 12), H - 4), xLbl = xAchse + 15 > H ? xAchse - 6 : xAchse + 15;
     let s = unten;
     for (let k = Math.ceil(-w / gx); k * gx <= w; k++) s += `<line class="gr" x1="${X(k * gx)}" y1="0" x2="${X(k * gx)}" y2="${H}"/>`;
@@ -186,41 +188,41 @@ function laborZeichnen() {
       s += `<line class="gr" x1="0" y1="${Y(y)}" x2="${W}" y2="${Y(y)}"/>`;
       if (y && y % ls === 0) s += `<text x="${yAchse + 5}" y="${Y(y) + 4}">${labZahl(y)}</text>`;
     }
-    if (trig) for (let q = -Math.floor(w / (Math.PI / 2)); q * Math.PI / 2 <= w; q++) { if (q && (w < 10 || q % 2 === 0) && Math.abs(X(q * Math.PI / 2) - W / 2) < W / 2 - 16) s += `<text x="${X(q * Math.PI / 2)}" y="${xLbl}" text-anchor="middle">${labPi(q)}</text>`; }
-    else for (let x = -w + 1; x < w; x++) if (x && x % ls === 0) s += `<text x="${X(x)}" y="${xLbl}" text-anchor="middle">${labZahl(x)}</text>`;
+    if (trig) for (let q = -Math.floor(w / (Math.PI / 2)); q * Math.PI / 2 <= w; q++) { if (q && (w <= 6 || q % 2 === 0) && randFrei(q * Math.PI / 2)) s += `<text x="${X(q * Math.PI / 2)}" y="${xLbl}" text-anchor="middle">${labPi(q)}</text>`; }
+    else for (let k = Math.ceil(-w / ls); k * ls <= w; k++) { const x = k * ls; if (x && randFrei(x)) s += `<text x="${X(x)}" y="${xLbl}" text-anchor="middle">${labZahl(x)}</text>`; }
     s += `<line class="ax" x1="0" y1="${Y(0)}" x2="${W}" y2="${Y(0)}"/><line class="ax" x1="${yAchse}" y1="0" x2="${yAchse}" y2="${H}"/>`;
     return `<svg class="lab-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Graph von ${name}">${s}${oben}<text class="name" x="8" y="20">${name}</text></svg>`;
   };
 
-  const fs = x => ableitung(f, x), fS = system(f), aS = modus === 'ableiten' && system(fs);
+  const fs = x => ableitung(f, x), fS = system(f), aS = an('ableiten') && system(fs);
   // Alle Graphen zusammen höchstens 75 % der Fensterhöhe, sonst schmaler (x und y bleiben gleich skaliert)
   W = Math.min(W, Math.max(280, .75 * innerHeight * 2 * w / [fS, aS].reduce((s, S) => s + (S ? S.hi - S.lo : 0), 0)));
   const y0 = f(x0), m = ableitung(f, x0), m2 = abl2(f, x0);
-  // Punkt P mit Tangente, auf Wunsch mit Steigungsdreieck
+  // Punkt P, auf Wunsch mit Tangente und Steigungsdreieck
   const punktP = dreieck => {
     if (!isFinite(y0)) return '';
     const Y = fS.Y;
     let s = `<line class="hilfs" x1="${X(x0)}" y1="${Y(0)}" x2="${X(x0)}" y2="${Y(y0)}"/>`;
-    if (isFinite(m)) {
+    if (dreieck && isFinite(m)) {
       s += `<line class="tangente" x1="${X(-w)}" y1="${Y(y0 - m * (w + x0))}" x2="${X(w)}" y2="${Y(y0 + m * (w - x0))}"/>`;
-      if (dreieck) s += `<path class="dreieck" d="M${X(x0)},${Y(y0)}H${X(x0 + 1)}V${Y(y0 + m)}"/>
+      s += `<path class="dreieck" d="M${X(x0)},${Y(y0)}H${X(x0 + 1)}V${Y(y0 + m)}"/>
         <text x="${X(x0 + .5)}" y="${Y(y0) + (m > 0 ? 15 : -7)}" text-anchor="middle">1</text>
         <text class="lbl" x="${X(x0 + 1) + 6}" y="${Y(y0 + m / 2) + 4}">${labZahl(m)}</text>`;
     }
     return s + `<circle class="punkt" cx="${X(x0)}" cy="${Y(y0)}" r="5.5"/>`;
   };
   // Stelle des Schiebereglers direkt eingesetzt: f(−1,9), f′(−1,9)
-  const an = `(${labZahl(x0)})`;
+  const st = `(${labZahl(x0)})`;
   let bild, info;
 
-  if (modus === 'ableiten') {
+  if (an('ableiten')) {
     if (box.dataset.weg === 'regler') {
       // f′ entsteht beim Schieben: jede Tangentensteigung wird zu einem Punkt (x₀ | f′(x₀))
       bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}${punktP(true)}`)
         + svg(aS, 'f′', '', `${senkrecht(x0, aS)}<path class="kurve abl" d="${pfad(fs, -w, x0, aS)}"/>`
           + (isFinite(m) ? `<circle class="punkt" cx="${X(x0)}" cy="${aS.Y(m)}" r="5.5"/>` : ''));
-      info = !isFinite(m) ? `<i>f′</i>${an} lässt sich nicht bestimmen.`
-        : `Steigung der Tangente <i>f′</i>${an} = ${labZahl(m)} · wird zum Punkt (${labZahl(x0)} | ${labZahl(m)}) auf dem Graphen von <i>f′</i>`;
+      info = !isFinite(m) ? `<i>f′</i>${st} lässt sich nicht bestimmen.`
+        : `Steigung der Tangente <i>f′</i>${st} = ${labZahl(m)} · wird zum Punkt (${labZahl(x0)} | ${labZahl(m)}) auf dem Graphen von <i>f′</i>`;
     } else {
       const schritt = +box.dataset.schritt, berM = bereiche(artM), E = wechsel(berM), Wd = wechsel(bereiche(artK));
       let o = `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>`, u = '';
@@ -243,43 +245,56 @@ function laborZeichnen() {
       ][schritt - 1];
     }
   } else {
-    const art = modus === 'monotonie' ? artM : modus === 'kruemmung' ? artK : x => isFinite(f(x)) ? 1 : NaN;
-    const ber = bereiche(art), k0 = modus === 'steigung';
-    bild = svg(fS, 'f', k0 ? '' : baender(ber, fS),
-      ber.filter(b => !isNaN(b.k)).map(b => `<path class="kurve ${k0 ? 'k0' : cls(b.k)}" d="${pfad(f, b.xa, b.xb, fS)}"/>`).join('')
-      + wechsel(ber).filter(x => isFinite(f(x))).map(x => `<circle class="wechsel" cx="${X(x)}" cy="${fS.Y(f(x))}" r="5"/>`).join('')
-      + punktP(k0));
+    // Steigung, Monotonie und Krümmung lassen sich kombinieren: Monotonie färbt den Graphen, Krümmung den Hintergrund
+    const berM = an('monotonie') && bereiche(artM), berK = an('kruemmung') && bereiche(artK);
+    const kurve = berM ? berM.filter(b => !isNaN(b.k)).map(b => `<path class="kurve ${cls(b.k)}" d="${pfad(f, b.xa, b.xb, fS)}"/>`).join('')
+      : `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>`;
+    const marken = (ber, t) => ber ? wechsel(ber).filter(x => isFinite(f(x))).map(x => marke(x, f(x), fS, t)).join('') : '';
+    bild = svg(fS, 'f', berK ? baender(berK, fS, clsK) : berM ? baender(berM, fS) : '', kurve + marken(berM, 'E') + marken(berK, 'W') + punktP(an('steigung')));
 
     // Text unter dem Graphen (ohne MathJax, damit der Schieberegler flüssig bleibt)
-    const n = modus === 'kruemmung' ? 'f″' : 'f′', v = modus === 'kruemmung' ? m2 : m;
-    if (!isFinite(y0)) info = `<i>f</i>${an} ist nicht definiert.`;
-    else if (!isFinite(v)) info = `Am Rand des Definitionsbereichs lässt sich <i>${n}</i>${an} nicht bestimmen.`;
-    else if (k0) info = `<i>f</i>${an} = ${labZahl(y0)} · Steigung der Tangente <i>f′</i>${an} = ${labZahl(m)}`;
-    else {
-      const k = vz(v, modus === 'monotonie' ? 1e-6 : 1e-4), hier = ber.find(b => x0 >= b.xa && x0 <= b.xb);
-      info = `<i>${n}</i>${an} = ${labZahl(v)}${k > 0 ? ' &gt; 0' : k < 0 ? ' &lt; 0' : ''}` + (k === 0
-        ? (modus === 'monotonie' ? ' · waagrechte Tangente' : ' · mögliche Wendestelle')
-        : ` · Bereich von ${stelleText(hier.xa)} bis ${stelleText(hier.xb)}: <b class="${cls(hier.k)}">${LABOR_ART[modus][hier.k]}</b>`);
-      const liste = ber.filter(b => !isNaN(b.k) && b.xb - b.xa > 1e-3)
-        .map(b => `<li><i class="${cls(b.k)}"></i>${stelleText(b.xa)} bis ${stelleText(b.xb)}: ${LABOR_ART[modus][b.k]}</li>`).join('');
-      info += `<ul class="lab-liste">${liste}</ul>`;
-    }
+    const zeile = (ber, n, v, eps, art, c) => {
+      if (!isFinite(v)) return `<div>Am Rand des Definitionsbereichs lässt sich <i>${n}</i>${st} nicht bestimmen.</div>`;
+      const k = vz(v, eps), hier = ber.find(b => x0 >= b.xa && x0 <= b.xb);
+      return `<div><i>${n}</i>${st} = ${labZahl(v)}${k > 0 ? ' &gt; 0' : k < 0 ? ' &lt; 0' : ''}` + (k === 0
+        ? (n === 'f′' ? ' · waagrechte Tangente' : ' · mögliche Wendestelle')
+        : ` · Bereich von ${stelleText(hier.xa)} bis ${stelleText(hier.xb)}: <b class="${c(hier.k)}">${LABOR_ART[art][hier.k]}</b>`) + '</div>'
+        + `<ul class="lab-liste">${ber.filter(b => !isNaN(b.k) && b.xb - b.xa > 1e-3)
+          .map(b => `<li><i class="${c(b.k)}"></i>${stelleText(b.xa)} bis ${stelleText(b.xb)}: ${LABOR_ART[art][b.k]}</li>`).join('')}</ul>`;
+    };
+    info = !isFinite(y0) ? `<i>f</i>${st} ist nicht definiert.`
+      : `<div><i>f</i>${st} = ${labZahl(y0)}${an('steigung') && isFinite(m) ? ` · Steigung der Tangente <i>f′</i>${st} = ${labZahl(m)}` : ''}</div>`
+        + (berM ? zeile(berM, 'f′', m, 1e-6, 'monotonie', cls) : '') + (berK ? zeile(berK, 'f″', m2, 1e-4, 'kruemmung', clsK) : '');
   }
   $('#labGraph').innerHTML = bild;
   $('#labInfo').innerHTML = info;
 }
 
-document.addEventListener('input', e => { if (e.target.id === 'labF' || e.target.id === 'labX') laborZeichnen(); });
+// Ausschnitt −w bis w; der Punkt bleibt im Ausschnitt
+function laborAusschnitt() {
+  const box = $('#labor'), w = +$('#labW').value, r = $('#labX');
+  box.dataset.w = r.max = w; r.min = -w; r.value = Math.max(-w, Math.min(w, r.value));
+  $('#labWText').textContent = `−${labZahl(w)} bis ${labZahl(w)}`;
+  // Grafisch ableiten mit Schieberegler beginnt am linken Rand
+  if (box.dataset.modi === 'ableiten') r.value = -w;
+}
+document.addEventListener('input', e => {
+  if (e.target.id === 'labW') laborAusschnitt();
+  if (['labF', 'labX', 'labW'].includes(e.target.id)) laborZeichnen();
+});
 document.addEventListener('click', e => {
   const b = e.target.closest('#labor button'), box = $('#labor'); if (!b) return;
   if (b.dataset.f) { $('#labF').value = termFunktion(b.dataset.f).tex; b.closest('details').open = false; }
-  if (b.dataset.w) {
-    const r = $('#labX'); box.dataset.w = r.max = b.dataset.w; r.min = -b.dataset.w; r.value = Math.max(-r.max, Math.min(r.max, r.value));
-    box.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('on', x === b));
+  // Ansichten an- und abwählen; Grafisch ableiten steht für sich allein
+  if (b.dataset.modus) {
+    const m = b.dataset.modus, modi = box.dataset.modi.split(' ').filter(x => x && x !== 'ableiten');
+    box.dataset.modi = m === 'ableiten' ? (box.dataset.modi === 'ableiten' ? '' : 'ableiten')
+      : (modi.includes(m) ? modi.filter(x => x !== m) : [...modi, m]).join(' ');
+    box.querySelectorAll('[data-modus]').forEach(x => { const on = box.dataset.modi.split(' ').includes(x.dataset.modus); x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+    if (box.dataset.modi === 'ableiten') $('#labX').value = -box.dataset.w;
   }
-  for (const a of ['modus', 'weg', 'schritt']) if (b.dataset[a]) { box.dataset[a] = b.dataset[a]; box.querySelectorAll(`[data-${a}]`).forEach(x => x.classList.toggle('on', x === b)); }
-  // Grafisch ableiten mit Schieberegler beginnt am linken Rand
-  if (box.dataset.modus === 'ableiten' && (b.dataset.modus || b.dataset.weg || b.dataset.w)) $('#labX').value = -box.dataset.w;
+  for (const a of ['weg', 'schritt']) if (b.dataset[a]) { box.dataset[a] = b.dataset[a]; box.querySelectorAll(`[data-${a}]`).forEach(x => x.classList.toggle('on', x === b)); }
+  if (b.dataset.weg === 'regler') $('#labX').value = -box.dataset.w;
   laborZeichnen();
 });
 addEventListener('resize', laborZeichnen);
