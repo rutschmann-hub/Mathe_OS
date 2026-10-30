@@ -101,7 +101,11 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Wie schnell ändert sich eine Größe – nicht im Durchschnitt, sondern genau in einem Moment? Die Ableitung beantwortet das: Sie ist die <b>momentane Änderungsrate</b> und zugleich die <b>Steigung der Tangente</b> an den Graphen.`,
     merk: {
-      formel: String.raw`\begin{aligned} m_s &= \frac{f(a+h)-f(a)}{h} \\[4pt] f'(a) &= \lim_{h\to 0}\frac{f(a+h)-f(a)}{h} \\[4pt] t:\; y &= f'(a)\,(x-a) + f(a) \end{aligned}`,
+      zeilen: [
+        ['Sekantensteigung', String.raw`m_s = \frac{f(a+h)-f(a)}{h}`],
+        ['Ableitung', String.raw`f'(a) = \lim\limits_{h\to 0}\frac{f(a+h)-f(a)}{h}`],
+        ['Tangente', String.raw`y = f'(a)\,(x-a) + f(a)`],
+      ],
       text: String.raw`Sekantensteigung \(m_s\) (mittlere Änderungsrate), Ableitung (momentane Änderungsrate) und Tangente in \(P(a\mid f(a))\). Für \(h \to 0\) wird die Sekantensteigung zur Tangentensteigung.`,
     },
     erklaerung: String.raw`<p>Lässt man den Punkt \(Q\) immer näher an \(P\) heranrücken, dreht sich die Sekante in die Tangente.
@@ -174,7 +178,13 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Ableiten über den Grenzwert ist mühsam. Mit wenigen Regeln geht es schnell – und leitet man die Ableitung noch einmal ab, erhält man <b>höhere Ableitungen</b> \(f'',\, f''',\, \dots\)`,
     merk: {
-      formel: String.raw`\begin{aligned} (x^r)' &= r\,x^{r-1} &&\class{regel}{\text{Potenzregel}} \\ (c\cdot g)' &= c\cdot g' &&\class{regel}{\text{Faktorregel}} \\ (g + h)' &= g' + h' &&\class{regel}{\text{Summenregel}} \\ (\sin x)' &= \cos x \\ (\cos x)' &= -\sin x \end{aligned}`,
+      zeilen: [
+        ['Potenzregel', String.raw`(x^r)' = r\,x^{r-1}`],
+        ['Faktorregel', String.raw`(c\cdot g)' = c\cdot g'`],
+        ['Summenregel', String.raw`(g + h)' = g' + h'`],
+        ['Sinus', String.raw`(\sin x)' = \cos x`],
+        ['Kosinus', String.raw`(\cos x)' = -\sin x`],
+      ],
       text: String.raw`Gilt auch für Wurzeln und Brüche: \(\sqrt{x} = x^{\frac12}\), \(\frac{1}{x} = x^{-1}\).`,
     },
     beispiel: {
@@ -215,7 +225,10 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Steht in einer Funktion statt \(x\) ein linearer Term wie \(3x - 1\), zum Beispiel \((3x-1)^4\) oder \(\sin(2x)\), leitet man wie gewohnt ab und multipliziert zusätzlich mit der Steigung des inneren Terms.`,
     merk: {
-      formel: String.raw`\begin{aligned} f(x) &= g(mx + c) \\ f'(x) &= m\cdot g'(mx + c) \end{aligned}`,
+      zeilen: [
+        ['Funktion', String.raw`f(x) = g(mx + c)`],
+        ['Ableitung', String.raw`f'(x) = m\cdot g'(mx + c)`],
+      ],
       text: String.raw`Der innere Term \(mx + c\) bleibt stehen, dazu kommt der Faktor \(m\) („nachdifferenzieren“).`,
     },
     beispiel: {
@@ -254,7 +267,10 @@ Object.assign(INHALTE, {
     video: null, // z. B. { url: 'https://…', titel: 'Produktregel in 5 Minuten' }
     kurz: String.raw`Wie leitet man ein Produkt zweier Funktionen ab, zum Beispiel \(x^2 \cdot \sin(x)\)? Faktorweise ableiten funktioniert nicht – dafür gibt es die Produktregel.`,
     merk: {
-      formel: String.raw`\begin{aligned} f(x) &= u(x)\cdot v(x) \\ f'(x) &= u'(x)\cdot v(x) + u(x)\cdot v'(x) \end{aligned}`,
+      zeilen: [
+        ['Funktion', String.raw`f(x) = u(x)\cdot v(x)`],
+        ['Ableitung', String.raw`f'(x) = u'(x)\cdot v(x) + u(x)\cdot v'(x)`],
+      ],
       text: String.raw`Kurz: \((u\cdot v)' = u'v + uv'\) – „erster Faktor abgeleitet mal zweiter, plus erster mal zweiter abgeleitet“.`,
     },
     beispiel: {
@@ -326,7 +342,12 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Steigt oder fällt der Graph – und wie ist er gebogen? Das Vorzeichen von \(f'\) verrät die <b>Monotonie</b>, das Vorzeichen von \(f''\) die <b>Krümmung</b>.`,
     merk: {
-      formel: String.raw`\begin{aligned} f' > 0 &\;\Rightarrow\; \text{streng monoton steigend} \\ f' < 0 &\;\Rightarrow\; \text{streng monoton fallend} \\ f'' > 0 &\;\Rightarrow\; \text{linksgekrümmt} \\ f'' < 0 &\;\Rightarrow\; \text{rechtsgekrümmt} \end{aligned}`,
+      zeilen: [
+        ['streng monoton steigend', String.raw`f'(x) > 0`],
+        ['streng monoton fallend', String.raw`f'(x) < 0`],
+        ['linksgekrümmt', String.raw`f''(x) > 0`],
+        ['rechtsgekrümmt', String.raw`f''(x) < 0`],
+      ],
       text: String.raw`Jeweils auf einem ganzen Intervall \(I\). Die Pfeile gelten nur in eine Richtung: \(f(x) = x^3\) ist streng monoton steigend, obwohl \(f'(0) = 0\).`,
     },
     erklaerung: String.raw`<p>Stell dir vor, du fährst mit dem Fahrrad auf dem Graphen von links nach rechts.
@@ -410,7 +431,11 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Hoch- und Tiefpunkte sind die Stellen, an denen der Graph von Steigen auf Fallen umschaltet (oder umgekehrt). An einem <b>Wendepunkt</b> wechselt die Krümmung – dort ist der Graph am steilsten oder am flachsten.`,
     merk: {
-      formel: String.raw`\begin{aligned} \text{Hochpunkt:}&\quad f'(x_0) = 0,\; f''(x_0) < 0 \\ \text{Tiefpunkt:}&\quad f'(x_0) = 0,\; f''(x_0) > 0 \\ \text{Wendepunkt:}&\quad f''(x_0) = 0,\; f'''(x_0) \neq 0 \end{aligned}`,
+      zeilen: [
+        ['Hochpunkt', String.raw`f'(x_0) = 0,\; f''(x_0) < 0`],
+        ['Tiefpunkt', String.raw`f'(x_0) = 0,\; f''(x_0) > 0`],
+        ['Wendepunkt', String.raw`f''(x_0) = 0,\; f'''(x_0) \neq 0`],
+      ],
       text: String.raw`\(f'(x_0) = 0\) ist nur <i>notwendig</i>. Hinreichend ist zusätzlich \(f''(x_0) \ne 0\) – oder ein Vorzeichenwechsel von \(f'\) bei \(x_0\).`,
     },
     erklaerung: graph({ x: [-2.5, 2.5], y: [-3, 3], kurven: [{ f: x => x ** 3 - 3 * x, kl: 'k1', label: 'f', lx: 2.05 }],
@@ -485,7 +510,11 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Beschreibt \(f(t)\) eine Größe im Lauf der Zeit, sagt die Ableitung, wie schnell sie sich gerade ändert. Mit den bekannten Werkzeugen findest du größte Werte und Zeitpunkte stärkster Änderung.`,
     merk: {
-      formel: String.raw`\begin{aligned} \text{Änderungsrate:}&\quad f'(t) \\ \text{größter Wert:}&\quad f'(t) = 0 \\ \text{stärkste Änderung:}&\quad f''(t) = 0 \end{aligned}`,
+      zeilen: [
+        ['Änderungsrate', String.raw`f'(t)`],
+        ['größter Wert', String.raw`f'(t) = 0`],
+        ['stärkste Änderung', String.raw`f''(t) = 0`],
+      ],
       text: String.raw`Beim größten Wert auch die Ränder prüfen. Einheit von \(f'(t)\): Größe pro Zeit, z. B. m/s. Zum Schluss immer einen Antwortsatz mit Einheit formulieren.`,
     },
     beispiel: {
@@ -553,7 +582,14 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Die Ableitung \(f'(a)\) ist der Grenzwert der Differenzenquotienten: die <b>momentane Änderungsrate</b> von \(f\) an der Stelle \(a\) – geometrisch die Steigung der Tangente. Mit Regeln lassen sich Ableitungen schnell berechnen.`,
     merk: {
-      formel: String.raw`\begin{aligned} f'(a) &= \lim_{h\to 0}\frac{f(a+h) - f(a)}{h} \\[4pt] (x^r)' &= r\,x^{r-1} \\ (c\cdot g)' &= c\cdot g' \\ (g + h)' &= g' + h' \\ (\sin x)' &= \cos x \\ (\cos x)' &= -\sin x \end{aligned}`,
+      zeilen: [
+        ['Ableitung', String.raw`f'(a) = \lim\limits_{h\to 0}\frac{f(a+h) - f(a)}{h}`],
+        ['Potenzregel', String.raw`(x^r)' = r\,x^{r-1}`],
+        ['Faktorregel', String.raw`(c\cdot g)' = c\cdot g'`],
+        ['Summenregel', String.raw`(g + h)' = g' + h'`],
+        ['Sinus', String.raw`(\sin x)' = \cos x`],
+        ['Kosinus', String.raw`(\cos x)' = -\sin x`],
+      ],
       text: String.raw`Leitet man \(f'\) erneut ab, erhält man \(f''\), dann \(f'''\) usw.`,
     },
     erklaerung: String.raw`<p>Drei Sichtweisen auf dieselbe Zahl \(f'(a)\): <b>momentane Änderungsrate</b> (z. B. Geschwindigkeit),
@@ -598,7 +634,11 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Zwei Funktionen hintereinander ausführen: erst \(v\), dann \(u\). So entsteht zum Beispiel \(\sqrt{x^2 + 1}\) aus \(v(x) = x^2 + 1\) und \(u(x) = \sqrt{x}\). Für die Kettenregel muss man solche Verkettungen sicher erkennen.`,
     merk: {
-      formel: String.raw`\begin{aligned} &(u \circ v)(x) = u(v(x)) \\ &v: \text{ innere Funktion} \\ &u: \text{ äußere Funktion} \end{aligned}`,
+      zeilen: [
+        ['Verkettung', String.raw`(u \circ v)(x) = u(v(x))`],
+        ['innere Funktion', String.raw`v`],
+        ['äußere Funktion', String.raw`u`],
+      ],
       text: String.raw`Die Reihenfolge zählt: \(u(v(x))\) und \(v(u(x))\) sind im Allgemeinen verschieden. \(x\) muss in der Definitionsmenge von \(v\) liegen und \(v(x)\) in der von \(u\).`,
     },
     beispiel: {
@@ -658,7 +698,10 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Wie leitet man eine Verkettung wie \(\sin(x^2)\) oder \(\sqrt{x^3 + 2}\) ab? Die Kettenregel sagt: äußere Ableitung mal innere Ableitung.`,
     merk: {
-      formel: String.raw`\begin{aligned} f(x) &= u(v(x)) \\ f'(x) &= u'(v(x))\cdot v'(x) \end{aligned}`,
+      zeilen: [
+        ['Funktion', String.raw`f(x) = u(v(x))`],
+        ['Ableitung', String.raw`f'(x) = u'(v(x))\cdot v'(x)`],
+      ],
       text: String.raw`„Äußere Ableitung (innere Funktion bleibt stehen) mal innere Ableitung.“`,
     },
     erklaerung: String.raw`<p><b>Verstärkungsfaktoren:</b> Ändert sich \(x\) ein wenig, ändert sich \(v(x)\) etwa um das \(v'(x)\)-Fache.
@@ -716,8 +759,11 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Die <b>Tangente</b> schmiegt sich im Punkt \(P\) an den Graphen an. Die <b>Normale</b> steht in \(P\) senkrecht auf der Tangente.`,
     merk: {
-      formel: String.raw`\begin{aligned} t:\; y &= f'(a)\,(x - a) + f(a) \\ n:\; y &= -\frac{1}{f'(a)}\,(x - a) + f(a) \qquad (f'(a) \ne 0) \end{aligned}`,
-      text: String.raw`Senkrechte Geraden: \(m_t\cdot m_n = -1\). Ist \(f'(a) = 0\), ist die Normale die senkrechte Gerade \(x = a\).`,
+      zeilen: [
+        ['Tangente', String.raw`y = f'(a)\,(x - a) + f(a)`],
+        ['Normale', String.raw`y = -\frac{1}{f'(a)}\,(x - a) + f(a)`],
+      ],
+      text: String.raw`Normale nur für \(f'(a) \ne 0\). Senkrechte Geraden: \(m_t\cdot m_n = -1\). Ist \(f'(a) = 0\), ist die Normale die senkrechte Gerade \(x = a\).`,
     },
     erklaerung: graph({ x: [-2, 3], y: [-1, 4], kurven: [
       { f: x => x * x, kl: 'k1', label: 'f', lx: -1.9 },
@@ -783,7 +829,11 @@ Object.assign(INHALTE, {
     video: null,
     kurz: String.raw`Größtmögliche Fläche, kleinster Materialverbrauch: Optimieren heißt, eine Zielgröße zu maximieren oder zu minimieren – unter einer Bedingung, die die Variablen miteinander verknüpft.`,
     merk: {
-      formel: String.raw`\begin{aligned} &\text{Zielfunktion } Z(x, y) \\ &\downarrow\ \text{Nebenbedingung einsetzen} \\ &Z(x) \text{ mit Definitionsbereich} \\ &\downarrow \\ &Z'(x) = 0,\ \text{Ränder prüfen} \end{aligned}`,
+      zeilen: [
+        ['1. Zielfunktion', String.raw`Z(x, y)`],
+        ['2. Nebenbedingung einsetzen', String.raw`Z(x)\ \text{mit Definitionsbereich}`],
+        ['3. Extremum', String.raw`Z'(x) = 0,\ \text{Ränder prüfen}`],
+      ],
       text: 'Ablauf: Skizze und Variablen – Zielfunktion – Nebenbedingung – einsetzen – Definitionsbereich – Extremum (inklusive Ränder) – Antwortsatz.',
     },
     beispiel: {

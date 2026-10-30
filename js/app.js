@@ -64,7 +64,9 @@ function inhalt(x, kurs) {
   const fuer = b => !b.kurs || b.kurs === kurs;
   const ue = x.uebungen.filter(fuer);
   return `<p class="intro">${x.kurz}</p>
-    <div class="merk"><div class="lbl">Merke</div><div class="f">\\[${x.merk.formel}\\]</div><p>${x.merk.text}</p></div>
+    <div class="merk"><div class="lbl">Merke</div>${x.merk.zeilen
+      ? `<div class="regeln">${x.merk.zeilen.map(([name, f], i) => `<div class="r-name${i ? ' t' : ''}">${name}</div><div class="f${i ? ' t' : ''}">\\(\\displaystyle ${f}\\)</div>`).join('')}</div>`
+      : `<div class="f">\\[${x.merk.formel}\\]</div>`}<p>${x.merk.text}</p></div>
     <section class="sec"><h2>Erklärung</h2><div class="body">
       ${x.erklaerung || ''}
       <p><b>Beispiel:</b> ${x.beispiel.aufgabe}</p>
