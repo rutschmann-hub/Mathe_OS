@@ -2,12 +2,12 @@
 // Im Thema einschalten mit  labor: { modus: 'steigung' | 'monotonie' | 'kruemmung', f: 'x^3-3x' }
 
 // Term wie im Taschenrechner → JS-Funktion mit LaTeX-Darstellung (f.tex).
-// Erlaubt: + - * / ^ ( ), 2x, 0,5x, x², sin cos tan √ sqrt ln exp abs, pi, e
+// Erlaubt: + - * / ^ ( ), 2x, 0,5x, x², sin cos tan √ sqrt root(n)(x) ln exp abs, pi, e
 // Knoten: { f: Funktion, t: LaTeX, p: Rang (1 Summe, 2 Produkt, 3 Vorzeichen, 4 Potenz, 5 Atom), i: Inhalt einer Klammer }
 function termFunktion(text) {
   const s = text.replace(/^\s*(f\s*\(\s*x\s*\)|y)\s*=/i, '').replace(/−/g, '-').replace(/[·×]/g, '*')
     .replace(/²/g, '^2').replace(/³/g, '^3').replace(/,/g, '.').toLowerCase();
-  const woerter = ['sqrt', 'sin', 'cos', 'tan', 'exp', 'ln', 'abs', 'pi', 'π', '√', 'x', 'e'];
+  const woerter = ['sqrt', 'root', 'sin', 'cos', 'tan', 'exp', 'ln', 'abs', 'pi', 'π', '√', 'x', 'e'];
   const tok = [];
   for (let i = 0; i < s.length;) {
     if (/\s/.test(s[i])) { i++; continue; }
@@ -66,6 +66,8 @@ function termFunktion(text) {
     if (t === 'e') return { f: () => Math.E, t: 'e', p: 5 };
     if (t === '(') { const a = summe(); if (!nimm(')')) throw 'Klammer „)“ fehlt'; return { f: a.f, t: `\\left(${a.t}\\right)`, p: 5, i: a }; }
     if (F[t]) { const [g, tex] = F[t], a = atom(); return { f: x => g(a.f(x)), t: tex(a), p: 5 }; }
+    // n-te Wurzel root(n)(x); bei ungeradem n auch für negative x
+    if (t === 'root') { const n = atom(), a = atom(); return { f: x => { const k = n.f(x), v = a.f(x); return v < 0 && k % 2 === 1 ? -Math.pow(-v, 1 / k) : Math.pow(v, 1 / k); }, t: `\\sqrt[${(n.i || n).t}]{${(a.i || a).t}}`, p: 5 }; }
     throw t === undefined ? 'Term unvollständig' : `„${t}“ an dieser Stelle unerwartet`;
   }
   const a = summe();
@@ -81,23 +83,23 @@ const LABOR_ART = {
   kruemmung: { 1: 'linksgekrümmt', '-1': 'rechtsgekrümmt', 0: 'nicht gekrümmt (Gerade)' },
 };
 
-// Standardbeispiele: [Anzeige, Eingabe]
+// Standardbeispiele
 const LABOR_BSP = {
-  'Ganzrationale Funktionen': [['x²', 'x^2'], ['−x² + 4x', '-x^2+4x'], ['x³', 'x^3'], ['x³ − 3x', 'x^3-3x'], ['−x³ + 3x²', '-x^3+3x^2'],
-    ['0,25x⁴ − 2x²', '0,25x^4-2x^2'], ['0,5(x − 1)²(x + 2)', '0,5(x-1)^2(x+2)']],
-  'Bruch und Wurzel': [['1/x', '1/x'], ['1/x²', '1/x^2'], ['√x', '√x']],
-  'Trigonometrische Funktionen': [['sin(x)', 'sin(x)'], ['cos(x)', 'cos(x)'], ['2·sin(x)', '2sin(x)'], ['sin(2x)', 'sin(2x)']],
+  'Ganzrationale Funktionen': ['x^2', '-x^2+4x', 'x^3', 'x^3-3x', '-x^3+3x^2', '0,25x^4-2x^2', '0,5(x-1)^2(x+2)'],
+  'Bruch und Wurzel': ['1/x', '1/x^2', '√x'],
+  'Trigonometrische Funktionen': ['sin(x)', 'cos(x)', '2sin(x)', 'sin(2x)'],
 };
+// Formel-Eingabefeld (MathLive, lokal in vendor/mathlive, Schriften von dort): ohne Töne
+if (window.MathfieldElement) MathfieldElement.soundsDirectory = null;
+// Eingabe als Text für termFunktion, z. B. x^3-3x oder sqrt(x)
+const labTerm = () => $('#labF').getValue('ascii-math');
 
 function laborSek({ modus, f }) {
   return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansicht wählen und den Punkt mit dem Schieberegler über die x-Achse bewegen.</p>
     <div class="labor" id="labor" data-modus="${modus}" data-w="10" data-weg="new" data-schritt="1">
-      <select id="labBsp" aria-label="Beispiel wählen"><option value="">Beispiel wählen …</option>
-        ${Object.entries(LABOR_BSP).map(([g, l]) => `<optgroup label="${g}">${l.map(([n, t]) => `<option value="${t}"${t === f ? ' selected' : ''}>${n}</option>`).join('')}</optgroup>`).join('')}</select>
-      <label class="lab-f"><span>Eingabe</span><input id="labF" value="${f}" spellcheck="false" autocomplete="off" autocapitalize="off"></label>
-      <div class="lab-tasten">${[['x²', '^2'], ['x³', '^3'], ['xⁿ', '^'], ['√', '√('], ['π', 'π']].map(([n, t]) => `<button data-tippe="${t}" title="${t}">${n}</button>`).join('')}
-        <span>z. B. x^3 für x³, √(x+1) für die Wurzel</span></div>
-      <div class="lab-tex" id="labTex">\\(f(x) = ${termFunktion(f).tex}\\)</div>
+      <div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
+      <details class="lab-bsp"><summary>Beispiele</summary>
+        ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</details>
       <div class="stufen">${Object.entries(LABOR_MODI).map(([m, n]) => `<button data-modus="${m}" class="${m === modus ? 'on' : ''}">${n}</button>`).join('')}</div>
       <div class="stufen lab-zoom"><span>Ausschnitt</span>${[10, 5, 2].map(w => `<button data-w="${w}" class="${w === 10 ? 'on' : ''}">−${w} bis ${w}</button>`).join('')}</div>
       <div class="stufen lab-weg"><button data-weg="new" class="on">Markante Stellen (NEW)</button><button data-weg="regler">Mit Schieberegler</button>
@@ -118,12 +120,12 @@ const labPi = q => (q < 0 ? '−' : '') + (q % 2 ? (Math.abs(q) === 1 ? '' : Mat
 function laborZeichnen() {
   const box = $('#labor'); if (!box) return;
   let f;
-  try { f = termFunktion($('#labF').value); }
+  try { f = termFunktion(labTerm()); }
   catch (e) { $('#labInfo').innerHTML = `<span class="lab-fehler">${e}</span>`; return; }
   const modus = box.dataset.modus, w = +box.dataset.w, x0 = +$('#labX').value;
   let W = $('#labGraph').clientWidth;
   const N = 600;
-  const trig = /sin|cos|tan/i.test($('#labF').value);
+  const trig = /sin|cos|tan/i.test(labTerm());
   // Stellen bei trigonometrischen Funktionen im Bogenmaß, z. B. 3π/2
   const stelleText = x => trig && Math.abs(x / (Math.PI / 2) - Math.round(x / (Math.PI / 2))) < 1e-4 && Math.round(x / (Math.PI / 2)) ? labPi(Math.round(x / (Math.PI / 2))) : labZahl(x);
   const xs = Array.from({ length: N + 1 }, (_, i) => -w + 2 * w * i / N);
@@ -267,21 +269,10 @@ function laborZeichnen() {
   $('#labInfo').innerHTML = info;
 }
 
-// Formel zum eingegebenen Term; bei Tippfehlern bleibt die letzte gültige Formel blass stehen
-let labTexFertig = Promise.resolve();
-function laborTerm() {
-  const el = $('#labTex');
-  try { const tex = termFunktion($('#labF').value).tex; el.classList.remove('alt'); labTexFertig = labTexFertig.then(() => { el.innerHTML = `\\(f(x) = ${tex}\\)`; return typeset(el); }); }
-  catch (e) { el.classList.add('alt'); }
-}
-document.addEventListener('input', e => {
-  if (e.target.id === 'labF') { $('#labBsp').value = ''; laborTerm(); }
-  if (e.target.id === 'labF' || e.target.id === 'labX') laborZeichnen();
-});
-document.addEventListener('change', e => { if (e.target.id === 'labBsp' && e.target.value) { $('#labF').value = e.target.value; laborTerm(); laborZeichnen(); } });
+document.addEventListener('input', e => { if (e.target.id === 'labF' || e.target.id === 'labX') laborZeichnen(); });
 document.addEventListener('click', e => {
   const b = e.target.closest('#labor button'), box = $('#labor'); if (!b) return;
-  if (b.dataset.tippe) { const i = $('#labF'); i.setRangeText(b.dataset.tippe, i.selectionStart, i.selectionEnd, 'end'); i.focus(); $('#labBsp').value = ''; laborTerm(); }
+  if (b.dataset.f) { $('#labF').value = termFunktion(b.dataset.f).tex; b.closest('details').open = false; }
   if (b.dataset.w) {
     const r = $('#labX'); box.dataset.w = r.max = b.dataset.w; r.min = -b.dataset.w; r.value = Math.max(-r.max, Math.min(r.max, r.value));
     box.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('on', x === b));

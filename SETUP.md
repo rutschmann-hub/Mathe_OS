@@ -16,7 +16,7 @@ Live-Seite: https://rutschmann-hub.github.io/Mathe_OS/ (GitHub Pages, Branch `ma
 │   ├── inhalte/            Eigene Inhalte, eine Datei pro Kapitel (kapitel-1.js …)
 │   ├── labor.js            „Ausprobieren“: eigene Funktion, Steigung/Monotonie/Krümmung am Graphen
 │   └── app.js              Navigation, Seitenaufbau, Zufallsaufgaben, Selbsttest
-├── vendor/                 Lokale Kopien von MathJax, KaTeX und Schriften (mit Lizenzen)
+├── vendor/                 Lokale Kopien von MathJax, KaTeX, MathLive und Schriften (mit Lizenzen)
 ├── werkzeuge/              Eigenständige Werkzeuge (z. B. Funktionsmaschine)
 ├── kurztests/              Eigenständige Kurztests
 └── tools/                  Prüfskript für Inhalte und Zufallsaufgaben
