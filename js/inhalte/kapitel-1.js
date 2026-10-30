@@ -179,11 +179,11 @@ Object.assign(INHALTE, {
     kurz: String.raw`Ableiten über den Grenzwert ist mühsam. Mit wenigen Regeln geht es schnell – und leitet man die Ableitung noch einmal ab, erhält man <b>höhere Ableitungen</b> \(f'',\, f''',\, \dots\)`,
     merk: {
       zeilen: [
-        ['Potenzregel', String.raw`(x^r)' = r\,x^{r-1}`],
-        ['Faktorregel', String.raw`(c\cdot g)' = c\cdot g'`],
-        ['Summenregel', String.raw`(g + h)' = g' + h'`],
-        ['Sinus', String.raw`(\sin x)' = \cos x`],
-        ['Kosinus', String.raw`(\cos x)' = -\sin x`],
+        ['Potenzregel', String.raw`f(x) = x^r \;\Rightarrow\; f'(x) = r\cdot x^{r-1}`],
+        ['Faktorregel', String.raw`f(x) = c\cdot g(x) \;\Rightarrow\; f'(x) = c\cdot g'(x)`],
+        ['Summenregel', String.raw`f(x) = g(x) + h(x) \;\Rightarrow\; f'(x) = g'(x) + h'(x)`],
+        ['Sinus', String.raw`f(x) = \sin(x) \;\Rightarrow\; f'(x) = \cos(x)`],
+        ['Kosinus', String.raw`f(x) = \cos(x) \;\Rightarrow\; f'(x) = -\sin(x)`],
       ],
       text: String.raw`Gilt auch für Wurzeln und Brüche: \(\sqrt{x} = x^{\frac12}\), \(\frac{1}{x} = x^{-1}\).`,
     },
@@ -584,11 +584,11 @@ Object.assign(INHALTE, {
     merk: {
       zeilen: [
         ['Ableitung', String.raw`f'(a) = \lim\limits_{h\to 0}\frac{f(a+h) - f(a)}{h}`],
-        ['Potenzregel', String.raw`(x^r)' = r\,x^{r-1}`],
-        ['Faktorregel', String.raw`(c\cdot g)' = c\cdot g'`],
-        ['Summenregel', String.raw`(g + h)' = g' + h'`],
-        ['Sinus', String.raw`(\sin x)' = \cos x`],
-        ['Kosinus', String.raw`(\cos x)' = -\sin x`],
+        ['Potenzregel', String.raw`f(x) = x^r \;\Rightarrow\; f'(x) = r\cdot x^{r-1}`],
+        ['Faktorregel', String.raw`f(x) = c\cdot g(x) \;\Rightarrow\; f'(x) = c\cdot g'(x)`],
+        ['Summenregel', String.raw`f(x) = g(x) + h(x) \;\Rightarrow\; f'(x) = g'(x) + h'(x)`],
+        ['Sinus', String.raw`f(x) = \sin(x) \;\Rightarrow\; f'(x) = \cos(x)`],
+        ['Kosinus', String.raw`f(x) = \cos(x) \;\Rightarrow\; f'(x) = -\sin(x)`],
       ],
       text: String.raw`Leitet man \(f'\) erneut ab, erhält man \(f''\), dann \(f'''\) usw.`,
     },
