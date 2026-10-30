@@ -466,6 +466,36 @@ Object.assign(INHALTE, {
       { niveau: 3, aufgabe: String.raw`Bestimme \(a\) so, dass \(f(x) = x^3 + ax^2\) an der Stelle \(x = 2\) eine Extremstelle hat. Hoch- oder Tiefpunkt?`,
         loesung: String.raw`\(f'(x) = 3x^2 + 2ax\), \(f'(2) = 12 + 4a = 0 \Rightarrow a = -3\).<br>\(f''(x) = 6x - 6\), \(f''(2) = 6 > 0\) → Tiefpunkt \(T(2\mid -4)\).` },
     ],
+    // Lösung prüfen: eine Lösung „wie von einer KI“, genau ein Schritt (fehler, ab 0 gezählt) ist falsch
+    pruefen: [
+      { aufgabe: String.raw`Bestimme den Extrempunkt von \(f(x) = -x^2 + 4x\).`,
+        schritte: [
+          String.raw`\(f'(x) = -2x + 4 = 0 \;\Rightarrow\; x = 2\)`,
+          String.raw`\(f''(x) = -2\), also \(f''(2) = -2 < 0\)`,
+          String.raw`Wegen \(f''(2) < 0\) liegt ein Tiefpunkt vor: \(T(2\mid 4)\)`,
+        ],
+        fehler: 2,
+        erklaerung: String.raw`\(f''(2) < 0\) heißt: Der Graph ist rechtsgekrümmt – das ist ein <b>Hochpunkt</b> \(H(2\mid 4)\).` },
+      { aufgabe: String.raw`Bestimme die Wendepunkte von \(f(x) = x^4 - 6x^2\).`,
+        schritte: [
+          String.raw`\(f'(x) = 4x^3 - 12x\), \(f''(x) = 12x^2 - 12\)`,
+          String.raw`\(f''(x) = 0 \;\Leftrightarrow\; x^2 = 1 \;\Rightarrow\; x = 1\)`,
+          String.raw`\(f'''(x) = 24x\), \(f'''(1) = 24 \ne 0\)`,
+          String.raw`\(f(1) = 1 - 6 = -5\), also Wendepunkt \(W(1\mid -5)\)`,
+        ],
+        fehler: 1,
+        erklaerung: String.raw`\(x^2 = 1\) hat zwei Lösungen: \(x = 1\) <b>und</b> \(x = -1\). Mit \(f'''(-1) = -24 \ne 0\) und \(f(-1) = -5\) gibt es einen zweiten Wendepunkt \(W_2(-1\mid -5)\).` },
+      { aufgabe: String.raw`Bestimme die Extrempunkte von \(f(x) = x^3 - 3x^2 + 3x\).`,
+        schritte: [
+          String.raw`\(f'(x) = 3x^2 - 6x + 3 = 3(x - 1)^2\)`,
+          String.raw`\(f'(x) = 0 \;\Rightarrow\; x = 1\)`,
+          String.raw`\(f''(x) = 6x - 6\), also \(f''(1) = 0\)`,
+          String.raw`Da \(f'(1) = 0\) gilt, hat \(f\) bei \(x = 1\) einen Extrempunkt: \(E(1\mid 1)\)`,
+        ],
+        fehler: 3,
+        erklaerung: String.raw`\(f'(1) = 0\) ist nur notwendig, und wegen \(f''(1) = 0\) entscheidet auch das \(f''\)-Kriterium nicht.
+          Vorzeichen prüfen: \(f'(x) = 3(x-1)^2 \ge 0\) auf beiden Seiten – kein Vorzeichenwechsel. Also <b>kein</b> Extrempunkt, sondern ein Sattelpunkt \(S(1\mid 1)\).` },
+    ],
     generator: {
       1: () => {
         const a = nichtNull(-3, 3), xs = zuf(-4, 4), ys = zuf(-6, 6), c = a * xs * xs + ys, f = x => a * x * x - 2 * a * xs * x + c;

@@ -117,6 +117,19 @@
   .stufen .neu { margin-left: auto; letter-spacing: 0; color: var(--text); font-weight: 600; }
   .gen-a { font-size: 1.1rem; margin-bottom: 6px; overflow-x: auto; }
 
+  /* Lösung prüfen */
+  .ki { margin-top: 14px; padding: 16px 18px; border: 1.5px dashed var(--line); border-radius: 16px; background: var(--surface); }
+  .ki-kopf { font-weight: 600; margin-bottom: 8px; }
+  .ki-tag { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 2px 8px; margin-right: 8px; vertical-align: 2px; }
+  .ki-schritte { margin: 0; padding-left: 1.4rem; }
+  .ki-schritte li { margin: 4px 0; }
+  .ki-schritte button { display: block; width: 100%; text-align: left; border: 1px solid transparent; background: transparent; border-radius: 10px; padding: 6px 10px; font-size: .97rem; transition: border-color .15s, background .15s; }
+  .ki-schritte button:hover:not(:disabled) { border-color: var(--k); background: var(--k-soft); }
+  .ki-schritte button.ok { background: color-mix(in srgb, #16a34a 10%, transparent); }
+  .ki-schritte button.no { border-color: #e5484d; background: color-mix(in srgb, #e5484d 10%, transparent); }
+  .ki-schritte button:disabled { cursor: default; color: inherit; }
+  .ki .fb { margin-top: 8px; font-size: .93rem; line-height: 1.6; }
+
   /* Eigene Graphen */
   .graph { display: block; width: 100%; max-width: 380px; margin: 6px 0 14px; color: var(--muted); }
   .graph .gr { stroke: var(--line); stroke-width: .6; }

@@ -17,6 +17,7 @@ for (const [t, x] of Object.entries(INHALTE)) {
   if (!titel.has(t)) melde(t, 'kein Thema in buecher.js');
   for (const k of ['kurz', 'merk', 'beispiel', 'fehler', 'uebungen', 'test']) if (!x[k]) melde(t, `fehlt: ${k}`);
   (x.test || []).forEach((q, i) => { if (!(q.richtig >= 0 && q.richtig < q.optionen.length)) melde(t, `Testfrage ${i + 1}: richtig außerhalb`); });
+  (x.pruefen || []).forEach((k, i) => { if (!(k.fehler >= 0 && k.fehler < k.schritte.length)) melde(t, `Lösung prüfen ${i + 1}: fehler außerhalb`); });
   for (const [stufe, gen] of Object.entries(x.generator || {})) {
     for (let n = 0; n < 300; n++) {
       const r = gen();

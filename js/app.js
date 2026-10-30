@@ -79,6 +79,9 @@ function inhalt(x, kurs) {
     ${x.generator ? `<section class="sec"><h2>Weiter üben</h2><p>Zufallsaufgaben – so viele du willst. Stufe wählen, dann „Neue Aufgabe“.</p>
       <div class="gen"><div class="stufen">${[1, 2, 3].map(n => `<button data-stufe="${n}" class="${n === 1 ? 'on' : ''}">${'●'.repeat(n)}</button>`).join('')}
         <button class="neu" id="neu">Neue Aufgabe ↻</button></div><div id="genAufgabe"></div></div></section>` : ''}
+    ${x.pruefen ? `<section class="sec"><h2>Lösung prüfen</h2><p>Eine KI hat gerechnet – sauber aufgeschrieben, aber in jeder Lösung steckt genau ein Fehler. Tippe auf den falschen Schritt.</p>
+      ${x.pruefen.map((k, i) => `<div class="ki" data-k="${i}"><div class="ki-kopf"><span class="ki-tag">KI-Lösung</span>${k.aufgabe}</div>
+        <ol class="ki-schritte">${k.schritte.map((s, j) => `<li><button data-s="${j}">${s}</button></li>`).join('')}</ol><div class="fb"></div></div>`).join('')}</section>` : ''}
     <section class="sec"><h2>Selbsttest</h2><p>Drei kurze Fragen – du bekommst sofort Rückmeldung. Nichts wird gespeichert.</p>
       ${x.test.map((q, i) => `<div class="q" data-i="${i}"><div class="fr">${q.frage}</div>
         <div class="opts">${q.optionen.map((o, j) => `<button data-j="${j}">${o}</button>`).join('')}</div><div class="fb"></div></div>`).join('')}
@@ -104,6 +107,18 @@ document.addEventListener('click', e => {
   const s = e.target.closest('.stufen button[data-stufe]');
   if (s) { stufe = +s.dataset.stufe; document.querySelectorAll('.stufen button[data-stufe]').forEach(b => b.classList.toggle('on', b === s)); neueAufgabe(); }
   if (e.target.closest('#neu')) neueAufgabe();
+});
+
+// Lösung prüfen: falschen Schritt suchen
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.ki-schritte button');
+  if (!btn || btn.disabled) return;
+  const kEl = btn.closest('.ki'), k = INHALTE[$('h1').textContent].pruefen[kEl.dataset.k];
+  if (+btn.dataset.s !== k.fehler) { btn.classList.add('ok'); btn.disabled = true; kEl.querySelector('.fb').textContent = 'Dieser Schritt stimmt – such weiter.'; return; }
+  btn.classList.add('no');
+  kEl.querySelectorAll('.ki-schritte button').forEach(b => b.disabled = true);
+  kEl.querySelector('.fb').innerHTML = '✓ Gefunden! ' + k.erklaerung;
+  typeset(kEl.querySelector('.fb'));
 });
 
 // Selbsttest: Klick auswerten
