@@ -121,6 +121,11 @@ function laborSek({ f }) {
 const labZahl = v => String(+(Math.abs(v) < 5e-3 ? 0 : v).toFixed(2)).replace('.', ',').replace('-', '−');
 // Vielfaches von π/2 als Text: q = 1 → π/2, q = 2 → π, q = −3 → −3π/2
 const labPi = q => (q < 0 ? '−' : '') + (q % 2 ? (Math.abs(q) === 1 ? '' : Math.abs(q)) + 'π/2' : (Math.abs(q) === 2 ? '' : Math.abs(q / 2)) + 'π');
+// Formeln im Text unter dem Graphen: LaTeX, sofort gesetzt mit MathLive (schnell genug für den Schieberegler)
+const labTex = l => MathLive.convertLatexToMarkup(l);
+const labZahlTex = v => labZahl(v).replace('−', '-').replace(',', '{,}');
+// Vielfaches von π/2 als LaTeX: q = 1 → π/2, q = 2 → π, q = −3 → −3π/2
+const labPiTex = q => (q < 0 ? '-' : '') + (q % 2 ? `\\frac{${Math.abs(q) === 1 ? '' : Math.abs(q)}\\pi}{2}` : `${Math.abs(q) === 2 ? '' : Math.abs(q / 2)}\\pi`);
 
 function laborZeichnen() {
   const box = $('#labor'); if (!box) return;
@@ -133,7 +138,8 @@ function laborZeichnen() {
   const N = 600;
   const trig = /sin|cos|tan/i.test(labTerm());
   // Stellen bei trigonometrischen Funktionen im Bogenmaß, z. B. 3π/2
-  const stelleText = x => trig && Math.abs(x / (Math.PI / 2) - Math.round(x / (Math.PI / 2))) < 1e-4 && Math.round(x / (Math.PI / 2)) ? labPi(Math.round(x / (Math.PI / 2))) : labZahl(x);
+  const stelleTex = x => trig && Math.abs(x / (Math.PI / 2) - Math.round(x / (Math.PI / 2))) < 1e-4 && Math.round(x / (Math.PI / 2)) ? labPiTex(Math.round(x / (Math.PI / 2))) : labZahlTex(x);
+  const intervall = (a, b) => labTex(`\\left[${stelleTex(a)};\\,${stelleTex(b)}\\right]`), z = labZahlTex;
   const xs = Array.from({ length: N + 1 }, (_, i) => -w + 2 * w * i / N);
   if (!xs.map(f).some(isFinite)) { $('#labGraph').innerHTML = ''; $('#labInfo').innerHTML = '<span class="lab-fehler">Die Funktion ist in diesem Ausschnitt nicht definiert.</span>'; return; }
   const X = x => (x + w) / (2 * w) * W;
@@ -224,11 +230,11 @@ function laborZeichnen() {
     }
     return s + `<circle class="punkt" cx="${X(x0)}" cy="${Y(y0)}" r="5.5"/>` + (sekante ? `<text class="lbl" x="${X(x0) - 8}" y="${Y(y0) - 8}" text-anchor="end">P</text>` : '');
   };
-  // Geradengleichung y = kx + b als Text
-  const geradeText = (n, k, b) => {
+  // Geradengleichung y = kx + b als LaTeX
+  const geradeTex = (n, k, b) => {
     k = +k.toFixed(2); b = +b.toFixed(2);
-    const kx = k === 0 ? '' : k === 1 ? '<i>x</i>' : k === -1 ? '−<i>x</i>' : `${labZahl(k)}<i>x</i>`;
-    return `${n}: <i>y</i> = ${kx}${kx && b ? (b > 0 ? ' + ' : ' − ') + labZahl(Math.abs(b)) : kx ? '' : labZahl(b)}`;
+    const kx = k === 0 ? '' : k === 1 ? 'x' : k === -1 ? '-x' : `${z(k)}x`;
+    return `${n}\\colon y = ${kx}${kx && b ? (b > 0 ? ' + ' : ' - ') + z(Math.abs(b)) : kx ? '' : z(b)}`;
   };
   // Nullstellen: Vorzeichenwechsel von f und Berührstellen (|f| hat dort ein Minimum nahe 0)
   const nullstellen = () => {
@@ -244,7 +250,7 @@ function laborZeichnen() {
     return ns.sort((a, b) => a - b);
   };
   // Stelle des Schiebereglers direkt eingesetzt: f(−1,9), f′(−1,9)
-  const st = `(${labZahl(x0)})`;
+  const st = `(${z(x0)})`;
   let bild, info;
 
   if (an('ableiten')) {
@@ -253,8 +259,8 @@ function laborZeichnen() {
       bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}${punktP(true, false, false)}`)
         + svg(aS, 'f′', '', `${senkrecht(x0, aS)}<path class="kurve abl" d="${pfad(fs, -w, x0, aS)}"/>`
           + (isFinite(m) ? `<circle class="punkt" cx="${X(x0)}" cy="${aS.Y(m)}" r="5.5"/>` : ''));
-      info = !isFinite(m) ? `<i>f′</i>${st} lässt sich nicht bestimmen.`
-        : `Steigung der Tangente <i>f′</i>${st} = ${labZahl(m)} · wird zum Punkt (${labZahl(x0)} | ${labZahl(m)}) auf dem Graphen von <i>f′</i>`;
+      info = !isFinite(m) ? `${labTex(`f'${st}`)} lässt sich nicht bestimmen.`
+        : `Steigung der Tangente ${labTex(`f'${st} = ${z(m)}`)} wird zum Punkt ${labTex(`(${z(x0)}\\mid ${z(m)})`)} auf dem Graphen von ${labTex("f'")}`;
     } else {
       const schritt = +box.dataset.schritt, berM = bereiche(artM), E = wechsel(berM), Wd = wechsel(bereiche(artK));
       let o = `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>`, u = '';
@@ -269,11 +275,11 @@ function laborZeichnen() {
       }
       if (schritt >= 3) u = `<path class="kurve abl" d="${pfad(fs, -w, w, aS)}"/>` + u;
       bild = svg(fS, 'f', schritt >= 2 ? baender(berM, fS) : '', o) + svg(aS, 'f′', schritt >= 2 ? baender(berM, aS) : '', u);
-      const liste = xs => xs.length ? xs.map(stelleText).join('; ') : 'keine';
+      const liste = xs => xs.length ? labTex('x = ' + xs.map(stelleTex).join(';\\ ')) : 'keine';
       info = [
-        `Markiere bei <i>f</i> die Extremstellen (E): <i>x</i> = ${liste(E)} und die Wendestellen (W): <i>x</i> = ${liste(Wd)}.`,
-        `Übertragen: Aus jeder Extremstelle von <i>f</i> wird eine <b>Nullstelle</b> von <i>f′</i>, aus jeder Wendestelle eine <b>Extremstelle</b> von <i>f′</i>. Wo <i>f</i> steigt, liegt <i>f′</i> über der x-Achse (+), wo <i>f</i> fällt, darunter (−).`,
-        `<i>f′</i> zeichnen: durch die Nullstellen und Extrempunkte, oberhalb der x-Achse bei +, unterhalb bei −.`,
+        `Markiere bei ${labTex('f')} die Extremstellen (E): ${liste(E)} und die Wendestellen (W): ${liste(Wd)}.`,
+        `Übertragen: Aus jeder Extremstelle von ${labTex('f')} wird eine <b>Nullstelle</b> von ${labTex("f'")}, aus jeder Wendestelle eine <b>Extremstelle</b> von ${labTex("f'")}. Wo ${labTex('f')} steigt, liegt ${labTex("f'")} über der x-Achse (+), wo ${labTex('f')} fällt, darunter (−).`,
+        `${labTex("f'")} zeichnen: durch die Nullstellen und Extrempunkte, oberhalb der x-Achse bei +, unterhalb bei −.`,
       ][schritt - 1];
     }
   } else {
@@ -288,24 +294,25 @@ function laborZeichnen() {
 
     // Text unter dem Graphen (ohne MathJax, damit der Schieberegler flüssig bleibt)
     const zeile = (ber, n, v, eps, art, c) => {
-      if (!isFinite(v)) return `<div>Am Rand des Definitionsbereichs lässt sich <i>${n}</i>${st} nicht bestimmen.</div>`;
+      if (!isFinite(v)) return `<div>Am Rand des Definitionsbereichs lässt sich ${labTex(n + st)} nicht bestimmen.</div>`;
       const k = vz(v, eps), hier = ber.find(b => x0 >= b.xa && x0 <= b.xb);
-      return `<div><i>${n}</i>${st} = ${labZahl(v)}${k > 0 ? ' &gt; 0' : k < 0 ? ' &lt; 0' : ''}` + (k === 0
-        ? (n === 'f′' ? ' · waagrechte Tangente' : ' · mögliche Wendestelle')
-        : ` · Bereich von ${stelleText(hier.xa)} bis ${stelleText(hier.xb)}: <b class="${c(hier.k)}">${LABOR_ART[art][hier.k]}</b>`) + '</div>'
+      return `<div>${labTex(`${n}${st} = ${z(v)}${k > 0 ? ' > 0' : k < 0 ? ' < 0' : ''}`)}` + (k === 0
+        ? (n === "f'" ? ' · waagrechte Tangente' : ' · mögliche Wendestelle')
+        : ` · auf ${intervall(hier.xa, hier.xb)}: <b class="${c(hier.k)}">${LABOR_ART[art][hier.k]}</b>`) + '</div>'
         + `<ul class="lab-liste">${ber.filter(b => !isNaN(b.k) && b.xb - b.xa > 1e-3)
-          .map(b => `<li><i class="${c(b.k)}"></i>${stelleText(b.xa)} bis ${stelleText(b.xb)}: ${LABOR_ART[art][b.k]}</li>`).join('')}</ul>`;
+          .map(b => `<li><i class="${c(b.k)}"></i>${intervall(b.xa, b.xb)}: ${LABOR_ART[art][b.k]}</li>`).join('')}</ul>`;
     };
-    const tm = isFinite(m), xh = `(${labZahl(xq)})`;
-    info = !isFinite(y0) ? `<i>f</i>${st} ist nicht definiert.`
-      : `<div><i>f</i>${st} = ${labZahl(y0)}</div>`
-        + (an('steigung') && tm ? `<div>Steigung der Tangente <i>f′</i>${st} = ${labZahl(m)} · ${geradeText('Tangente <i>t</i>', m, y0 - m * x0)}</div>` : '')
-        + (an('sekante') ? `<div>${!h ? 'Für <i>h</i> = 0 gibt es keine Sekante.' : !isFinite(yq) ? `<i>f</i>${xh} ist nicht definiert.`
-          : `Sekante durch <i>P</i> und <i>Q</i>(${labZahl(xq)} | ${labZahl(yq)}): Steigung (<i>f</i>${xh} − <i>f</i>${st}) / ${labZahl(h)} = ${labZahl(ms)}`
-            + (tm ? ` · Unterschied zu <i>f′</i>${st}: ${labZahl(ms - m)}` : '')}</div>` : '')
-        + (an('normale') && tm ? `<div>${Math.abs(m) < 1e-9 ? `Normale <i>n</i>: <i>x</i> = ${labZahl(x0)}` : `Steigung der Normale −1 / ${labZahl(m)} = ${labZahl(-1 / m)} · ${geradeText('Normale <i>n</i>', -1 / m, y0 + x0 / m)}`}</div>` : '')
-        + (an('nullstellen') ? `<div>Nullstellen: ${N0.length ? '<i>x</i> = ' + N0.map(stelleText).join('; ') : 'keine in diesem Ausschnitt'}</div>` : '')
-        + (berM ? zeile(berM, 'f′', m, 1e-6, 'monotonie', cls) : '') + (berK ? zeile(berK, 'f″', m2, 1e-4, 'kruemmung', clsK) : '');
+    const tm = isFinite(m), xh = `(${z(xq)})`;
+    info = !isFinite(y0) ? `${labTex(`f${st}`)} ist nicht definiert.`
+      : `<div>${labTex(`f${st} = ${z(y0)}`)}</div>`
+        + (an('steigung') && tm ? `<div>Steigung der Tangente ${labTex(`f'${st} = ${z(m)}`)} · ${labTex(geradeTex('t', m, y0 - m * x0))}</div>` : '')
+        + (an('sekante') ? `<div>${!h ? `Für ${labTex('h = 0')} gibt es keine Sekante.` : !isFinite(yq) ? `${labTex(`f${xh}`)} ist nicht definiert.`
+          : `Sekante durch ${labTex('P')} und ${labTex(`Q(${z(xq)}\\mid ${z(yq)})`)}: ${labTex(`m_s = \\frac{f${xh} - f${st}}{${z(h)}} = ${z(ms)}`)}`
+            + (tm ? ` · ${labTex(`m_s - f'${st} = ${z(ms - m)}`)}` : '')}</div>` : '')
+        + (an('normale') && tm ? `<div>${Math.abs(m) < 1e-9 ? `Normale ${labTex(`n\\colon x = ${z(x0)}`)}`
+          : `Steigung der Normale ${labTex(`m_n = -\\frac{1}{${z(m)}} = ${z(-1 / m)}`)} · ${labTex(geradeTex('n', -1 / m, y0 + x0 / m))}`}</div>` : '')
+        + (an('nullstellen') ? `<div>Nullstellen: ${N0.length ? labTex('x = ' + N0.map(stelleTex).join(';\\ ')) : 'keine in diesem Ausschnitt'}</div>` : '')
+        + (berM ? zeile(berM, "f'", m, 1e-6, 'monotonie', cls) : '') + (berK ? zeile(berK, "f''", m2, 1e-4, 'kruemmung', clsK) : '');
   }
   $('#labGraph').innerHTML = bild;
   $('#labInfo').innerHTML = info;

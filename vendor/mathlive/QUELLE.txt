@@ -1,2 +1,3 @@
 MathLive 0.110.0 (npm-Paket "mathlive"), MIT-Lizenz, siehe LICENSE.txt.
 Übernommen: mathlive.min.js und fonts/. Töne sind abgeschaltet (soundsDirectory = null).
+Zusätzlich: mathlive-static.css (Formeln im Text unter dem Graphen).
