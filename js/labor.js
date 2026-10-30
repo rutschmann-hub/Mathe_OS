@@ -76,7 +76,9 @@ function laborSek({ modus, f }) {
       <div class="lab-bsp">${['x^2', 'x^3-3x', '0,25x^4-2x^2', 'sin(x)', '√x'].map(b => `<button data-f="${b}">${b}</button>`).join('')}</div>
       <div class="stufen">${Object.entries(LABOR_MODI).map(([m, n]) => `<button data-modus="${m}" class="${m === modus ? 'on' : ''}">${n}</button>`).join('')}</div>
       <div class="stufen lab-zoom"><span>Ausschnitt</span>${[10, 5, 2].map(w => `<button data-w="${w}" class="${w === 10 ? 'on' : ''}">−${w} bis ${w}</button>`).join('')}</div>
-      <div class="stufen lab-weg"><button data-weg="regler" class="on">Mit Schieberegler</button><button data-weg="new">Markante Stellen (NEW)</button></div>
+      <div class="stufen lab-weg"><button data-weg="regler" class="on">Mit Schieberegler</button><button data-weg="new">Markante Stellen (NEW)</button>
+        <table class="lab-new"><tr><th><i>f</i></th><td>N</td><td class="e">E</td><td class="w">W</td><td></td></tr>
+          <tr><th><i>f′</i></th><td></td><td class="e">N</td><td class="w">E</td><td>W</td></tr></table></div>
       <div class="stufen lab-schritte">${['Stellen markieren', 'Übertragen', 'f′ zeichnen'].map((t, i) => `<button data-schritt="${i + 1}" class="${i ? '' : 'on'}">${i + 1} · ${t}</button>`).join('')}</div>
       <div id="labGraph"></div>
       <input type="range" id="labX" min="-10" max="10" step="0.05" value="1.5" aria-label="Stelle x₀">
@@ -208,8 +210,7 @@ function laborZeichnen() {
       if (schritt >= 3) u = `<path class="kurve abl" d="${pfad(fs, -w, w, aS)}"/>` + u;
       bild = svg(fS, 'f', schritt >= 2 ? baender(berM, fS) : '', o) + svg(aS, 'f′', schritt >= 2 ? baender(berM, aS) : '', u);
       const liste = xs => xs.length ? xs.map(stelleText).join('; ') : 'keine';
-      info = `<table class="lab-new"><tr><th><i>f</i></th><td>N</td><td class="e">E</td><td class="w">W</td><td></td></tr>
-        <tr><th><i>f′</i></th><td></td><td class="e">N</td><td class="w">E</td><td>W</td></tr></table>` + [
+      info = [
         `Markiere bei <i>f</i> die Extremstellen (E): <i>x</i> = ${liste(E)} und die Wendestellen (W): <i>x</i> = ${liste(Wd)}.`,
         `Übertragen: Aus jeder Extremstelle von <i>f</i> wird eine <b>Nullstelle</b> von <i>f′</i>, aus jeder Wendestelle eine <b>Extremstelle</b> von <i>f′</i>. Wo <i>f</i> steigt, liegt <i>f′</i> über der x-Achse (+), wo <i>f</i> fällt, darunter (−).`,
         `<i>f′</i> zeichnen: durch die Nullstellen und Extrempunkte, oberhalb der x-Achse bei +, unterhalb bei −.`,
