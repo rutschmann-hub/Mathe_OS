@@ -14,6 +14,7 @@ Live-Seite: https://rutschmann-hub.github.io/Mathe_OS/ (GitHub Pages, Branch `ma
 │   ├── buecher.js          Gliederung Basisfach / Leistungsfach (nach den Inhaltsverzeichnissen)
 │   ├── inhalte.js          Hilfsfunktionen für Inhalte (Terme, Brüche, eigene Graphen)
 │   ├── inhalte/            Eigene Inhalte, eine Datei pro Kapitel (kapitel-1.js …)
+│   ├── labor.js            „Ausprobieren“: eigene Funktion, Steigung/Monotonie/Krümmung am Graphen
 │   └── app.js              Navigation, Seitenaufbau, Zufallsaufgaben, Selbsttest
 ├── vendor/                 Lokale Kopien von MathJax, KaTeX und Schriften (mit Lizenzen)
 ├── werkzeuge/              Eigenständige Werkzeuge (z. B. Funktionsmaschine)
@@ -43,6 +44,7 @@ Jede Adresse lässt sich direkt teilen oder in itslearning verlinken.
 Inhalte stehen in `js/inhalte/kapitel-*.js` (neue Datei auch in `index.html` einbinden), Schlüssel ist der Thementitel aus `js/buecher.js`.
 Gleichnamige Themen in Basisfach und Leistungsfach teilen sich das Material automatisch.
 Bausteine mit `kurs: 'lk'` bzw. `kurs: 'bf'` erscheinen nur in diesem Kurs.
+Mit `labor: { modus: 'steigung' | 'monotonie' | 'kruemmung', f: 'x^2' }` erscheint im Thema der interaktive Graph „Ausprobieren“.
 
 Nach jeder Änderung prüfen (alle Themen vollständig, jede Zufallsaufgabe 300-mal numerisch nachgerechnet):
 

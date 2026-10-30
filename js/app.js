@@ -72,6 +72,7 @@ function inhalt(x, kurs) {
       <p><b>Beispiel:</b> ${x.beispiel.aufgabe}</p>
       <details><summary>Lösung Schritt für Schritt</summary><div class="inner"><ol class="steps">${x.beispiel.schritte.map(s => `<li>${s}</li>`).join('')}</ol></div></details>
       <div class="fehler">${x.fehler}</div></div></section>
+    ${x.labor ? laborSek(x.labor) : ''}
     ${videoSek(x.video)}
     <section class="sec"><h2>Übungen</h2><p style="margin-bottom:6px">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
       ${ue.map((u, i) => `<div class="ue"><span class="nr">${i + 1}</span><div>${u.aufgabe}<span class="lvl">${'●'.repeat(u.niveau)}</span>${u.kurs === 'lk' ? '<span class="tag-lk">LK</span>' : ''}</div>
@@ -149,7 +150,7 @@ function passend() {
 }
 addEventListener('resize', passend);
 const _route = route;
-route = function () { stufe = 1; _route(); neueAufgabe(); typeset($('#main')).then(passend); };
+route = function () { stufe = 1; _route(); neueAufgabe(); laborZeichnen(); typeset($('#main')).then(passend); };
 
 function themeToggle() {
   const r = document.documentElement;

@@ -154,3 +154,38 @@
     .kap > a { grid-template-columns: 2.6rem 1fr 1rem; } .kap .n { display: none; }
     .units { padding-left: 2.8rem; }
   }
+
+/* Ausprobieren: interaktiver Graph */
+  .labor { margin-top: 12px; padding: 18px 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line);
+    --pos: #16a34a; --neg: #e5484d; }
+  .labor[data-modus="kruemmung"] { --pos: #2563eb; --neg: #ea8a0b; }
+  .lab-f { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; }
+  .lab-f input { flex: 1; min-width: 0; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .45rem .7rem; }
+  .lab-f input:focus { outline: none; border-color: var(--k); }
+  .lab-bsp { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+  .lab-bsp button { border: none; background: var(--surface-2); color: var(--muted); border-radius: 8px; padding: .2rem .6rem; font-size: .82rem; font-family: ui-monospace, monospace; }
+  .lab-bsp button:hover { color: var(--text); }
+  #labGraph { width: 100%; }
+  .lab-svg { display: block; color: var(--muted); }
+  .lab-svg .gr { stroke: var(--line); stroke-width: .6; }
+  .lab-svg .ax { stroke: var(--muted); stroke-width: 1.1; }
+  .lab-svg text { font-size: 11px; fill: currentColor; }
+  .lab-svg text.lbl { font-weight: 600; fill: var(--k); }
+  .lab-svg .kurve { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  .lab-svg .kurve.k0 { stroke: var(--text); } .lab-svg .kurve.kp { stroke: var(--pos); } .lab-svg .kurve.kn { stroke: var(--neg); } .lab-svg .kurve.kz { stroke: var(--muted); }
+  .lab-svg .band.kp { fill: var(--pos); opacity: .07; } .lab-svg .band.kn { fill: var(--neg); opacity: .07; } .lab-svg .band.kz { fill: none; }
+  .lab-svg .tangente { stroke: var(--k); stroke-width: 1.6; }
+  .lab-svg .dreieck { fill: none; stroke: var(--k); stroke-width: 1.6; stroke-dasharray: 4 3; }
+  .lab-svg .hilfs { stroke: var(--muted); stroke-dasharray: 3 3; }
+  .lab-svg .punkt { fill: var(--k); stroke: var(--surface); stroke-width: 2; }
+  .lab-svg .wechsel { fill: var(--surface); stroke: var(--text); stroke-width: 2; }
+  #labX { display: block; width: 100%; margin: 10px 0 4px; accent-color: var(--k); }
+  .lab-info { font-size: .93rem; color: var(--muted); line-height: 1.6; min-height: 1.6em; }
+  .lab-info b.kp { color: var(--pos); } .lab-info b.kn { color: var(--neg); }
+  .lab-liste { list-style: none; padding: 0; margin: 8px 0 0; }
+  .lab-liste i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; background: var(--muted); }
+  .lab-liste i.kp { background: var(--pos); } .lab-liste i.kn { background: var(--neg); }
+  .lab-fehler { color: var(--neg); }
+  .lab-zoom { align-items: center; }
+  .lab-zoom span { font-size: .8rem; color: var(--muted); margin-right: 4px; }
+  .lab-zoom button { letter-spacing: 0; font-size: .8rem; padding: .25rem .7rem; }
