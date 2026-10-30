@@ -2,12 +2,12 @@
 // Im Thema einschalten mit  labor: { f: 'x^3-3x' }
 
 // Term wie im Taschenrechner → JS-Funktion mit LaTeX-Darstellung (f.tex).
-// Erlaubt: + - * / ^ ( ), 2x, 0,5x, x², sin cos tan √ sqrt root(n)(x) ln exp abs, pi, e
+// Erlaubt: + - * / ^ ( ), 2x, 0,5x, x², sin cos tan √ sqrt root(n)(x) ln exp abs, pi, e und den Parameter a (Wert aus par.a)
 // Knoten: { f: Funktion, t: LaTeX, p: Rang (1 Summe, 2 Produkt, 3 Vorzeichen, 4 Potenz, 5 Atom), i: Inhalt einer Klammer }
-function termFunktion(text) {
+function termFunktion(text, par = { a: 1 }) {
   const s = text.replace(/^\s*(f\s*\(\s*x\s*\)|y)\s*=/i, '').replace(/−/g, '-').replace(/[·×]/g, '*')
     .replace(/²/g, '^2').replace(/³/g, '^3').replace(/,/g, '.').toLowerCase();
-  const woerter = ['sqrt', 'root', 'sin', 'cos', 'tan', 'exp', 'ln', 'abs', 'pi', 'π', '√', 'x', 'e'];
+  const woerter = ['sqrt', 'root', 'sin', 'cos', 'tan', 'exp', 'ln', 'abs', 'pi', 'π', '√', 'x', 'e', 'a'];
   const tok = [];
   for (let i = 0; i < s.length;) {
     if (/\s/.test(s[i])) { i++; continue; }
@@ -64,6 +64,7 @@ function termFunktion(text) {
     if (t === 'x') return { f: x => x, t: 'x', p: 5 };
     if (t === 'pi' || t === 'π') return { f: () => Math.PI, t: '\\pi', p: 5 };
     if (t === 'e') return { f: () => Math.E, t: 'e', p: 5 };
+    if (t === 'a') return { f: () => par.a, t: 'a', p: 5 };
     if (t === '(') { const a = summe(); if (!nimm(')')) throw 'Klammer „)“ fehlt'; return { f: a.f, t: `\\left(${a.t}\\right)`, p: 5, i: a }; }
     if (F[t]) { const [g, tex] = F[t], a = atom(); return { f: x => g(a.f(x)), t: tex(a), p: 5 }; }
     // n-te Wurzel root(n)(x); bei ungeradem n auch für negative x
@@ -74,10 +75,11 @@ function termFunktion(text) {
   if (p < tok.length) throw `„${tok[p]}“ an dieser Stelle unerwartet`;
   const f = a.f;
   f.tex = a.t;
+  f.hatA = tok.includes('a');
   return f;
 }
 
-const LABOR_MODI = { steigung: 'Steigung', monotonie: 'Monotonie', kruemmung: 'Krümmung', ableiten: 'Grafisch ableiten' };
+const LABOR_MODI = { steigung: 'Steigung', sekante: 'Sekante', normale: 'Normale', nullstellen: 'Nullstellen', monotonie: 'Monotonie', kruemmung: 'Krümmung', ableiten: 'Grafisch ableiten' };
 const LABOR_ART = {
   monotonie: { 1: 'streng monoton steigend', '-1': 'streng monoton fallend', 0: 'konstant' },
   kruemmung: { 1: 'linksgekrümmt', '-1': 'rechtsgekrümmt', 0: 'nicht gekrümmt (Gerade)' },
@@ -88,6 +90,7 @@ const LABOR_BSP = {
   'Ganzrationale Funktionen': ['x^2', '-x^2+4x', 'x^3', 'x^3-3x', '-x^3+3x^2', '0,25x^4-2x^2', '0,5(x-1)^2(x+2)'],
   'Bruch und Wurzel': ['1/x', '1/x^2', '√x'],
   'Trigonometrische Funktionen': ['sin(x)', 'cos(x)', '2sin(x)', 'sin(2x)'],
+  'Mit Parameter a': ['ax^3-3x', 'x^3-ax^2', '0,25x^4-ax^2', 'a sin(x)'],
 };
 // Formel-Eingabefeld (MathLive, lokal in vendor/mathlive, Schriften von dort): ohne Töne
 if (window.MathfieldElement) MathfieldElement.soundsDirectory = null;
@@ -95,13 +98,15 @@ if (window.MathfieldElement) MathfieldElement.soundsDirectory = null;
 const labTerm = () => $('#labF').getValue('ascii-math');
 
 function laborSek({ f }) {
-  return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansicht wählen und den Punkt mit dem Schieberegler über die x-Achse bewegen.</p>
+  return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansichten an- oder abwählen und den Punkt mit dem Schieberegler oder direkt im Graphen bewegen.</p>
     <div class="labor" id="labor" data-modi="" data-w="10" data-weg="new" data-schritt="1">
       <div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
       <details class="lab-bsp"><summary>Beispiele</summary>
         ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</details>
       <div class="stufen">${Object.entries(LABOR_MODI).map(([m, n]) => `<button data-modus="${m}" aria-pressed="false">${n}</button>`).join('')}</div>
-      <label class="lab-zoom"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="10"><span id="labWText">−10 bis 10</span></label>
+      <label class="lab-regler"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="10"><span id="labWText">−10 bis 10</span></label>
+      <label class="lab-regler lab-a" hidden><span>Parameter <i>a</i></span><input type="range" id="labA" min="-5" max="5" step="0.1" value="1"><span id="labAText">a = 1</span></label>
+      <label class="lab-regler lab-h"><span>Abstand <i>h</i></span><input type="range" id="labH" min="-3" max="3" step="0.05" value="1"><span id="labHText">h = 1</span></label>
       <div class="stufen lab-weg"><button data-weg="new" class="on">Markante Stellen (NEW)</button><button data-weg="regler">Mit Schieberegler</button>
         <table class="lab-new"><tr><th><i>f</i></th><td>N</td><td class="e">E</td><td class="w">W</td><td></td></tr>
           <tr><th><i>f′</i></th><td></td><td class="e">N</td><td class="w">E</td><td>W</td></tr></table></div>
@@ -120,8 +125,9 @@ const labPi = q => (q < 0 ? '−' : '') + (q % 2 ? (Math.abs(q) === 1 ? '' : Mat
 function laborZeichnen() {
   const box = $('#labor'); if (!box) return;
   let f;
-  try { f = termFunktion(labTerm()); }
+  try { f = termFunktion(labTerm(), { a: +$('#labA').value }); }
   catch (e) { $('#labInfo').innerHTML = `<span class="lab-fehler">${e}</span>`; return; }
+  $('.lab-a').hidden = !f.hatA;
   const modi = box.dataset.modi.split(' '), an = m => modi.includes(m), w = +box.dataset.w, x0 = +$('#labX').value;
   let W = $('#labGraph').clientWidth;
   const N = 600;
@@ -198,18 +204,44 @@ function laborZeichnen() {
   // Alle Graphen zusammen höchstens 75 % der Fensterhöhe, sonst schmaler (x und y bleiben gleich skaliert)
   W = Math.min(W, Math.max(280, .75 * innerHeight * 2 * w / [fS, aS].reduce((s, S) => s + (S ? S.hi - S.lo : 0), 0)));
   const y0 = f(x0), m = ableitung(f, x0), m2 = abl2(f, x0);
-  // Punkt P, auf Wunsch mit Tangente und Steigungsdreieck
-  const punktP = dreieck => {
+  // Gerade durch (x₀ | y₀) mit Steigung k über den ganzen Ausschnitt
+  const gerade = (k, kl) => `<line class="${kl}" x1="${X(-w)}" y1="${fS.Y(y0 - k * (w + x0))}" x2="${X(w)}" y2="${fS.Y(y0 + k * (w - x0))}"/>`;
+  const h = +$('#labH').value, xq = x0 + h, yq = f(xq), ms = (yq - y0) / h;
+  // Punkt P, auf Wunsch mit Tangente und Steigungsdreieck, Sekante durch Q und Normale
+  const punktP = (dreieck, sekante, normale) => {
     if (!isFinite(y0)) return '';
     const Y = fS.Y;
     let s = `<line class="hilfs" x1="${X(x0)}" y1="${Y(0)}" x2="${X(x0)}" y2="${Y(y0)}"/>`;
+    if (sekante && h && isFinite(yq)) s += gerade(ms, 'sekante') + `<path class="dreieck sek" d="M${X(x0)},${Y(y0)}H${X(xq)}V${Y(yq)}"/>
+      <text x="${X(x0 + h / 2)}" y="${Y(y0) + (ms * h > 0 ? 15 : -7)}" text-anchor="middle">h</text>
+      <circle class="punkt sek" cx="${X(xq)}" cy="${Y(yq)}" r="5"/><text class="lbl sek" x="${X(xq) + 8}" y="${Y(yq) - 8}">Q</text>`;
+    if (normale && isFinite(m)) s += Math.abs(m) < 1e-9 ? `<line class="normale" x1="${X(x0)}" y1="0" x2="${X(x0)}" y2="${fS.H}"/>` : gerade(-1 / m, 'normale');
     if (dreieck && isFinite(m)) {
-      s += `<line class="tangente" x1="${X(-w)}" y1="${Y(y0 - m * (w + x0))}" x2="${X(w)}" y2="${Y(y0 + m * (w - x0))}"/>`;
+      s += gerade(m, 'tangente');
       s += `<path class="dreieck" d="M${X(x0)},${Y(y0)}H${X(x0 + 1)}V${Y(y0 + m)}"/>
         <text x="${X(x0 + .5)}" y="${Y(y0) + (m > 0 ? 15 : -7)}" text-anchor="middle">1</text>
         <text class="lbl" x="${X(x0 + 1) + 6}" y="${Y(y0 + m / 2) + 4}">${labZahl(m)}</text>`;
     }
-    return s + `<circle class="punkt" cx="${X(x0)}" cy="${Y(y0)}" r="5.5"/>`;
+    return s + `<circle class="punkt" cx="${X(x0)}" cy="${Y(y0)}" r="5.5"/>` + (sekante ? `<text class="lbl" x="${X(x0) - 8}" y="${Y(y0) - 8}" text-anchor="end">P</text>` : '');
+  };
+  // Geradengleichung y = kx + b als Text
+  const geradeText = (n, k, b) => {
+    k = +k.toFixed(2); b = +b.toFixed(2);
+    const kx = k === 0 ? '' : k === 1 ? '<i>x</i>' : k === -1 ? '−<i>x</i>' : `${labZahl(k)}<i>x</i>`;
+    return `${n}: <i>y</i> = ${kx}${kx && b ? (b > 0 ? ' + ' : ' − ') + labZahl(Math.abs(b)) : kx ? '' : labZahl(b)}`;
+  };
+  // Nullstellen: Vorzeichenwechsel von f und Berührstellen (|f| hat dort ein Minimum nahe 0)
+  const nullstellen = () => {
+    const ns = wechsel(bereiche(x => vz(f(x), 0))).filter(x => Math.abs(f(x)) < 1e-6); // nicht bei Polstellen wie 1/x
+    for (let i = 1; i < N; i++) {
+      const [a, b, c] = [xs[i - 1], xs[i], xs[i + 1]].map(x => Math.abs(f(x)));
+      if (!(b <= a && b <= c)) continue;
+      let l = xs[i - 1], r = xs[i + 1];
+      for (let n = 0; n < 60; n++) { const m1 = l + (r - l) / 3, m2 = r - (r - l) / 3; Math.abs(f(m1)) < Math.abs(f(m2)) ? r = m2 : l = m1; }
+      const x = (l + r) / 2;
+      if (Math.abs(f(x)) < 1e-7 && !ns.some(n => Math.abs(n - x) < 1e-3)) ns.push(x);
+    }
+    return ns.sort((a, b) => a - b);
   };
   // Stelle des Schiebereglers direkt eingesetzt: f(−1,9), f′(−1,9)
   const st = `(${labZahl(x0)})`;
@@ -218,7 +250,7 @@ function laborZeichnen() {
   if (an('ableiten')) {
     if (box.dataset.weg === 'regler') {
       // f′ entsteht beim Schieben: jede Tangentensteigung wird zu einem Punkt (x₀ | f′(x₀))
-      bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}${punktP(true)}`)
+      bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}${punktP(true, false, false)}`)
         + svg(aS, 'f′', '', `${senkrecht(x0, aS)}<path class="kurve abl" d="${pfad(fs, -w, x0, aS)}"/>`
           + (isFinite(m) ? `<circle class="punkt" cx="${X(x0)}" cy="${aS.Y(m)}" r="5.5"/>` : ''));
       info = !isFinite(m) ? `<i>f′</i>${st} lässt sich nicht bestimmen.`
@@ -250,7 +282,9 @@ function laborZeichnen() {
     const kurve = berM ? berM.filter(b => !isNaN(b.k)).map(b => `<path class="kurve ${cls(b.k)}" d="${pfad(f, b.xa, b.xb, fS)}"/>`).join('')
       : `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>`;
     const marken = (ber, t) => ber ? wechsel(ber).filter(x => isFinite(f(x))).map(x => marke(x, f(x), fS, t)).join('') : '';
-    bild = svg(fS, 'f', berK ? baender(berK, fS, clsK) : berM ? baender(berM, fS) : '', kurve + marken(berM, 'E') + marken(berK, 'W') + punktP(an('steigung')));
+    const N0 = an('nullstellen') ? nullstellen() : [];
+    bild = svg(fS, 'f', berK ? baender(berK, fS, clsK) : berM ? baender(berM, fS) : '',
+      kurve + N0.map(x => marke(x, 0, fS, 'N')).join('') + marken(berM, 'E') + marken(berK, 'W') + punktP(an('steigung'), an('sekante'), an('normale')));
 
     // Text unter dem Graphen (ohne MathJax, damit der Schieberegler flüssig bleibt)
     const zeile = (ber, n, v, eps, art, c) => {
@@ -262,8 +296,15 @@ function laborZeichnen() {
         + `<ul class="lab-liste">${ber.filter(b => !isNaN(b.k) && b.xb - b.xa > 1e-3)
           .map(b => `<li><i class="${c(b.k)}"></i>${stelleText(b.xa)} bis ${stelleText(b.xb)}: ${LABOR_ART[art][b.k]}</li>`).join('')}</ul>`;
     };
+    const tm = isFinite(m), xh = `(${labZahl(xq)})`;
     info = !isFinite(y0) ? `<i>f</i>${st} ist nicht definiert.`
-      : `<div><i>f</i>${st} = ${labZahl(y0)}${an('steigung') && isFinite(m) ? ` · Steigung der Tangente <i>f′</i>${st} = ${labZahl(m)}` : ''}</div>`
+      : `<div><i>f</i>${st} = ${labZahl(y0)}</div>`
+        + (an('steigung') && tm ? `<div>Steigung der Tangente <i>f′</i>${st} = ${labZahl(m)} · ${geradeText('Tangente <i>t</i>', m, y0 - m * x0)}</div>` : '')
+        + (an('sekante') ? `<div>${!h ? 'Für <i>h</i> = 0 gibt es keine Sekante.' : !isFinite(yq) ? `<i>f</i>${xh} ist nicht definiert.`
+          : `Sekante durch <i>P</i> und <i>Q</i>(${labZahl(xq)} | ${labZahl(yq)}): Steigung (<i>f</i>${xh} − <i>f</i>${st}) / ${labZahl(h)} = ${labZahl(ms)}`
+            + (tm ? ` · Unterschied zu <i>f′</i>${st}: ${labZahl(ms - m)}` : '')}</div>` : '')
+        + (an('normale') && tm ? `<div>${Math.abs(m) < 1e-9 ? `Normale <i>n</i>: <i>x</i> = ${labZahl(x0)}` : `Steigung der Normale −1 / ${labZahl(m)} = ${labZahl(-1 / m)} · ${geradeText('Normale <i>n</i>', -1 / m, y0 + x0 / m)}`}</div>` : '')
+        + (an('nullstellen') ? `<div>Nullstellen: ${N0.length ? '<i>x</i> = ' + N0.map(stelleText).join('; ') : 'keine in diesem Ausschnitt'}</div>` : '')
         + (berM ? zeile(berM, 'f′', m, 1e-6, 'monotonie', cls) : '') + (berK ? zeile(berK, 'f″', m2, 1e-4, 'kruemmung', clsK) : '');
   }
   $('#labGraph').innerHTML = bild;
@@ -280,8 +321,25 @@ function laborAusschnitt() {
 }
 document.addEventListener('input', e => {
   if (e.target.id === 'labW') laborAusschnitt();
-  if (['labF', 'labX', 'labW'].includes(e.target.id)) laborZeichnen();
+  if (e.target.id === 'labA') $('#labAText').textContent = `a = ${labZahl(+e.target.value)}`;
+  if (e.target.id === 'labH') $('#labHText').textContent = `h = ${labZahl(+e.target.value)}`;
+  if (['labF', 'labX', 'labW', 'labA', 'labH'].includes(e.target.id)) laborZeichnen();
 });
+// Punkt direkt im Graphen ziehen (nur waagrecht, senkrecht scrollt die Seite weiter)
+let labZiehen = false;
+function labZiehe(e) {
+  const r = $('#labGraph svg').getBoundingClientRect(), w = +$('#labor').dataset.w;
+  $('#labX').value = ((e.clientX - r.left) / r.width * 2 - 1) * w;
+  laborZeichnen();
+}
+document.addEventListener('pointerdown', e => {
+  const g = e.target.closest('#labGraph');
+  if (!g || !$('#labX').offsetParent) return;
+  labZiehen = true; g.setPointerCapture(e.pointerId); labZiehe(e);
+});
+document.addEventListener('pointermove', e => { if (labZiehen) labZiehe(e); });
+document.addEventListener('pointerup', () => labZiehen = false);
+document.addEventListener('pointercancel', () => labZiehen = false);
 document.addEventListener('click', e => {
   const b = e.target.closest('#labor button'), box = $('#labor'); if (!b) return;
   if (b.dataset.f) { $('#labF').value = termFunktion(b.dataset.f).tex; b.closest('details').open = false; }

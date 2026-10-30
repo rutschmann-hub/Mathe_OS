@@ -157,7 +157,7 @@
 
 /* Ausprobieren: interaktiver Graph */
   .labor { margin-top: 12px; padding: 18px 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line);
-    --pos: #16a34a; --neg: #e5484d; --li: #2563eb; --re: #ea8a0b; }
+    --pos: #16a34a; --neg: #e5484d; --li: #2563eb; --re: #ea8a0b; --sek: #c026d3; }
   .lab-f { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
   .lab-f math-field { flex: 1; min-width: 0; font-size: 1.35rem; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: .3rem .7rem;
     --caret-color: var(--k); --selection-background-color: var(--k-soft); --contains-highlight-background-color: transparent; }
@@ -191,9 +191,16 @@
   .lab-liste i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; background: var(--muted); }
   .lab-liste i.kp { background: var(--pos); } .lab-liste i.kn { background: var(--neg); } .lab-liste i.kl { background: var(--li); } .lab-liste i.kr { background: var(--re); }
   .lab-fehler { color: var(--neg); }
-  .lab-zoom { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: .82rem; color: var(--muted); }
-  .lab-zoom input { flex: 1; min-width: 0; accent-color: var(--k); }
-  .lab-zoom #labWText { min-width: 6.5em; text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+  .lab-regler { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: .82rem; color: var(--muted); }
+  .lab-regler > span:first-child { min-width: 6.5em; }
+  .lab-regler input { flex: 1; min-width: 0; accent-color: var(--k); }
+  .lab-regler > span:last-child { min-width: 6.5em; text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+  .lab-regler[hidden], .labor:not([data-modi~="sekante"]) .lab-h { display: none; }
+  #labGraph { touch-action: pan-y; cursor: ew-resize; }
+  .lab-svg .sekante { stroke: var(--sek); stroke-width: 1.6; }
+  .lab-svg .dreieck.sek { stroke: var(--sek); }
+  .lab-svg .punkt.sek { fill: var(--sek); } .lab-svg text.lbl.sek { fill: var(--sek); }
+  .lab-svg .normale { stroke: var(--text); stroke-width: 1.4; stroke-dasharray: 6 4; }
   .labor:not([data-modi="ableiten"]) .lab-weg, .labor:not([data-modi="ableiten"]) .lab-schritte, .labor:not([data-weg="new"]) .lab-schritte,
   .labor[data-modi="ableiten"][data-weg="new"] #labX { display: none; }
   .lab-weg { align-items: center; }
