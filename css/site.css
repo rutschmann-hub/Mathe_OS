@@ -159,12 +159,17 @@
   .labor { margin-top: 12px; padding: 18px 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line);
     --pos: #16a34a; --neg: #e5484d; }
   .labor[data-modus="kruemmung"] { --pos: #2563eb; --neg: #ea8a0b; }
+  #labBsp { font: inherit; font-size: .93rem; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .45rem .7rem; margin-bottom: 10px; max-width: 100%; }
   .lab-f { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; }
+  .lab-f span { font-size: .85rem; color: var(--muted); }
   .lab-f input { flex: 1; min-width: 0; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .45rem .7rem; }
   .lab-f input:focus { outline: none; border-color: var(--k); }
-  .lab-bsp { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
-  .lab-bsp button { border: none; background: var(--surface-2); color: var(--muted); border-radius: 8px; padding: .2rem .6rem; font-size: .82rem; font-family: ui-monospace, monospace; }
-  .lab-bsp button:hover { color: var(--text); }
+  .lab-tasten { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 0; }
+  .lab-tasten button { border: 1px solid var(--line); background: var(--surface-2); color: var(--text); border-radius: 8px; min-width: 2.4rem; padding: .25rem .6rem; font-size: .95rem; }
+  .lab-tasten button:hover { border-color: var(--k); }
+  .lab-tasten span { font-size: .78rem; color: var(--muted); margin-left: 4px; }
+  .lab-tex { margin: 12px 0 14px; padding: 10px 14px; border-radius: 12px; background: var(--k-soft); font-size: 1.2rem; overflow-x: auto; transition: opacity .15s; }
+  .lab-tex.alt { opacity: .4; }
   #labGraph { width: 100%; }
   .lab-svg { display: block; margin: 0 auto; color: var(--muted); }
   .lab-svg .gr { stroke: var(--line); stroke-width: .6; }
