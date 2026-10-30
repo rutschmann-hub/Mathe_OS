@@ -84,6 +84,8 @@ function laborSek({ modus, f }) {
 
 // Zahl mit Komma und echtem Minus, höchstens zwei Nachkommastellen
 const labZahl = v => String(+(Math.abs(v) < 5e-3 ? 0 : v).toFixed(2)).replace('.', ',').replace('-', '−');
+// Vielfaches von π/2 als Text: q = 1 → π/2, q = 2 → π, q = −3 → −3π/2
+const labPi = q => (q < 0 ? '−' : '') + (q % 2 ? (Math.abs(q) === 1 ? '' : Math.abs(q)) + 'π/2' : (Math.abs(q) === 2 ? '' : Math.abs(q / 2)) + 'π');
 
 function laborZeichnen() {
   const box = $('#labor'); if (!box) return;
@@ -91,15 +93,19 @@ function laborZeichnen() {
   try { f = termFunktion($('#labF').value); }
   catch (e) { $('#labInfo').innerHTML = `<span class="lab-fehler">${e}</span>`; return; }
   const modus = box.dataset.modus, w = +box.dataset.w, x0 = +$('#labX').value;
-  const W = $('#labGraph').clientWidth, H = Math.round(W * .62), N = 600;
+  const W = $('#labGraph').clientWidth, N = 600;
+  const trig = /sin|cos|tan/i.test($('#labF').value);
+  // Stellen bei trigonometrischen Funktionen im Bogenmaß, z. B. 3π/2
+  const stelleText = x => trig && Math.abs(x / (Math.PI / 2) - Math.round(x / (Math.PI / 2))) < 1e-4 && Math.round(x / (Math.PI / 2)) ? labPi(Math.round(x / (Math.PI / 2))) : labZahl(x);
   const xs = Array.from({ length: N + 1 }, (_, i) => -w + 2 * w * i / N);
   const ok = xs.map(f).filter(isFinite);
   if (!ok.length) { $('#labGraph').innerHTML = ''; $('#labInfo').innerHTML = '<span class="lab-fehler">Die Funktion ist in diesem Ausschnitt nicht definiert.</span>'; return; }
 
-  // y-Bereich: höchstens ±12, sonst drückt z. B. x³ alles flach; die x-Achse ist immer zu sehen
-  let lo = Math.max(Math.min(0, ...ok), -12), hi = Math.min(Math.max(0, ...ok), 12);
-  if (hi - lo < 2) { const m = (hi + lo) / 2; lo = m - 1; hi = m + 1; }
-  const pad = (hi - lo) * .08; lo -= pad; hi += pad;
+  // x und y gleich skaliert: Die Höhe ergibt sich aus dem y-Bereich (höchstens ±0,75·Ausschnitt), die x-Achse ist immer zu sehen
+  let lo = Math.max(Math.min(0, ...ok), -.75 * w), hi = Math.min(Math.max(0, ...ok), .75 * w);
+  if (hi - lo < .6 * w) { const m = (hi + lo) / 2; lo = m - .3 * w; hi = m + .3 * w; }
+  const pad = (hi - lo) * .06; lo -= pad; hi += pad;
+  const H = Math.round(W * (hi - lo) / (2 * w));
   const X = x => (x + w) / (2 * w) * W, Y = y => H - (y - lo) / (hi - lo) * H;
 
   // Vorzeichen von f' bzw. f'' auf dem Raster, Bereiche gleicher Art zusammenfassen
@@ -132,15 +138,18 @@ function laborZeichnen() {
 
   let s = '';
   if (modus !== 'steigung') for (const b of ber) if (!isNaN(b.k)) s += `<rect class="band ${cls(b.k)}" x="${X(b.xa)}" y="0" width="${X(b.xb) - X(b.xa)}" height="${H}"/>`;
-  for (let x = -w; x <= w; x++) s += `<line class="gr" x1="${X(x)}" y1="0" x2="${X(x)}" y2="${H}"/>`;
-  const roh = (hi - lo) / 8, p10 = 10 ** Math.floor(Math.log10(roh)), st = [1, 2, 5, 10].map(q => q * p10).find(q => q >= roh);
-  const yAchse = X(0), xAchse = Math.min(Math.max(Y(0), 12), H - 4);
-  for (let k = Math.ceil(lo / st); k * st <= hi; k++) {
-    const y = +(k * st).toFixed(6);
+  // Raster: Kästchen 1 (bei −2 bis 2: 0,5), beschriftet jede bzw. jede zweite Einheit; trigonometrisch auf der x-Achse Vielfache von π/2
+  const g = w === 2 ? .5 : 1, ls = w === 10 ? 2 : 1;
+  const yAchse = X(0), xAchse = Math.min(Math.max(Y(0), 12), H - 4), xLbl = xAchse + 15 > H ? xAchse - 6 : xAchse + 15;
+  const gx = trig ? Math.PI / (w === 2 ? 4 : 2) : g;
+  for (let k = Math.ceil(-w / gx); k * gx <= w; k++) s += `<line class="gr" x1="${X(k * gx)}" y1="0" x2="${X(k * gx)}" y2="${H}"/>`;
+  for (let k = Math.ceil(lo / g); k * g <= hi; k++) {
+    const y = +(k * g).toFixed(6);
     s += `<line class="gr" x1="0" y1="${Y(y)}" x2="${W}" y2="${Y(y)}"/>`;
-    if (y) s += `<text x="${yAchse + 5}" y="${Y(y) + 4}">${labZahl(y)}</text>`;
+    if (y && y % ls === 0) s += `<text x="${yAchse + 5}" y="${Y(y) + 4}">${labZahl(y)}</text>`;
   }
-  for (let x = -w + 1; x < w; x++) if (x && (w < 10 || x % 2 === 0)) s += `<text x="${X(x)}" y="${xAchse + 15 > H ? xAchse - 6 : xAchse + 15}" text-anchor="middle">${labZahl(x)}</text>`;
+  if (trig) for (let q = -Math.floor(w / (Math.PI / 2)); q * Math.PI / 2 <= w; q++) { if (q && (w < 10 || q % 2 === 0) && Math.abs(X(q * Math.PI / 2) - W / 2) < W / 2 - 16) s += `<text x="${X(q * Math.PI / 2)}" y="${xLbl}" text-anchor="middle">${labPi(q)}</text>`; }
+  else for (let x = -w + 1; x < w; x++) if (x && x % ls === 0) s += `<text x="${X(x)}" y="${xLbl}" text-anchor="middle">${labZahl(x)}</text>`;
   s += `<line class="ax" x1="0" y1="${Y(0)}" x2="${W}" y2="${Y(0)}"/><line class="ax" x1="${yAchse}" y1="0" x2="${yAchse}" y2="${H}"/>`;
   for (const b of ber) if (!isNaN(b.k)) s += `<path class="kurve ${cls(b.k)}" d="${pfad(b.xa, b.xb)}"/>`;
   // Vorzeichenwechsel markieren: Extremstellen bzw. Wendestellen
@@ -170,9 +179,9 @@ function laborZeichnen() {
     const k = vz(v, modus === 'monotonie' ? 1e-6 : 1e-4), hier = ber.find(b => x0 >= b.xa && x0 <= b.xb);
     info = `${stelle} · <i>${n}</i>(<i>x</i>₀) = ${labZahl(v)}${k > 0 ? ' &gt; 0' : k < 0 ? ' &lt; 0' : ''}` + (k === 0
       ? (modus === 'monotonie' ? ' · waagrechte Tangente' : ' · mögliche Wendestelle')
-      : ` · Bereich von ${labZahl(hier.xa)} bis ${labZahl(hier.xb)}: <b class="${cls(hier.k)}">${LABOR_ART[modus][hier.k]}</b>`);
+      : ` · Bereich von ${stelleText(hier.xa)} bis ${stelleText(hier.xb)}: <b class="${cls(hier.k)}">${LABOR_ART[modus][hier.k]}</b>`);
     const liste = ber.filter(b => !isNaN(b.k) && b.xb - b.xa > 1e-3)
-      .map(b => `<li><i class="${cls(b.k)}"></i>${labZahl(b.xa)} bis ${labZahl(b.xb)}: ${LABOR_ART[modus][b.k]}</li>`).join('');
+      .map(b => `<li><i class="${cls(b.k)}"></i>${stelleText(b.xa)} bis ${stelleText(b.xb)}: ${LABOR_ART[modus][b.k]}</li>`).join('');
     info += `<ul class="lab-liste">${liste}</ul>`;
   }
   $('#labInfo').innerHTML = info;
