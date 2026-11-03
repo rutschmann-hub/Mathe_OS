@@ -79,7 +79,9 @@ function termFunktion(text, par = { a: 1 }) {
   return f;
 }
 
-const LABOR_MODI = { steigung: 'Steigung', sekante: 'Sekante', normale: 'Normale', nullstellen: 'Nullstellen', monotonie: 'Monotonie', kruemmung: 'Krümmung', ableiten: 'Grafisch ableiten' };
+const LABOR_MODI = { steigung: 'Steigung', sekante: 'Sekante', normale: 'Normale', nullstellen: 'Nullstellen', monotonie: 'Monotonie', kruemmung: 'Krümmung', ableitung: 'Ableitung', ableiten: 'Grafisch ableiten' };
+// Diese Ansichten stehen für sich allein, die übrigen lassen sich kombinieren
+const LABOR_ALLEIN = ['ableitung', 'ableiten'];
 const LABOR_ART = {
   monotonie: { 1: 'streng monoton steigend', '-1': 'streng monoton fallend', 0: 'konstant' },
   kruemmung: { 1: 'linksgekrümmt', '-1': 'rechtsgekrümmt', 0: 'nicht gekrümmt (Gerade)' },
@@ -103,7 +105,9 @@ function laborSek({ f }) {
       <div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
       <details class="lab-bsp"><summary>Beispiele</summary>
         ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</details>
-      <div class="stufen">${Object.entries(LABOR_MODI).map(([m, n]) => `<button data-modus="${m}" aria-pressed="false">${n}</button>`).join('')}</div>
+      <details class="lab-menu"><summary>Ansichten: <span id="labModiText">keine</span></summary>
+        <div class="lab-menu-liste">${Object.entries(LABOR_MODI).map(([m, n]) => (m === LABOR_ALLEIN[0] ? '<hr><div class="lab-menu-hinweis">einzeln</div>' : '')
+          + `<button data-modus="${m}" aria-pressed="false">${n}</button>`).join('')}</div></details>
       <label class="lab-regler"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="10"><span id="labWText">−10 bis 10</span></label>
       <label class="lab-regler lab-a" hidden><span>Parameter <i>a</i></span><input type="range" id="labA" min="-5" max="5" step="0.1" value="1"><span id="labAText">a = 1</span></label>
       <label class="lab-regler lab-h"><span>Abstand <i>h</i></span><input type="range" id="labH" min="-3" max="3" step="0.05" value="1"><span id="labHText">h = 1</span></label>
@@ -111,6 +115,7 @@ function laborSek({ f }) {
         <table class="lab-new"><tr><th><i>f</i></th><td>N</td><td class="e">E</td><td class="w">W</td><td></td></tr>
           <tr><th><i>f′</i></th><td></td><td class="e">N</td><td class="w">E</td><td>W</td></tr></table></div>
       <div class="stufen lab-schritte">${['Stellen markieren', 'Übertragen', 'f′ zeichnen'].map((t, i) => `<button data-schritt="${i + 1}" class="${i ? '' : 'on'}">${i + 1} · ${t}</button>`).join('')}</div>
+      <div class="stufen lab-verlauf"><button data-verlauf aria-pressed="false">Ganzen Verlauf von f′ zeigen</button></div>
       <div id="labGraph"></div>
       <input type="range" id="labX" min="-10" max="10" step="0.05" value="1.5" aria-label="Stelle x₀">
       <div class="lab-info" id="labInfo"></div>
@@ -206,7 +211,7 @@ function laborZeichnen() {
     return `<svg class="lab-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Graph von ${name}">${s}${oben}<text class="name" x="8" y="20">${name}</text></svg>`;
   };
 
-  const fs = x => ableitung(f, x), fS = system(f), aS = an('ableiten') && system(fs);
+  const fs = x => ableitung(f, x), fS = system(f), aS = (an('ableiten') || an('ableitung')) && system(fs);
   // Alle Graphen zusammen höchstens 75 % der Fensterhöhe, sonst schmaler (x und y bleiben gleich skaliert)
   W = Math.min(W, Math.max(280, .75 * innerHeight * 2 * w / [fS, aS].reduce((s, S) => s + (S ? S.hi - S.lo : 0), 0)));
   const y0 = f(x0), m = ableitung(f, x0), m2 = abl2(f, x0);
@@ -253,7 +258,20 @@ function laborZeichnen() {
   const st = `(${z(x0)})`;
   let bild, info;
 
-  if (an('ableiten')) {
+  if (an('ableitung')) {
+    // Spurpunkte (x₀ | f′(x₀)) sammeln, bis sich Funktion, a oder Ausschnitt ändern
+    const key = [labTerm(), $('#labA').value, w].join('|');
+    if (key !== labSpurKey) { labSpur.clear(); labSpurKey = key; }
+    if (isFinite(m)) labSpur.set(x0, m);
+    const voll = box.dataset.voll === 'an';
+    bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}${punktP(true, false, false)}`)
+      + svg(aS, 'f′', '', (voll ? `<path class="kurve abl voll" d="${pfad(fs, -w, w, aS)}"/>` : '') + senkrecht(x0, aS)
+        + [...labSpur].map(([x, y]) => `<circle class="spur" cx="${X(x)}" cy="${aS.Y(y)}" r="3.5"/>`).join('')
+        // Höhe des Steigungsdreiecks wird zum y-Wert des Spurpunkts
+        + (isFinite(m) ? `<line class="dreieck" x1="${X(x0)}" y1="${aS.Y(0)}" x2="${X(x0)}" y2="${aS.Y(m)}"/><circle class="punkt" cx="${X(x0)}" cy="${aS.Y(m)}" r="5.5"/>` : ''));
+    info = !isFinite(m) ? `${labTex(`f'${st}`)} lässt sich nicht bestimmen.`
+      : `Steigungsdreieck: 1 nach rechts, ${Math.abs(m) < 5e-3 ? 'Höhe ' + labTex('0') : labTex(z(Math.abs(m))) + ' nach ' + (m < 0 ? 'unten' : 'oben')}, also ${labTex(`f'${st} = ${z(m)}`)}. Daraus wird der Spurpunkt ${labTex(`(${z(x0)}\\mid ${z(m)})`)} von ${labTex("f'")}.`;
+  } else if (an('ableiten')) {
     if (box.dataset.weg === 'regler') {
       // f′ entsteht beim Schieben: jede Tangentensteigung wird zu einem Punkt (x₀ | f′(x₀))
       bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}${punktP(true, false, false)}`)
@@ -318,13 +336,19 @@ function laborZeichnen() {
   $('#labInfo').innerHTML = info;
 }
 
+// Spurpunkte der Ansicht Ableitung: Stelle → f′(Stelle)
+const labSpur = new Map();
+let labSpurKey = '';
+
 // Ausschnitt −w bis w; der Punkt bleibt im Ausschnitt
 function laborAusschnitt() {
   const box = $('#labor'), w = +$('#labW').value, r = $('#labX');
-  box.dataset.w = r.max = w; r.min = -w; r.value = Math.max(-w, Math.min(w, r.value));
+  // Ableitung: Schieberegler in 0,2-Schritten auf Vielfachen von 0,2 (trifft 0 und die ganzen Zahlen)
+  const ab = box.dataset.modi === 'ableitung', g = ab ? +(Math.floor(w / .2 + 1e-9) * .2).toFixed(1) : w;
+  box.dataset.w = w; r.step = ab ? .2 : .05; r.max = g; r.min = -g; r.value = Math.max(-g, Math.min(g, r.value));
   $('#labWText').textContent = `−${labZahl(w)} bis ${labZahl(w)}`;
-  // Grafisch ableiten mit Schieberegler beginnt am linken Rand
-  if (box.dataset.modi === 'ableiten') r.value = -w;
+  // Ableitung und Grafisch ableiten beginnen am linken Rand
+  if (LABOR_ALLEIN.includes(box.dataset.modi)) r.value = -g;
 }
 document.addEventListener('input', e => {
   if (e.target.id === 'labW') laborAusschnitt();
@@ -336,7 +360,7 @@ document.addEventListener('input', e => {
 let labZiehen = false;
 function labZiehe(e) {
   const r = $('#labGraph svg').getBoundingClientRect(), w = +$('#labor').dataset.w;
-  $('#labX').value = ((e.clientX - r.left) / r.width * 2 - 1) * w;
+  $('#labX').value = ((e.clientX - r.left) / r.width * 2 - 1) * w; // rastet auf die Schrittweite des Reglers ein
   laborZeichnen();
 }
 document.addEventListener('pointerdown', e => {
@@ -350,16 +374,25 @@ document.addEventListener('pointercancel', () => labZiehen = false);
 document.addEventListener('click', e => {
   const b = e.target.closest('#labor button'), box = $('#labor'); if (!b) return;
   if (b.dataset.f) { $('#labF').value = termFunktion(b.dataset.f).tex; b.closest('details').open = false; }
-  // Ansichten an- und abwählen; Grafisch ableiten steht für sich allein
+  // Ansichten an- und abwählen; Ableitung und Grafisch ableiten stehen für sich allein
   if (b.dataset.modus) {
-    const m = b.dataset.modus, modi = box.dataset.modi.split(' ').filter(x => x && x !== 'ableiten');
-    box.dataset.modi = m === 'ableiten' ? (box.dataset.modi === 'ableiten' ? '' : 'ableiten')
+    const m = b.dataset.modus, modi = box.dataset.modi.split(' ').filter(x => x && !LABOR_ALLEIN.includes(x));
+    box.dataset.modi = LABOR_ALLEIN.includes(m) ? (box.dataset.modi === m ? '' : m)
       : (modi.includes(m) ? modi.filter(x => x !== m) : [...modi, m]).join(' ');
     box.querySelectorAll('[data-modus]').forEach(x => { const on = box.dataset.modi.split(' ').includes(x.dataset.modus); x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
-    if (box.dataset.modi === 'ableiten') $('#labX').value = -box.dataset.w;
+    $('#labModiText').textContent = box.dataset.modi ? box.dataset.modi.split(' ').map(x => LABOR_MODI[x]).join(', ') : 'keine';
+    // Ableitung: Spur beginnt neu am linken Rand
+    if (box.dataset.modi === 'ableitung') {
+      labSpur.clear(); box.dataset.voll = '';
+      const v = box.querySelector('[data-verlauf]'); v.classList.remove('on'); v.setAttribute('aria-pressed', false);
+    }
+    laborAusschnitt();
   }
+  if (b.dataset.verlauf !== undefined) { box.dataset.voll = box.dataset.voll === 'an' ? '' : 'an'; b.classList.toggle('on'); b.setAttribute('aria-pressed', box.dataset.voll === 'an'); }
   for (const a of ['weg', 'schritt']) if (b.dataset[a]) { box.dataset[a] = b.dataset[a]; box.querySelectorAll(`[data-${a}]`).forEach(x => x.classList.toggle('on', x === b)); }
   if (b.dataset.weg === 'regler') $('#labX').value = -box.dataset.w;
   laborZeichnen();
 });
+// Ansichten-Menü schließen, wenn daneben getippt wird
+document.addEventListener('click', e => { const d = $('.lab-menu'); if (d && d.open && !e.target.closest('.lab-menu')) d.open = false; });
 addEventListener('resize', laborZeichnen);
