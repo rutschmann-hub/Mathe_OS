@@ -7,6 +7,7 @@ Live-Seite: https://rutschmann-hub.github.io/Mathe_OS/ (GitHub Pages, Branch `ma
 ```
 /
 ├── index.html              Seitengerüst (lädt CSS, MathJax und die Skripte)
+├── labor.html              nur „Ausprobieren“, zum Einbetten (iframe)
 ├── css/
 │   ├── base.css            Farben, Schrift, Hell/Dunkel
 │   └── site.css            Layout und Bausteine (Merkkasten, Übungen, Selbsttest …)
@@ -45,6 +46,10 @@ Inhalte stehen in `js/inhalte/kapitel-*.js` (neue Datei auch in `index.html` ein
 Gleichnamige Themen in Basisfach und Leistungsfach teilen sich das Material automatisch.
 Bausteine mit `kurs: 'lk'` bzw. `kurs: 'bf'` erscheinen nur in diesem Kurs.
 Mit `labor: { f: 'x^2' }` erscheint im Thema der interaktive Graph „Ausprobieren“ (Startfunktion f).
+
+`labor.html` zeigt nur das „Ausprobieren“, z. B. zum Einbetten als iframe in itslearning. Startzustand über die Adresse (auch auf der Hauptseite), erzeugt vom Knopf „Link zu dieser Ansicht kopieren“:
+`labor.html?f=x^3-3x&ansicht=ableitung&zusatz=f2&w=5&a=1&kurs=bf`
+(`ansicht`: steigung, sekante, normale, nullstellen, monotonie, kruemmung, ableitung, ableiten – kommagetrennt; `zusatz`: f1, f2; `kurs`: Farbe bf oder lk)
 
 Nach jeder Änderung prüfen (alle Themen vollständig, jede Zufallsaufgabe 300-mal numerisch nachgerechnet):
 

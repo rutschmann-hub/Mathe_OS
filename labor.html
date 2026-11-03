@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ausprobieren · Mathe Kursstufe</title>
+<!-- Nur das „Ausprobieren“, zum Einbetten (z. B. als iframe in itslearning).
+     Startzustand über die Adresse: labor.html?f=x^3-3x&ansicht=ableitung&w=5&kurs=bf (Knopf „Link kopieren“) -->
+<link rel="stylesheet" href="vendor/fonts/inter.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="vendor/mathlive/mathlive-static.css">
+</head>
+<body>
+<main class="wrap" id="main"></main>
+
+<script>window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  chtml: { fontURL: 'vendor/mathjax/output/chtml/fonts/woff-v2', mtextInheritFont: true }, options: { enableMenu: false }, startup: { typeset: false, ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(start); } } };</script>
+<script async src="vendor/mathjax/tex-chtml.js"></script>
+<script>const $ = s => document.querySelector(s);</script>
+<script src="js/inhalte.js"></script>
+<script src="vendor/mathlive/mathlive.min.js"></script>
+<script src="js/labor.js"></script>
+<script>
+function start() {
+  // Farbe des Kurses: labor.html?kurs=bf (Basisfach) oder kurs=lk (Leistungsfach, Standard)
+  document.body.dataset.kurs = new URLSearchParams(location.search).get('kurs') === 'bf' ? 'bf' : 'lk';
+  $('#main').innerHTML = laborSek({ f: 'x^3-3x' });
+  laborStart();
+  MathJax.typesetPromise([$('#main')]);
+}
+</script>
+</body>
+</html>

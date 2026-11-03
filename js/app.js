@@ -150,7 +150,7 @@ function passend() {
 }
 addEventListener('resize', passend);
 const _route = route;
-route = function () { stufe = 1; _route(); neueAufgabe(); laborZeichnen(); typeset($('#main')).then(passend); };
+route = function () { stufe = 1; _route(); neueAufgabe(); laborStart(); typeset($('#main')).then(passend); };
 
 function themeToggle() {
   const r = document.documentElement;

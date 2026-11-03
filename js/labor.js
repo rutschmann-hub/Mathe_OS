@@ -82,6 +82,10 @@ function termFunktion(text, par = { a: 1 }) {
 const LABOR_MODI = { steigung: 'Steigung', sekante: 'Sekante', normale: 'Normale', nullstellen: 'Nullstellen', monotonie: 'Monotonie', kruemmung: 'Krümmung', ableitung: 'Ableitung', ableiten: 'Grafisch ableiten' };
 // Diese Ansichten stehen für sich allein, die übrigen lassen sich kombinieren
 const LABOR_ALLEIN = ['ableitung', 'ableiten'];
+// Zusätzliche Graphen unter f, zu jeder Ansicht
+const LABOR_ZUSATZ = { f1: 'Graph von f′', f2: 'Graph von f″' };
+const labModiName = (modi, zusatz) => [...modi.split(' ').filter(Boolean).map(m => LABOR_MODI[m]),
+  ...zusatz.split(' ').filter(Boolean).map(z => LABOR_ZUSATZ[z])].join(', ') || 'keine';
 const LABOR_ART = {
   monotonie: { 1: 'streng monoton steigend', '-1': 'streng monoton fallend', 0: 'konstant' },
   kruemmung: { 1: 'linksgekrümmt', '-1': 'rechtsgekrümmt', 0: 'nicht gekrümmt (Gerade)' },
@@ -92,6 +96,7 @@ const LABOR_BSP = {
   'Ganzrationale Funktionen': ['x^2', '-x^2+4x', 'x^3', 'x^3-3x', '-x^3+3x^2', '0,25x^4-2x^2', '0,5(x-1)^2(x+2)'],
   'Bruch und Wurzel': ['1/x', '1/x^2', '√x'],
   'Trigonometrische Funktionen': ['sin(x)', 'cos(x)', '2sin(x)', 'sin(2x)'],
+  'Exponentialfunktionen (ab Kapitel II)': ['e^x', 'e^(-x)', '2e^(0,5x)', 'e^x-x', 'x e^x', 'e^(-x^2)'],
   'Mit Parameter a': ['ax^3-3x', 'x^3-ax^2', '0,25x^4-ax^2', 'a sin(x)'],
 };
 // Formel-Eingabefeld (MathLive, lokal in vendor/mathlive, Schriften von dort): ohne Töne
@@ -100,25 +105,37 @@ if (window.MathfieldElement) MathfieldElement.soundsDirectory = null;
 const labTerm = () => $('#labF').getValue('ascii-math');
 
 function laborSek({ f }) {
+  // Anfangszustand aus der Adresse, z. B. labor.html?f=x^3-3x&ansicht=ableitung&w=5 (erzeugt von „Link kopieren“)
+  const q = new URLSearchParams(location.search), zahl = (n, d) => q.get(n) && isFinite(q.get(n)) ? +q.get(n) : d;
+  try { termFunktion(q.get('f') || ''); f = q.get('f'); } catch (e) { /* kein oder ungültiger Term: Startfunktion des Themas */ }
+  const gew = (q.get('ansicht') || '').split(',').filter(m => LABOR_MODI[m]);
+  const modi = gew.find(m => LABOR_ALLEIN.includes(m)) || gew.join(' ');
+  const zusatz = (q.get('zusatz') || '').split(',').filter(z => LABOR_ZUSATZ[z]).join(' ');
+  const w = Math.min(10, Math.max(1, zahl('w', 10))), a = Math.min(5, Math.max(-5, zahl('a', 1)));
+  const an = (liste, x) => liste.split(' ').includes(x) ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"';
   return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansichten an- oder abwählen und den Punkt mit dem Schieberegler oder direkt im Graphen bewegen.</p>
-    <div class="labor" id="labor" data-modi="" data-w="10" data-weg="new" data-schritt="1">
+    <div class="labor" id="labor" data-modi="${modi}" data-zusatz="${zusatz}" data-w="${w}" data-weg="new" data-schritt="1">
       <div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
       <details class="lab-bsp"><summary>Beispiele</summary>
         ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</details>
-      <details class="lab-menu"><summary>Ansichten: <span id="labModiText">keine</span></summary>
+      <details class="lab-menu"><summary>Ansichten: <span id="labModiText">${labModiName(modi, zusatz)}</span></summary>
         <div class="lab-menu-liste">${Object.entries(LABOR_MODI).map(([m, n]) => (m === LABOR_ALLEIN[0] ? '<hr><div class="lab-menu-hinweis">einzeln</div>' : '')
-          + `<button data-modus="${m}" aria-pressed="false">${n}</button>`).join('')}</div></details>
-      <label class="lab-regler"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="10"><span id="labWText">−10 bis 10</span></label>
-      <label class="lab-regler lab-a" hidden><span>Parameter <i>a</i></span><input type="range" id="labA" min="-5" max="5" step="0.1" value="1"><span id="labAText">a = 1</span></label>
+          + `<button data-modus="${m}"${an(modi, m)}>${n}</button>`).join('')}
+          <hr><div class="lab-menu-hinweis">zusätzlich darunter</div>
+          ${Object.entries(LABOR_ZUSATZ).map(([z, n]) => `<button data-zusatz="${z}"${an(zusatz, z)}>${n}</button>`).join('')}</div></details>
+      <label class="lab-regler"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="${w}"><span id="labWText"></span></label>
+      <label class="lab-regler lab-a" hidden><span>Parameter <i>a</i></span><input type="range" id="labA" min="-5" max="5" step="0.1" value="${a}"><span id="labAText">a = ${labZahl(a)}</span></label>
       <label class="lab-regler lab-h"><span>Abstand <i>h</i></span><input type="range" id="labH" min="-3" max="3" step="0.05" value="1"><span id="labHText">h = 1</span></label>
       <div class="stufen lab-weg"><button data-weg="new" class="on">Markante Stellen (NEW)</button><button data-weg="regler">Mit Schieberegler</button>
         <table class="lab-new"><tr><th><i>f</i></th><td>N</td><td class="e">E</td><td class="w">W</td><td></td></tr>
           <tr><th><i>f′</i></th><td></td><td class="e">N</td><td class="w">E</td><td>W</td></tr></table></div>
       <div class="stufen lab-schritte">${['Stellen markieren', 'Übertragen', 'f′ zeichnen'].map((t, i) => `<button data-schritt="${i + 1}" class="${i ? '' : 'on'}">${i + 1} · ${t}</button>`).join('')}</div>
-      <div class="stufen lab-verlauf"><button data-verlauf aria-pressed="false">Ganzen Verlauf von f′ zeigen</button></div>
+      <div class="stufen lab-ableitung"><button data-aktion="setzen">● Punkt setzen</button><button data-aktion="abspielen">▶ Abspielen</button><button data-aktion="loeschen">Spur löschen</button>
+        <button data-schalter="raten" aria-pressed="false">Erst raten</button><button data-schalter="voll" aria-pressed="false">Ganzen Verlauf von f′ zeigen</button></div>
       <div id="labGraph"></div>
       <input type="range" id="labX" min="-10" max="10" step="0.05" value="1.5" aria-label="Stelle x₀">
       <div class="lab-info" id="labInfo"></div>
+      <div class="lab-fuss"><button data-aktion="link">Link zu dieser Ansicht kopieren</button></div>
     </div></section>`;
 }
 
@@ -212,8 +229,11 @@ function laborZeichnen() {
   };
 
   const fs = x => ableitung(f, x), fS = system(f), aS = (an('ableiten') || an('ableitung')) && system(fs);
+  // Zusätzliche Graphen von f′ (falls nicht schon da) und f″
+  const zus = (box.dataset.zusatz || '').split(' '), f2 = x => abl2(f, x);
+  const S1 = !aS && zus.includes('f1') && system(fs), S2 = zus.includes('f2') && system(f2);
   // Alle Graphen zusammen höchstens 75 % der Fensterhöhe, sonst schmaler (x und y bleiben gleich skaliert)
-  W = Math.min(W, Math.max(280, .75 * innerHeight * 2 * w / [fS, aS].reduce((s, S) => s + (S ? S.hi - S.lo : 0), 0)));
+  W = Math.min(W, Math.max(280, .75 * innerHeight * 2 * w / [fS, aS, S1, S2].reduce((s, S) => s + (S ? S.hi - S.lo : 0), 0)));
   const y0 = f(x0), m = ableitung(f, x0), m2 = abl2(f, x0);
   // Gerade durch (x₀ | y₀) mit Steigung k über den ganzen Ausschnitt
   const gerade = (k, kl) => `<line class="${kl}" x1="${X(-w)}" y1="${fS.Y(y0 - k * (w + x0))}" x2="${X(w)}" y2="${fS.Y(y0 + k * (w - x0))}"/>`;
@@ -261,16 +281,30 @@ function laborZeichnen() {
   if (an('ableitung')) {
     // Spurpunkte (x₀ | f′(x₀)) sammeln, bis sich Funktion, a oder Ausschnitt ändern
     const key = [labTerm(), $('#labA').value, w].join('|');
-    if (key !== labSpurKey) { labSpur.clear(); labSpurKey = key; }
-    if (isFinite(m)) labSpur.set(x0, m);
-    const voll = box.dataset.voll === 'an';
-    bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}${punktP(true, false, false)}`)
+    if (key !== labSpurKey) { labSpur.clear(); labTipp = null; labSpurKey = key; }
+    // Erst raten: Steigung erst nach einem Tipp in den Graphen von f′ aufdecken
+    if (labTipp && labTipp.x !== x0) labTipp = null;
+    const offen = box.dataset.raten !== 'an' || labTipp, voll = box.dataset.voll === 'an';
+    // Spurpunkt nur auf Knopfdruck („Punkt setzen“), sobald die Steigung zu sehen ist
+    labJetzt = isFinite(m) && offen ? { x: x0, m } : null;
+    labAS = { hi: aS.hi, k: 2 * w / W };
+    bild = svg(fS, 'f', '', `<path class="kurve k0" d="${pfad(f, -w, w, fS)}"/>${senkrecht(x0, fS)}`
+        + (offen ? punktP(true, false, false) : (isFinite(m) && isFinite(y0) ? gerade(m, 'tangente') : '') + punktP(false, false, false)))
       + svg(aS, 'f′', '', (voll ? `<path class="kurve abl voll" d="${pfad(fs, -w, w, aS)}"/>` : '') + senkrecht(x0, aS)
         + [...labSpur].map(([x, y]) => `<circle class="spur" cx="${X(x)}" cy="${aS.Y(y)}" r="3.5"/>`).join('')
+        + (labTipp ? `<circle class="tipp" cx="${X(x0)}" cy="${aS.Y(labTipp.y)}" r="6"/>` : '')
         // Höhe des Steigungsdreiecks wird zum y-Wert des Spurpunkts
-        + (isFinite(m) ? `<line class="dreieck" x1="${X(x0)}" y1="${aS.Y(0)}" x2="${X(x0)}" y2="${aS.Y(m)}"/><circle class="punkt" cx="${X(x0)}" cy="${aS.Y(m)}" r="5.5"/>` : ''));
+        + (isFinite(m) && offen ? `<line class="dreieck" x1="${X(x0)}" y1="${aS.Y(0)}" x2="${X(x0)}" y2="${aS.Y(m)}"/><circle class="punkt" cx="${X(x0)}" cy="${aS.Y(m)}" r="5.5"/>` : ''));
+    const d = labTipp && Math.abs(labTipp.y - m), tol = .2 + .1 * Math.abs(m);
     info = !isFinite(m) ? `${labTex(`f'${st}`)} lässt sich nicht bestimmen.`
-      : `Steigungsdreieck: 1 nach rechts, ${Math.abs(m) < 5e-3 ? 'Höhe ' + labTex('0') : labTex(z(Math.abs(m))) + ' nach ' + (m < 0 ? 'unten' : 'oben')}, also ${labTex(`f'${st} = ${z(m)}`)}. Daraus wird der Spurpunkt ${labTex(`(${z(x0)}\\mid ${z(m)})`)} von ${labTex("f'")}.`;
+      : !offen ? `Schätze die Steigung der Tangente bei ${labTex(`x = ${z(x0)}`)} und tippe in den Graphen von ${labTex("f'")}, wo der Punkt liegen müsste.`
+      : (labTipp ? `<div>Dein Tipp: ${labTex(z(labTipp.y))} · richtig: ${labTex(`f'${st} = ${z(m)}`)} · <b>${d <= tol ? 'sehr gut!' : d <= 3 * tol ? 'knapp daneben' : 'daneben – vergleiche mit dem Steigungsdreieck'}</b></div>` : '')
+        + `<div>Steigungsdreieck: 1 nach rechts, ${Math.abs(m) < 5e-3 ? 'Höhe ' + labTex('0') : labTex(z(Math.abs(m))) + ' nach ' + (m < 0 ? 'unten' : 'oben')}, also ${labTex(`f'${st} = ${z(m)}`)}. Mit „Punkt setzen“ wird daraus der Spurpunkt ${labTex(`(${z(x0)}\\mid ${z(m)})`)} von ${labTex("f'")}.</div>`;
+    // Wertetabelle der Spurpunkte
+    const pkte = [...labSpur].sort((p, q) => p[0] - q[0]), zelle = x => `<td${x === x0 ? ' class="jetzt"' : ''}>`;
+    if (pkte.length) info += `<div class="lab-tabelle"><table><tr><th><i>x</i></th>${pkte.map(([x]) => zelle(x) + labZahl(x)).join('</td>')}</td></tr>
+      <tr><th><i>f</i>(<i>x</i>)</th>${pkte.map(([x]) => zelle(x) + labZahl(f(x))).join('</td>')}</td></tr>
+      <tr><th><i>f′</i>(<i>x</i>)</th>${pkte.map(([x, y]) => zelle(x) + labZahl(y)).join('</td>')}</td></tr></table></div>`;
   } else if (an('ableiten')) {
     if (box.dataset.weg === 'regler') {
       // f′ entsteht beim Schieben: jede Tangentensteigung wird zu einem Punkt (x₀ | f′(x₀))
@@ -294,9 +328,13 @@ function laborZeichnen() {
       if (schritt >= 3) u = `<path class="kurve abl" d="${pfad(fs, -w, w, aS)}"/>` + u;
       bild = svg(fS, 'f', schritt >= 2 ? baender(berM, fS) : '', o) + svg(aS, 'f′', schritt >= 2 ? baender(berM, aS) : '', u);
       const liste = xs => xs.length ? labTex('x = ' + xs.map(stelleTex).join(';\\ ')) : 'keine';
+      // Sattelstellen: Wendestellen mit f′ = 0 (kein Vorzeichenwechsel von f′, also keine Extremstelle)
+      const Sa = Wd.filter(x => Math.abs(fs(x)) < 1e-3);
       info = [
-        `Markiere bei ${labTex('f')} die Extremstellen (E): ${liste(E)} und die Wendestellen (W): ${liste(Wd)}.`,
-        `Übertragen: Aus jeder Extremstelle von ${labTex('f')} wird eine <b>Nullstelle</b> von ${labTex("f'")}, aus jeder Wendestelle eine <b>Extremstelle</b> von ${labTex("f'")}. Wo ${labTex('f')} steigt, liegt ${labTex("f'")} über der x-Achse (+), wo ${labTex('f')} fällt, darunter (−).`,
+        `Markiere bei ${labTex('f')} die Extremstellen (E): ${liste(E)} und die Wendestellen (W): ${liste(Wd)}.`
+          + (Sa.length ? ` Bei ${liste(Sa)} ist zusätzlich ${labTex("f'(x) = 0")}, aber ${labTex("f'")} wechselt dort nicht das Vorzeichen: ein <b>Sattelpunkt</b> (Wendepunkt mit waagrechter Tangente), kein Extrempunkt.` : ''),
+        `Übertragen: Aus jeder Extremstelle von ${labTex('f')} wird eine <b>Nullstelle</b> von ${labTex("f'")}, aus jeder Wendestelle eine <b>Extremstelle</b> von ${labTex("f'")}. Wo ${labTex('f')} steigt, liegt ${labTex("f'")} über der x-Achse (+), wo ${labTex('f')} fällt, darunter (−).`
+          + (Sa.length ? ` Aus dem Sattelpunkt wird ein Extrempunkt von ${labTex("f'")} auf der x-Achse: ${labTex("f'")} berührt sie dort.` : ''),
         `${labTex("f'")} zeichnen: durch die Nullstellen und Extrempunkte, oberhalb der x-Achse bei +, unterhalb bei −.`,
       ][schritt - 1];
     }
@@ -332,29 +370,70 @@ function laborZeichnen() {
         + (an('nullstellen') ? `<div>Nullstellen: ${N0.length ? labTex('x = ' + N0.map(stelleTex).join(';\\ ')) : 'keine in diesem Ausschnitt'}</div>` : '')
         + (berM ? zeile(berM, "f'", m, 1e-6, 'monotonie', cls) : '') + (berK ? zeile(berK, "f''", m2, 1e-4, 'kruemmung', clsK) : '');
   }
+  // Zusätzliche Graphen darunter, mit der Stelle des Schiebereglers (wenn er zu sehen ist)
+  const regler = !!$('#labX').offsetParent;
+  const zusatzGraph = (S, fn, name, kl) => svg(S, name, '', `<path class="kurve ${kl}" d="${pfad(fn, -w, w, S)}"/>`
+    + (regler ? senkrecht(x0, S) + (isFinite(fn(x0)) ? `<circle class="punkt" cx="${X(x0)}" cy="${S.Y(fn(x0))}" r="4.5"/>` : '') : ''));
+  if (S1) bild += zusatzGraph(S1, fs, 'f′', 'abl');
+  if (S2) bild += zusatzGraph(S2, f2, 'f″', 'abl2');
   $('#labGraph').innerHTML = bild;
   $('#labInfo').innerHTML = info;
+  // Wertetabelle: aktuelle Spalte sichtbar halten
+  const t = $('.lab-tabelle'), j = t && t.querySelector('.jetzt');
+  if (j) t.scrollLeft = j.offsetLeft - t.clientWidth / 2;
+  const sb = $('[data-aktion="setzen"]'); if (sb) sb.disabled = !labJetzt;
 }
+
+// Nach dem Aufbau der Seite: Schieberegler an Ausschnitt und Ansicht anpassen, dann zeichnen
+function laborStart() { if (!$('#labor')) return; laborAusschnitt(); laborZeichnen(); }
 
 // Spurpunkte der Ansicht Ableitung: Stelle → f′(Stelle)
 const labSpur = new Map();
-let labSpurKey = '';
+let labSpurKey = '', labTipp = null, labJetzt = null, labAS = null, labTimer = null;
+
+// Abspielen: der Punkt läuft von selbst nach rechts
+function labAbspielen(an) {
+  clearInterval(labTimer); labTimer = null;
+  const b = $('[data-aktion="abspielen"]'), r = $('#labX');
+  if (b) { b.textContent = an ? '⏸ Anhalten' : '▶ Abspielen'; b.classList.toggle('on', an); }
+  if (!an) return;
+  if (+r.value >= +r.max) r.value = r.min;
+  labTimer = setInterval(() => { if (!r.isConnected || +r.value >= +r.max) return labAbspielen(false); r.stepUp(); laborZeichnen(); }, 50);
+}
+// Link mit Funktion, Ansichten und Ausschnitt in die Zwischenablage
+function labLink(b) {
+  const box = $('#labor'), q = new URLSearchParams({ f: labTerm() });
+  if (box.dataset.modi) q.set('ansicht', box.dataset.modi.split(' ').join(','));
+  if (box.dataset.zusatz) q.set('zusatz', box.dataset.zusatz.split(' ').join(','));
+  if (box.dataset.w !== '10') q.set('w', box.dataset.w);
+  if (!$('.lab-a').hidden) q.set('a', $('#labA').value);
+  if (document.body.dataset.kurs) q.set('kurs', document.body.dataset.kurs);
+  const url = location.origin + location.pathname + '?' + q + location.hash;
+  (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+    .then(() => { b.textContent = '✓ Link kopiert'; setTimeout(() => b.textContent = 'Link zu dieser Ansicht kopieren', 2500); },
+      () => prompt('Link zum Kopieren:', url));
+}
 
 // Ausschnitt −w bis w; der Punkt bleibt im Ausschnitt
 function laborAusschnitt() {
   const box = $('#labor'), w = +$('#labW').value, r = $('#labX');
-  // Ableitung: Schieberegler in 0,2-Schritten auf Vielfachen von 0,2 (trifft 0 und die ganzen Zahlen)
-  const ab = box.dataset.modi === 'ableitung', g = ab ? +(Math.floor(w / .2 + 1e-9) * .2).toFixed(1) : w;
-  box.dataset.w = w; r.step = ab ? .2 : .05; r.max = g; r.min = -g; r.value = Math.max(-g, Math.min(g, r.value));
+  box.dataset.w = r.max = w; r.min = -w; r.value = Math.max(-w, Math.min(w, r.value));
   $('#labWText').textContent = `−${labZahl(w)} bis ${labZahl(w)}`;
   // Ableitung und Grafisch ableiten beginnen am linken Rand
-  if (LABOR_ALLEIN.includes(box.dataset.modi)) r.value = -g;
+  if (LABOR_ALLEIN.includes(box.dataset.modi)) r.value = -w;
 }
 document.addEventListener('input', e => {
   if (e.target.id === 'labW') laborAusschnitt();
   if (e.target.id === 'labA') $('#labAText').textContent = `a = ${labZahl(+e.target.value)}`;
   if (e.target.id === 'labH') $('#labHText').textContent = `h = ${labZahl(+e.target.value)}`;
+  if (e.target.id === 'labX') labAbspielen(false);
   if (['labF', 'labX', 'labW', 'labA', 'labH'].includes(e.target.id)) laborZeichnen();
+});
+// Nach der Eingabe xxx als x³ anzeigen (x² entsprechend)
+document.addEventListener('change', e => {
+  if (e.target.id !== 'labF') return;
+  const t = e.target.value, n = t.replace(/(?<![\\A-Za-z])x{2,}(?![A-Za-z^])/g, s => `x^{${s.length}}`);
+  if (n !== t) { e.target.value = n; laborZeichnen(); }
 });
 // Punkt direkt im Graphen ziehen (nur waagrecht, senkrecht scrollt die Seite weiter)
 let labZiehen = false;
@@ -366,6 +445,15 @@ function labZiehe(e) {
 document.addEventListener('pointerdown', e => {
   const g = e.target.closest('#labGraph');
   if (!g || !$('#labX').offsetParent) return;
+  labAbspielen(false);
+  // Erst raten: Tipp in den Graphen von f′ setzen (y-Wert auf eine Nachkommastelle)
+  const box = $('#labor'), s = e.target.closest('svg[aria-label="Graph von f′"]');
+  if (box.dataset.modi === 'ableitung' && box.dataset.raten === 'an' && s) {
+    if (labTipp) return;
+    const r = s.getBoundingClientRect();
+    labTipp = { x: +$('#labX').value, y: Math.round((labAS.hi - (e.clientY - r.top) * s.viewBox.baseVal.width / r.width * labAS.k) * 10) / 10 };
+    return laborZeichnen();
+  }
   labZiehen = true; g.setPointerCapture(e.pointerId); labZiehe(e);
 });
 document.addEventListener('pointermove', e => { if (labZiehen) labZiehe(e); });
@@ -380,15 +468,29 @@ document.addEventListener('click', e => {
     box.dataset.modi = LABOR_ALLEIN.includes(m) ? (box.dataset.modi === m ? '' : m)
       : (modi.includes(m) ? modi.filter(x => x !== m) : [...modi, m]).join(' ');
     box.querySelectorAll('[data-modus]').forEach(x => { const on = box.dataset.modi.split(' ').includes(x.dataset.modus); x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
-    $('#labModiText').textContent = box.dataset.modi ? box.dataset.modi.split(' ').map(x => LABOR_MODI[x]).join(', ') : 'keine';
-    // Ableitung: Spur beginnt neu am linken Rand
+    labAbspielen(false);
+    // Ableitung: Spur beginnt neu am linken Rand, Schalter aus
     if (box.dataset.modi === 'ableitung') {
-      labSpur.clear(); box.dataset.voll = '';
-      const v = box.querySelector('[data-verlauf]'); v.classList.remove('on'); v.setAttribute('aria-pressed', false);
+      labSpur.clear(); labTipp = null;
+      box.querySelectorAll('[data-schalter]').forEach(x => { box.dataset[x.dataset.schalter] = ''; x.classList.remove('on'); x.setAttribute('aria-pressed', false); });
     }
     laborAusschnitt();
   }
-  if (b.dataset.verlauf !== undefined) { box.dataset.voll = box.dataset.voll === 'an' ? '' : 'an'; b.classList.toggle('on'); b.setAttribute('aria-pressed', box.dataset.voll === 'an'); }
+  if (b.dataset.zusatz) {
+    const z = box.dataset.zusatz.split(' ').filter(Boolean), on = !z.includes(b.dataset.zusatz);
+    box.dataset.zusatz = (on ? [...z, b.dataset.zusatz] : z.filter(x => x !== b.dataset.zusatz)).join(' ');
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+  }
+  if (b.dataset.modus || b.dataset.zusatz) $('#labModiText').textContent = labModiName(box.dataset.modi, box.dataset.zusatz);
+  if (b.dataset.schalter) {
+    const n = b.dataset.schalter, on = box.dataset[n] !== 'an';
+    box.dataset[n] = on ? 'an' : ''; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+    if (n === 'raten') { labTipp = null; labAbspielen(false); }
+  }
+  if (b.dataset.aktion === 'abspielen') labAbspielen(!labTimer);
+  if (b.dataset.aktion === 'setzen' && labJetzt) labSpur.set(labJetzt.x, labJetzt.m);
+  if (b.dataset.aktion === 'loeschen') { labSpur.clear(); labTipp = null; }
+  if (b.dataset.aktion === 'link') return labLink(b);
   for (const a of ['weg', 'schritt']) if (b.dataset[a]) { box.dataset[a] = b.dataset[a]; box.querySelectorAll(`[data-${a}]`).forEach(x => x.classList.toggle('on', x === b)); }
   if (b.dataset.weg === 'regler') $('#labX').value = -box.dataset.w;
   laborZeichnen();
