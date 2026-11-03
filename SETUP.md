@@ -49,7 +49,7 @@ Mit `labor: { f: 'x^2' }` erscheint im Thema der interaktive Graph „Ausprobier
 
 `labor.html` zeigt nur das „Ausprobieren“, z. B. zum Einbetten als iframe in itslearning. Startzustand über die Adresse (auch auf der Hauptseite), erzeugt vom Knopf „Link zu dieser Ansicht kopieren“:
 `labor.html?f=x^3-3x&ansicht=ableitung&zusatz=f2&w=5&a=1&kurs=bf`
-(`ansicht`: steigung, sekante, normale, nullstellen, monotonie, kruemmung, ableitung, ableiten – kommagetrennt; `zusatz`: f1, f2; `kurs`: Farbe bf oder lk)
+(`ansicht`: steigung, sekante, normale, nullstellen, monotonie, kruemmung, ableitung, ableiten – kommagetrennt; `zusatz`: f1, f2; `neben=1`: Graphen nebeneinander; `kurs`: Farbe bf oder lk). Für den Vollbild-Knopf im iframe `allow="fullscreen"` setzen.
 
 Nach jeder Änderung prüfen (alle Themen vollständig, jede Zufallsaufgabe 300-mal numerisch nachgerechnet):
 

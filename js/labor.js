@@ -112,17 +112,18 @@ function laborSek({ f }) {
   const modi = gew.find(m => LABOR_ALLEIN.includes(m)) || gew.join(' ');
   const zusatz = (q.get('zusatz') || '').split(',').filter(z => LABOR_ZUSATZ[z]).join(' ');
   const w = Math.min(10, Math.max(1, zahl('w', 10))), a = Math.min(5, Math.max(-5, zahl('a', 1)));
+  const neben = q.get('neben') === '1';
   const an = (liste, x) => liste.split(' ').includes(x) ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"';
   return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansichten an- oder abwählen und den Punkt mit dem Schieberegler oder direkt im Graphen bewegen.</p>
-    <div class="labor" id="labor" data-modi="${modi}" data-zusatz="${zusatz}" data-w="${w}" data-weg="new" data-schritt="1">
+    <div class="labor" id="labor" data-modi="${modi}" data-zusatz="${zusatz}" data-w="${w}" data-weg="new" data-schritt="1" data-neben="${neben ? 'an' : ''}">
       <div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
-      <details class="lab-bsp"><summary>Beispiele</summary>
-        ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</details>
+      <div class="lab-leiste"><details class="lab-bsp"><summary>Beispiele</summary><div class="lab-bsp-liste">
+        ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</div></details>
       <details class="lab-menu"><summary>Ansichten: <span id="labModiText">${labModiName(modi, zusatz)}</span></summary>
         <div class="lab-menu-liste">${Object.entries(LABOR_MODI).map(([m, n]) => (m === LABOR_ALLEIN[0] ? '<hr><div class="lab-menu-hinweis">einzeln</div>' : '')
           + `<button data-modus="${m}"${an(modi, m)}>${n}</button>`).join('')}
           <hr><div class="lab-menu-hinweis">zusätzlich darunter</div>
-          ${Object.entries(LABOR_ZUSATZ).map(([z, n]) => `<button data-zusatz="${z}"${an(zusatz, z)}>${n}</button>`).join('')}</div></details>
+          ${Object.entries(LABOR_ZUSATZ).map(([z, n]) => `<button data-zusatz="${z}"${an(zusatz, z)}>${n}</button>`).join('')}</div></details></div>
       <label class="lab-regler"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="${w}"><span id="labWText"></span></label>
       <label class="lab-regler lab-a" hidden><span>Parameter <i>a</i></span><input type="range" id="labA" min="-5" max="5" step="0.1" value="${a}"><span id="labAText">a = ${labZahl(a)}</span></label>
       <label class="lab-regler lab-h"><span>Abstand <i>h</i></span><input type="range" id="labH" min="-3" max="3" step="0.05" value="1"><span id="labHText">h = 1</span></label>
@@ -135,7 +136,8 @@ function laborSek({ f }) {
       <div id="labGraph"></div>
       <input type="range" id="labX" min="-10" max="10" step="0.05" value="1.5" aria-label="Stelle x₀">
       <div class="lab-info" id="labInfo"></div>
-      <div class="lab-fuss"><button data-aktion="link">Link zu dieser Ansicht kopieren</button></div>
+      <div class="lab-fuss"><button data-aktion="vollbild">⛶ Vollbild</button><button data-schalter="neben"${neben ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"'}>◫ Nebeneinander</button>
+        <button data-aktion="link">Link zu dieser Ansicht kopieren</button></div>
     </div></section>`;
 }
 
@@ -233,7 +235,11 @@ function laborZeichnen() {
   const zus = (box.dataset.zusatz || '').split(' '), f2 = x => abl2(f, x);
   const S1 = !aS && zus.includes('f1') && system(fs), S2 = zus.includes('f2') && system(f2);
   // Alle Graphen zusammen höchstens 75 % der Fensterhöhe, sonst schmaler (x und y bleiben gleich skaliert)
-  W = Math.min(W, Math.max(280, .75 * innerHeight * 2 * w / [fS, aS, S1, S2].reduce((s, S) => s + (S ? S.hi - S.lo : 0), 0)));
+  // Nebeneinander: jeder Graph bekommt einen Teil der Breite (Knopf nur bei mehreren Graphen)
+  const alle = [fS, aS, S1, S2].filter(Boolean), neben = box.dataset.neben === 'an' && alle.length > 1;
+  $('[data-schalter="neben"]').hidden = alle.length < 2;
+  if (neben) W = (W - 12 * (alle.length - 1)) / alle.length;
+  W = Math.min(W, Math.max(neben ? 200 : 280, .75 * innerHeight * 2 * w / (neben ? Math.max(...alle.map(S => S.hi - S.lo)) : alle.reduce((s, S) => s + S.hi - S.lo, 0))));
   const y0 = f(x0), m = ableitung(f, x0), m2 = abl2(f, x0);
   // Gerade durch (x₀ | y₀) mit Steigung k über den ganzen Ausschnitt
   const gerade = (k, kl) => `<line class="${kl}" x1="${X(-w)}" y1="${fS.Y(y0 - k * (w + x0))}" x2="${X(w)}" y2="${fS.Y(y0 + k * (w - x0))}"/>`;
@@ -377,6 +383,8 @@ function laborZeichnen() {
   if (S1) bild += zusatzGraph(S1, fs, 'f′', 'abl');
   if (S2) bild += zusatzGraph(S2, f2, 'f″', 'abl2');
   $('#labGraph').innerHTML = bild;
+  // Schieberegler genau unter dem Graphen, damit seine Stelle zur x-Achse passt
+  $('#labX').style.width = (neben ? alle.length * W + 12 * (alle.length - 1) : W) + 'px';
   $('#labInfo').innerHTML = info;
   // Wertetabelle: aktuelle Spalte sichtbar halten
   const t = $('.lab-tabelle'), j = t && t.querySelector('.jetzt');
@@ -407,6 +415,7 @@ function labLink(b) {
   if (box.dataset.zusatz) q.set('zusatz', box.dataset.zusatz.split(' ').join(','));
   if (box.dataset.w !== '10') q.set('w', box.dataset.w);
   if (!$('.lab-a').hidden) q.set('a', $('#labA').value);
+  if (box.dataset.neben === 'an') q.set('neben', '1');
   if (document.body.dataset.kurs) q.set('kurs', document.body.dataset.kurs);
   const url = location.origin + location.pathname + '?' + q + location.hash;
   (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
@@ -436,9 +445,22 @@ document.addEventListener('change', e => {
   if (n !== t) { e.target.value = n; laborZeichnen(); }
 });
 // Punkt direkt im Graphen ziehen (nur waagrecht, senkrecht scrollt die Seite weiter)
-let labZiehen = false;
+// Vollbild, z. B. für den Beamer (in einem iframe nur mit allow="fullscreen", sonst füllt es das iframe)
+function labVollbild() {
+  const box = $('#labor'), an = !box.classList.contains('vollbild');
+  box.classList.toggle('vollbild', an);
+  if (an && box.requestFullscreen) box.requestFullscreen().catch(() => {});
+  if (!an && document.fullscreenElement) document.exitFullscreen();
+  $('[data-aktion="vollbild"]').textContent = an ? '✕ Vollbild beenden' : '⛶ Vollbild';
+  laborZeichnen();
+}
+document.addEventListener('fullscreenchange', () => { const box = $('#labor'); if (box && !document.fullscreenElement && box.classList.contains('vollbild')) labVollbild(); });
+document.addEventListener('keydown', e => { const box = $('#labor'); if (e.key === 'Escape' && box && box.classList.contains('vollbild') && !document.fullscreenElement) labVollbild(); });
+
+// Gezogen wird im Graphen, in dem der Finger aufgesetzt hat (wichtig bei „Nebeneinander“)
+let labZiehen = false, labZiehNr = 0;
 function labZiehe(e) {
-  const r = $('#labGraph svg').getBoundingClientRect(), w = +$('#labor').dataset.w;
+  const r = $('#labGraph').querySelectorAll('svg')[labZiehNr].getBoundingClientRect(), w = +$('#labor').dataset.w;
   $('#labX').value = ((e.clientX - r.left) / r.width * 2 - 1) * w; // rastet auf die Schrittweite des Reglers ein
   laborZeichnen();
 }
@@ -454,6 +476,7 @@ document.addEventListener('pointerdown', e => {
     labTipp = { x: +$('#labX').value, y: Math.round((labAS.hi - (e.clientY - r.top) * s.viewBox.baseVal.width / r.width * labAS.k) * 10) / 10 };
     return laborZeichnen();
   }
+  labZiehNr = Math.max(0, [...g.querySelectorAll('svg')].indexOf(e.target.closest('svg')));
   labZiehen = true; g.setPointerCapture(e.pointerId); labZiehe(e);
 });
 document.addEventListener('pointermove', e => { if (labZiehen) labZiehe(e); });
@@ -472,7 +495,7 @@ document.addEventListener('click', e => {
     // Ableitung: Spur beginnt neu am linken Rand, Schalter aus
     if (box.dataset.modi === 'ableitung') {
       labSpur.clear(); labTipp = null;
-      box.querySelectorAll('[data-schalter]').forEach(x => { box.dataset[x.dataset.schalter] = ''; x.classList.remove('on'); x.setAttribute('aria-pressed', false); });
+      box.querySelectorAll('.lab-ableitung [data-schalter]').forEach(x => { box.dataset[x.dataset.schalter] = ''; x.classList.remove('on'); x.setAttribute('aria-pressed', false); });
     }
     laborAusschnitt();
   }
@@ -491,10 +514,11 @@ document.addEventListener('click', e => {
   if (b.dataset.aktion === 'setzen' && labJetzt) labSpur.set(labJetzt.x, labJetzt.m);
   if (b.dataset.aktion === 'loeschen') { labSpur.clear(); labTipp = null; }
   if (b.dataset.aktion === 'link') return labLink(b);
+  if (b.dataset.aktion === 'vollbild') return labVollbild();
   for (const a of ['weg', 'schritt']) if (b.dataset[a]) { box.dataset[a] = b.dataset[a]; box.querySelectorAll(`[data-${a}]`).forEach(x => x.classList.toggle('on', x === b)); }
   if (b.dataset.weg === 'regler') $('#labX').value = -box.dataset.w;
   laborZeichnen();
 });
 // Ansichten-Menü schließen, wenn daneben getippt wird
-document.addEventListener('click', e => { const d = $('.lab-menu'); if (d && d.open && !e.target.closest('.lab-menu')) d.open = false; });
+document.addEventListener('click', e => document.querySelectorAll('.lab-leiste details[open]').forEach(d => { if (!d.contains(e.target)) d.open = false; }));
 addEventListener('resize', laborZeichnen);
