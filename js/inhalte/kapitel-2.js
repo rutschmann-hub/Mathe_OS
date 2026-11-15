@@ -63,6 +63,9 @@ Object.assign(INHALTE, {
         loesung: String.raw`\(60e^{-0{,}1t} = 30 \;\Rightarrow\; e^{-0{,}1t} = 0{,}5 \;\Rightarrow\; -0{,}1t = \ln(0{,}5) \;\Rightarrow\; t = -10\ln(0{,}5) \approx 6{,}93\).<br>Nach knapp 7 Minuten.` },
       { niveau: 2, kurs: 'lk', aufgabe: String.raw`Löse \(3^x = 20\).`,
         loesung: String.raw`\(\ln(3^x) = \ln(20) \;\Rightarrow\; x\cdot\ln(3) = \ln(20) \;\Rightarrow\; x = \frac{\ln(20)}{\ln(3)} \approx 2{,}727\)` },
+      { niveau: 3, kurs: 'bf', aufgabe: String.raw`Schreibe \(2^x\) als Potenz mit der Basis \(e\) und löse damit \(2^x = 10\).`,
+        loesung: String.raw`\(2 = e^{\ln(2)}\), also \(2^x = \left(e^{\ln(2)}\right)^x = e^{x\ln(2)}\).<br>
+          \(e^{x\ln(2)} = 10 \;\Rightarrow\; x\ln(2) = \ln(10) \;\Rightarrow\; x = \frac{\ln(10)}{\ln(2)} \approx 3{,}322\)` },
       { niveau: 3, kurs: 'lk', aufgabe: String.raw`Löse \(\ln(x) + \ln(4) = \ln(12)\) für \(x > 0\).`,
         loesung: String.raw`Logarithmengesetz: \(\ln(4x) = \ln(12) \;\Rightarrow\; 4x = 12 \;\Rightarrow\; x = 3\)` },
     ],

@@ -9,7 +9,7 @@ Live-Seite: https://rutschmann-hub.github.io/Mathe_OS/ (GitHub Pages, Branch `ma
 ├── index.html              Seitengerüst (lädt CSS, MathJax und die Skripte)
 ├── labor.html              nur „Ausprobieren“, zum Einbetten (iframe)
 ├── css/
-│   ├── base.css            Farben, Schrift, Hell/Dunkel
+│   ├── base.css            Design-Tokens: Farben (auch Graphfarben), Schriftgrößen, Abstände, Radien; Hell/Dunkel
 │   └── site.css            Layout und Bausteine (Merkkasten, Übungen, Selbsttest …)
 ├── js/
 │   ├── buecher.js          Gliederung Basisfach / Leistungsfach (nach den Inhaltsverzeichnissen)
@@ -20,7 +20,7 @@ Live-Seite: https://rutschmann-hub.github.io/Mathe_OS/ (GitHub Pages, Branch `ma
 ├── vendor/                 Lokale Kopien von MathJax, KaTeX, MathLive und Schriften (mit Lizenzen)
 ├── werkzeuge/              Eigenständige Werkzeuge (z. B. Funktionsmaschine)
 ├── kurztests/              Eigenständige Kurztests
-└── tools/                  Prüfskript für Inhalte und Zufallsaufgaben
+└── tools/                  Prüfskript für Inhalte und Zufallsaufgaben, Arbeitsblätter als PDF
 ```
 
 Die Seite lädt nichts von fremden Servern – alle Schriften und Bibliotheken liegen in `vendor/`.
@@ -57,6 +57,14 @@ Nach jeder Änderung prüfen (alle Themen vollständig, jede Zufallsaufgabe 300-
 ```bash
 node tools/pruefe-inhalte.js
 ```
+
+Arbeitsblätter als PDF im Stil der Seite (Merkkasten, Erklärung, Beispiel, Übungen, Lösungen – Kursfassung wie auf der Seite). Druck über Brave im Hintergrund; ohne Zielordner landen die PDFs in `~/Documents/Schule/Mathe/MatheNavigator/Arbeitsblaetter`:
+
+```bash
+node tools/arbeitsblatt.js bf II
+```
+
+(einzelnes Thema: `node tools/arbeitsblatt.js lk II 5`, eigener Zielordner als viertes Argument)
 
 ## Veröffentlichen
 

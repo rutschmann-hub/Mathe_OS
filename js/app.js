@@ -15,7 +15,7 @@ function route() {
 
 function start() {
   const n = k => KURSE[k].kapitel.reduce((s, c) => s + c.u.length, 0);
-  return `<h1 style="margin-top:48px">Mathematik in der Kursstufe</h1>
+  return `<h1 style="margin-top:var(--sp-10)">Mathematik in der Kursstufe</h1>
     <p class="lead">Wähle deinen Kurs. Die Themen folgen dem Aufbau deines Schulbuchs.</p>
     <div class="choose">
       ${['bf', 'lk'].map(k => `<a class="${k}" href="#/${k}"><b>${KURSE[k].name}</b>
@@ -80,7 +80,7 @@ function inhalt(x, kurs) {
       <div class="fehler">${x.fehler}</div></div></section>
     ${x.labor ? laborSek(x.labor) : ''}
     ${videoSek(x.video)}
-    <section class="sec"><h2>Übungen</h2><p style="margin-bottom:6px">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
+    <section class="sec"><h2>Übungen</h2><p style="margin-bottom:var(--sp-2)">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
       ${ue.map((u, i) => `<div class="ue"><span class="nr">${i + 1}</span><div>${u.aufgabe}<span class="lvl">${'●'.repeat(u.niveau)}</span>${u.kurs === 'lk' ? '<span class="tag-lk">LK</span>' : ''}</div>
         <details><summary>Lösung</summary><div class="inner">${u.loesung}</div></details></div>`).join('')}</section>
     ${x.generator ? `<section class="sec"><h2>Weiter üben</h2><p>Zufallsaufgaben – so viele du willst. Stufe wählen, dann „Neue Aufgabe“.</p>

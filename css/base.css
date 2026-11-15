@@ -1,11 +1,13 @@
-/* Design-Tokens (Farben, Radien, Schrift) und Grundstile */
+/* Design-Tokens: Farben, Schrift, Abstände, Radien – alle Werte der Seite kommen von hier */
 :root {
+  /* Flächen und Text */
   --bg: #f6f7fb;
   --surface: #ffffff;
   --surface-2: #f0f2f8;
   --text: #141824;
   --muted: #5b6275;
   --line: #e2e5ee;
+  /* Kursfarben (Bedienelemente, Merkkasten, Links) */
   --bf: #0f9b8e;
   --bf-soft: #e1f5f2;
   --lk: #6d4aff;
@@ -13,24 +15,80 @@
   --both: #334155;
   --both-soft: #eef1f5;
   --accent: #ff7a3d;
-  --radius: 16px;
-  --radius-s: 10px;
-  --shadow: 0 1px 2px rgba(20, 24, 36, .04), 0 8px 24px rgba(20, 24, 36, .06);
-  --shadow-lg: 0 24px 60px rgba(20, 24, 36, .18);
+  /* Rückmeldung (immer zusammen mit ✓/✗ oder Text, nie nur Farbe) */
+  --ok: #16a34a;
+  --falsch: #e5484d;
+  /* Bereiche in der Kapitelliste */
+  --bereich-analysis: #3b6cf6;
+  --bereich-geometrie: #11a37f;
+  --bereich-stochastik: #ec7a2c;
+
+  /* Graphen – feste Farbe je Größe, unabhängig vom Kurs (geprüft mit dem dataviz-Validator, hell auf #fff, dunkel auf #151a24) */
+  --plot-ink: var(--text);       /* f */
+  --plot-1: #2a78d6;             /* f′, Tangente, Steigungsdreieck, Spurpunkte */
+  --plot-2: #eb6834;             /* f″ */
+  --plot-3: #1baf7a;             /* Hilfslinie in Erklärgrafiken (gestrichelt, beschriftet) */
+  --plot-sek: #dc9400;           /* Sekante (beschriftet mit P, Q, h) */
+  --plot-steigt: #166534;        /* Monotonie: streng monoton steigend */
+  --plot-faellt: #f0606a;        /* Monotonie: streng monoton fallend */
+  --plot-links: var(--plot-1);   /* Krümmung: linksgekrümmt (Hintergrund) */
+  --plot-rechts: var(--plot-2);  /* Krümmung: rechtsgekrümmt (Hintergrund) */
+  --plot-grid: var(--line);
+  --plot-axis: var(--muted);
+
+  /* Schrift */
   --font: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  --fs-2xs: .7rem;
+  --fs-xs: .78rem;
+  --fs-sm: .85rem;
+  --fs-body: .93rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.1rem;
+  --fs-xl: 1.2rem;
+  --fs-2xl: 1.35rem;
+  --fs-3xl: 1.5rem;
+  --fs-h1: clamp(2rem, 5vw, 2.8rem);
+  --fs-plot: 11px;               /* Achsenbeschriftung im Graphen */
+  --fs-plot-lg: 15px;            /* Name des Graphen (f, f′) und Vorzeichen */
+
+  /* Abstände */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 28px;
+  --sp-8: 32px;
+  --sp-9: 40px;
+  --sp-10: 48px;
+
+  /* Radien und Schatten */
+  --radius-xs: 6px;
+  --radius-s: 10px;
+  --radius-m: 12px;
+  --radius: 16px;
+  --radius-l: 20px;
+  --radius-pill: 999px;
+  --shadow: 0 1px 2px rgba(20, 24, 36, .04), 0 8px 24px rgba(20, 24, 36, .06);
+  --shadow-pop: 0 10px 28px rgb(0 0 0 / .14);
+  --shadow-lg: 0 24px 60px rgba(20, 24, 36, .18);
   color-scheme: light;
 }
+/* Dunkel: eigene, gegen den dunklen Hintergrund geprüfte Stufen – keine automatische Umkehrung */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0d1017; --surface: #151a24; --surface-2: #1c2230; --text: #eef1f7; --muted: #9aa3b8; --line: #2a3142;
     --bf: #2dd4bf; --bf-soft: #123330; --lk: #a28bff; --lk-soft: #241f45; --both: #cbd5e1; --both-soft: #222a38;
+    --plot-1: #3987e5; --plot-2: #d95926; --plot-3: #199e70; --plot-sek: #cc9a00; --plot-steigt: #10924c; --plot-faellt: #ea5c84;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0d1017; --surface: #151a24; --surface-2: #1c2230; --text: #eef1f7; --muted: #9aa3b8; --line: #2a3142;
   --bf: #2dd4bf; --bf-soft: #123330; --lk: #a28bff; --lk-soft: #241f45; --both: #cbd5e1; --both-soft: #222a38;
+  --plot-1: #3987e5; --plot-2: #d95926; --plot-3: #199e70; --plot-sek: #cc9a00; --plot-steigt: #10924c; --plot-faellt: #ea5c84;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3); color-scheme: dark;
 }
 
@@ -40,4 +98,4 @@ button { font: inherit; color: inherit; cursor: pointer; }
 a { color: inherit; }
 
 /* Theme-Schalter */
-.theme-btn { border: 1px solid var(--line); background: var(--surface); width: 2.4rem; height: 2.4rem; border-radius: 999px; }
+.theme-btn { border: 1px solid var(--line); background: var(--surface); width: 2.4rem; height: 2.4rem; border-radius: var(--radius-pill); }

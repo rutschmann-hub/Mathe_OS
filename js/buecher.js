@@ -54,9 +54,9 @@ const KURSE = {
 };
 
 const BEREICHE = {
-  analysis:   { name: 'Analysis',              farbe: '#3b6cf6' },
-  geometrie:  { name: 'Analytische Geometrie', farbe: '#11a37f' },
-  stochastik: { name: 'Stochastik',            farbe: '#ec7a2c' },
+  analysis:   { name: 'Analysis',              farbe: 'var(--bereich-analysis)' },
+  geometrie:  { name: 'Analytische Geometrie', farbe: 'var(--bereich-geometrie)' },
+  stochastik: { name: 'Stochastik',            farbe: 'var(--bereich-stochastik)' },
 };
 
 // Gleichnamiges Thema im anderen Kurs finden (nur bei exakt gleichem Titel – keine eigene Zuordnung)
