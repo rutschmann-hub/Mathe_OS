@@ -14,7 +14,7 @@
 <main class="wrap" id="main"></main>
 
 <script>window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
-  chtml: { fontURL: 'vendor/mathjax/output/chtml/fonts/woff-v2', mtextInheritFont: true }, options: { enableMenu: false }, startup: { typeset: false, ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(start); } } };</script>
+  chtml: { fontURL: 'vendor/mathjax/output/chtml/fonts/woff-v2', mtextInheritFont: true }, options: { enableMenu: false }, startup: { typeset: false, ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(() => document.readyState === 'loading' ? addEventListener('DOMContentLoaded', start) : start()); } } };</script>
 <script async src="vendor/mathjax/tex-chtml.js"></script>
 <script>const $ = s => document.querySelector(s);</script>
 <script src="js/inhalte.js"></script>

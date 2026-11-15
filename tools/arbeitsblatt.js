@@ -29,7 +29,7 @@ function blatt(titel, nr) {
 <link rel="stylesheet" href="file://${path.join(wurzel, 'css/base.css')}">
 <style>
   /* Farben, Schrift und Graphfarben aus css/base.css; hier nur die Kursfarbe */
-  :root { --k: var(--${kurs}); --k-soft: var(--${kurs}-soft); }
+  :root { --k: var(--${kurs}); --k-soft: var(--${kurs}-soft); --k-fill: var(--${kurs}-fill); --k-on: var(--${kurs}-on); }
   @page { size: A4; margin: 15mm 16mm 17mm;
     @bottom-left { content: "Mathe Kursstufe · ${KURSE[kurs].name} · Kapitel ${kapNr}.${nr}"; font: 8pt Inter, sans-serif; color: var(--muted); }
     @bottom-right { content: "Seite " counter(page) " von " counter(pages); font: 8pt Inter, sans-serif; color: var(--muted); } }
@@ -42,14 +42,14 @@ function blatt(titel, nr) {
   h2 { font-size: 11.5pt; margin: 14px 0 6px; }
   .lead { color: var(--muted); margin: 0 0 14px; }
   .merk { position: relative; background: var(--k-soft); border: 1px solid color-mix(in srgb, var(--k) 30%, transparent); border-radius: 14px; padding: 14px 14px 8px; break-inside: avoid; }
-  .merk .lbl { position: absolute; top: -9px; left: 16px; background: var(--k); color: var(--surface); font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; padding: 2px 10px; border-radius: 99px; }
+  .merk .lbl { position: absolute; top: -9px; left: 16px; background: var(--k-fill); color: var(--k-on); font-size: 7.5pt; font-weight: 700; letter-spacing: .12em; padding: 2px 10px; border-radius: 99px; }
   .regeln { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; }
   .regeln > div { padding: 3px 0; border-top: 1px solid color-mix(in srgb, var(--k) 18%, transparent); }
   .regeln > div:nth-child(-n+2) { border-top: 0; }
   .regeln .n { color: var(--muted); font-size: 8.5pt; padding-top: 6px; }
   .merk p { margin: 8px 0 2px; font-size: 9pt; color: var(--muted); }
   .erkl p { margin: 0 0 8px; }
-  .graph { display: block; width: 200px; float: right; margin: 0 0 8px 14px; color: var(--muted); }
+  .graph { display: block; width: 200px; float: right; margin: 0 0 8px 14px; color: var(--muted); border-radius: 10px; box-shadow: 0 0 0 1px var(--line); overflow: hidden; }
   .erkl::after { content: ''; display: block; clear: both; }
   .graph .gr { stroke: var(--plot-grid); stroke-width: .6; } .graph .ax { stroke: var(--plot-axis); stroke-width: 1.1; }
   .graph path { fill: none; stroke-width: 2.2; stroke-linecap: round; }
@@ -62,7 +62,7 @@ function blatt(titel, nr) {
   .fehler { background: color-mix(in srgb, var(--falsch) 7%, var(--surface)); border-left: 3px solid var(--falsch); border-radius: 0 10px 10px 0; padding: 7px 12px; margin-top: 10px; font-size: 9pt; break-inside: avoid; }
   .neue-seite { break-before: page; }
   .aufg { display: grid; grid-template-columns: 24px 1fr; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; margin: 0 0 8px; break-inside: avoid; }
-  .aufg .nr { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--k); color: var(--surface); font-size: 9pt; font-weight: 700; }
+  .aufg .nr { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--k-fill); color: var(--k-on); font-size: 9pt; font-weight: 700; }
   .lvl { margin-left: 8px; color: var(--muted); font-size: 8pt; letter-spacing: .1em; }
   .loes .aufg { font-size: 9pt; padding: 6px 12px; margin-bottom: 6px; }
 </style>

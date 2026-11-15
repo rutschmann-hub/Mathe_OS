@@ -1,17 +1,24 @@
 /* Design-Tokens: Farben, Schrift, Abstände, Radien – alle Werte der Seite kommen von hier */
 :root {
   /* Flächen und Text */
-  --bg: #f6f7fb;
+  --bg: #f3f4f7;
   --surface: #ffffff;
   --surface-2: #f0f2f8;
   --text: #141824;
   --muted: #5b6275;
   --line: #e2e5ee;
-  /* Kursfarben (Bedienelemente, Merkkasten, Links) */
-  --bf: #0f9b8e;
-  --bf-soft: #e1f5f2;
-  --lk: #6d4aff;
-  --lk-soft: #ece8ff;
+  /* Kursfarben „Senf & Grün“: --bf/--lk für Text und Linien, --…-fill für Flächen, --…-on für Schrift auf diesen Flächen (alle Kontraste ≥ 4,5) */
+  --bf: #7a5600;
+  --bf-soft: #fbf0d4;
+  --bf-fill: #e0a526;
+  --bf-on: #2b2000;
+  --lk: #25693f;
+  --lk-soft: #e2efe6;
+  --lk-fill: #25693f;
+  --lk-on: #ffffff;
+  --neutral-fill: #1f2a26;   /* Kopfbereich ohne Kurs (Startseite) */
+  --neutral-on: #ffffff;
+  --on-fill: #ffffff;        /* Aufhellung für Verläufe und Glanz */
   --both: #334155;
   --both-soft: #eef1f5;
   --accent: #ff7a3d;
@@ -73,6 +80,9 @@
   --radius-pill: 999px;
   --shadow: 0 1px 2px rgba(20, 24, 36, .04), 0 8px 24px rgba(20, 24, 36, .06);
   --shadow-pop: 0 10px 28px rgb(0 0 0 / .14);
+  --shadow-card: 0 1px 2px rgb(20 24 36 / .04), 0 4px 16px rgb(20 24 36 / .05);
+  --shadow-raised: 0 2px 4px rgb(20 24 36 / .04), 0 10px 30px rgb(20 24 36 / .08);
+  --radius-hero: 20px;
   --shadow-lg: 0 24px 60px rgba(20, 24, 36, .18);
   color-scheme: light;
 }
@@ -80,16 +90,16 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0d1017; --surface: #151a24; --surface-2: #1c2230; --text: #eef1f7; --muted: #9aa3b8; --line: #2a3142;
-    --bf: #2dd4bf; --bf-soft: #123330; --lk: #a28bff; --lk-soft: #241f45; --both: #cbd5e1; --both-soft: #222a38;
+    --bf: #e8b23a; --bf-soft: #3a2f12; --lk: #6cc488; --lk-soft: #17301f; --both: #cbd5e1; --both-soft: #222a38;
     --plot-1: #3987e5; --plot-2: #d95926; --plot-3: #199e70; --plot-sek: #cc9a00; --plot-steigt: #10924c; --plot-faellt: #ea5c84;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3); color-scheme: dark;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3); --shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --shadow-raised: 0 2px 4px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0d1017; --surface: #151a24; --surface-2: #1c2230; --text: #eef1f7; --muted: #9aa3b8; --line: #2a3142;
-  --bf: #2dd4bf; --bf-soft: #123330; --lk: #a28bff; --lk-soft: #241f45; --both: #cbd5e1; --both-soft: #222a38;
+  --bf: #e8b23a; --bf-soft: #3a2f12; --lk: #6cc488; --lk-soft: #17301f; --both: #cbd5e1; --both-soft: #222a38;
   --plot-1: #3987e5; --plot-2: #d95926; --plot-3: #199e70; --plot-sek: #cc9a00; --plot-steigt: #10924c; --plot-faellt: #ea5c84;
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3); color-scheme: dark;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3); --shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --shadow-raised: 0 2px 4px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35); color-scheme: dark;
 }
 
 * { box-sizing: border-box; }

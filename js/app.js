@@ -15,8 +15,8 @@ function route() {
 
 function start() {
   const n = k => KURSE[k].kapitel.reduce((s, c) => s + c.u.length, 0);
-  return `<h1 style="margin-top:var(--sp-10)">Mathematik in der Kursstufe</h1>
-    <p class="lead">Wähle deinen Kurs. Die Themen folgen dem Aufbau deines Schulbuchs.</p>
+  return `<div class="held" style="margin-top:var(--sp-9)"><h1>Mathematik in der Kursstufe</h1>
+    <p>Wähle deinen Kurs. Die Themen folgen dem Aufbau deines Schulbuchs.</p></div>
     <div class="choose">
       ${['bf', 'lk'].map(k => `<a class="${k}" href="#/${k}"><b>${KURSE[k].name}</b>
         <span>${KURSE[k].kapitel.length} Kapitel · ${n(k)} Themen</span></a>`).join('')}
@@ -38,7 +38,7 @@ function kursSeite(kurs, offen) {
       </ul></div>`;
   }).join('');
   return `<div class="crumb"><a href="#/">Start</a></div>
-    <h1>${KURSE[kurs].name}</h1><p class="lead">Kapitel antippen, um die Themen zu sehen.</p>${rows}`;
+    <div class="held"><h1>${KURSE[kurs].name}</h1><p>Kapitel antippen, um die Themen zu sehen.</p></div>${rows}`;
 }
 
 function themaSeite(kurs, kapNr, thema) {
@@ -49,14 +49,14 @@ function themaSeite(kurs, kapNr, thema) {
   const g = gegenstueck(kurs, titel);
   const nav = (j, lbl) => c.u[j] ? `<a href="#/${kurs}/${c.nr}/${j + 1}"><small>${lbl}</small><b>${c.u[j]}</b></a>` : '<span></span>';
   return `<div class="crumb"><a href="#/">Start</a> / <a href="#/${kurs}">${KURSE[kurs].name}</a> / <a href="#/${kurs}/${c.nr}">${c.nr} ${c.titel}</a></div>
-    <h1>${titel}</h1>
+    <div class="held"><h1>${titel}</h1>
     <div class="meta"><span>Kapitel ${c.nr} · Abschnitt ${i + 1}</span>
-      ${g ? `<a href="#/${g.kurs}/${g.kap}/${g.nr}">Auch im ${KURSE[g.kurs].name} →</a>` : ''}</div>
+      ${g ? `<a href="#/${g.kurs}/${g.kap}/${g.nr}">Auch im ${KURSE[g.kurs].name} →</a>` : ''}</div></div>
     ${INHALTE[titel] ? inhalt(inhaltFuer(titel, kurs), kurs) : `
-    <section class="sec"><h2>Erklärung</h2><p>Noch kein Material – hier kommt dein Input hin.</p></section>
+    <section class="sec">${h2('erklaerung', 'Erklärung')}<p>Noch kein Material – hier kommt dein Input hin.</p></section>
     ${videoSek(null)}
-    <section class="sec"><h2>Übungen</h2><p>Noch keine Übungen.</p></section>
-    <section class="sec"><h2>Selbsttest</h2><p>Noch kein Kurztest.</p></section>`}
+    <section class="sec">${h2('uebungen', 'Übungen')}<p>Noch keine Übungen.</p></section>
+    <section class="sec">${h2('test', 'Selbsttest')}<p>Noch kein Kurztest.</p></section>`}
     <div class="pager">${nav(i - 1, '← Zurück')}${nav(i + 1, 'Weiter →')}</div>`;
 }
 
@@ -66,6 +66,9 @@ function inhaltFuer(titel, kurs = document.body.dataset.kurs) {
   return x && x[kurs] ? { ...x, ...x[kurs] } : x;
 }
 
+// Abschnittsüberschrift mit Symbol (Symbole in css/site.css, .sym[data-sym])
+const h2 = (sym, text) => `<h2><span class="sym" data-sym="${sym}" aria-hidden="true"></span>${text}</h2>`;
+
 function inhalt(x, kurs) {
   const fuer = b => !b.kurs || b.kurs === kurs;
   const ue = x.uebungen.filter(fuer);
@@ -73,30 +76,30 @@ function inhalt(x, kurs) {
     <div class="merk"><div class="lbl">Merke</div>${x.merk.zeilen
       ? `<div class="regeln">${x.merk.zeilen.map(([name, f], i) => `<div class="r-name${i ? ' t' : ''}">${name}</div><div class="f${i ? ' t' : ''}">\\(\\displaystyle ${f}\\)</div>`).join('')}</div>`
       : `<div class="f">\\[${x.merk.formel}\\]</div>`}<p>${x.merk.text}</p></div>
-    <section class="sec"><h2>Erklärung</h2><div class="body">
+    <section class="sec">${h2('erklaerung', 'Erklärung')}<div class="body">
       ${x.erklaerung || ''}
       <p><b>Beispiel:</b> ${x.beispiel.aufgabe}</p>
       <details><summary>Lösung Schritt für Schritt</summary><div class="inner"><ol class="steps">${x.beispiel.schritte.map(s => `<li>${s}</li>`).join('')}</ol></div></details>
       <div class="fehler">${x.fehler}</div></div></section>
     ${x.labor ? laborSek(x.labor) : ''}
     ${videoSek(x.video)}
-    <section class="sec"><h2>Übungen</h2><p style="margin-bottom:var(--sp-2)">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
+    <section class="sec">${h2('uebungen', 'Übungen')}<p style="margin-bottom:var(--sp-2)">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
       ${ue.map((u, i) => `<div class="ue"><span class="nr">${i + 1}</span><div>${u.aufgabe}<span class="lvl">${'●'.repeat(u.niveau)}</span>${u.kurs === 'lk' ? '<span class="tag-lk">LK</span>' : ''}</div>
         <details><summary>Lösung</summary><div class="inner">${u.loesung}</div></details></div>`).join('')}</section>
-    ${x.generator ? `<section class="sec"><h2>Weiter üben</h2><p>Zufallsaufgaben – so viele du willst. Stufe wählen, dann „Neue Aufgabe“.</p>
+    ${x.generator ? `<section class="sec">${h2('weiter', 'Weiter üben')}<p>Zufallsaufgaben – so viele du willst. Stufe wählen, dann „Neue Aufgabe“.</p>
       <div class="gen"><div class="stufen">${[1, 2, 3].map(n => `<button data-stufe="${n}" class="${n === 1 ? 'on' : ''}">${'●'.repeat(n)}</button>`).join('')}
         <button class="neu" id="neu">Neue Aufgabe ↻</button></div><div id="genAufgabe"></div></div></section>` : ''}
-    ${x.pruefen ? `<section class="sec"><h2>Lösung prüfen</h2><p>Eine KI hat gerechnet – sauber aufgeschrieben, aber in jeder Lösung steckt genau ein Fehler. Tippe auf den falschen Schritt.</p>
+    ${x.pruefen ? `<section class="sec">${h2('pruefen', 'Lösung prüfen')}<p>Eine KI hat gerechnet – sauber aufgeschrieben, aber in jeder Lösung steckt genau ein Fehler. Tippe auf den falschen Schritt.</p>
       ${x.pruefen.map((k, i) => `<div class="ki" data-k="${i}"><div class="ki-kopf"><span class="ki-tag">KI-Lösung</span>${k.aufgabe}</div>
         <ol class="ki-schritte">${k.schritte.map((s, j) => `<li><button data-s="${j}">${s}</button></li>`).join('')}</ol><div class="fb"></div></div>`).join('')}</section>` : ''}
-    <section class="sec"><h2>Selbsttest</h2><p>Drei kurze Fragen – du bekommst sofort Rückmeldung. Nichts wird gespeichert.</p>
+    <section class="sec">${h2('test', 'Selbsttest')}<p>Drei kurze Fragen – du bekommst sofort Rückmeldung. Nichts wird gespeichert.</p>
       ${x.test.map((q, i) => `<div class="q" data-i="${i}"><div class="fr">${q.frage}</div>
         <div class="opts">${q.optionen.map((o, j) => `<button data-j="${j}">${o}</button>`).join('')}</div><div class="fb"></div></div>`).join('')}
       <div class="score" id="score"></div></section>`;
 }
 
 function videoSek(v) {
-  return `<section class="sec"><h2>Video</h2>${v
+  return `<section class="sec">${h2('video', 'Video')}${v
     ? `<a class="video" href="${v.url}" target="_blank" rel="noopener"><span class="play">▶</span><span><b>${v.titel}</b><small>Öffnet in neuem Tab</small></span></a>`
     : `<div class="video leer"><span class="play">▶</span><span><b>Video folgt</b><small>Platzhalter – Link wird ergänzt</small></span></div>`}</section>`;
 }

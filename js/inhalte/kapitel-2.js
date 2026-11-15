@@ -268,6 +268,7 @@ const genPar3 = () => {
 
 const paramGemeinsam = {
   video: null,
+  labor: { f: 'e^(x-a)' },
   erklaerung: String.raw`<p>Die Graphen von \(g_a(x) = e^{x-a}\) für \(a = -1\), \(a = 0\) und \(a = 2\): Jeder Wert von \(a\) liefert eine eigene Funktion. Erhöht man \(a\), wandert der Graph nach rechts.</p>`
     + graph({ x: [-3, 4], y: [-1, 4], kurven: [{ f: x => Math.exp(x + 1), kl: 'k2', label: 'a = −1', lx: -1.5 }, { f: Math.exp, kl: 'k1', label: 'a = 0', lx: 0.9 },
       { f: x => Math.exp(x - 2), kl: 'k3', label: 'a = 2', lx: 3.05 }] })

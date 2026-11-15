@@ -114,16 +114,17 @@ function laborSek({ f }) {
   const w = Math.min(10, Math.max(1, zahl('w', 10))), a = Math.min(5, Math.max(-5, zahl('a', 1)));
   const neben = q.get('neben') === '1';
   const an = (liste, x) => liste.split(' ').includes(x) ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"';
-  return `<section class="sec"><h2>Ausprobieren</h2><p>Funktion eingeben, Ansichten an- oder abwählen und den Punkt mit dem Schieberegler oder direkt im Graphen bewegen.</p>
+  return `<section class="sec lab-sec"><h2><span class="sym" data-sym="labor" aria-hidden="true"></span>Ausprobieren</h2><p>Funktion eingeben, Ansichten an- oder abwählen und den Punkt mit dem Schieberegler oder direkt im Graphen bewegen.</p>
     <div class="labor" id="labor" data-modi="${modi}" data-zusatz="${zusatz}" data-w="${w}" data-weg="new" data-schritt="1" data-neben="${neben ? 'an' : ''}">
-      <div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
+      <div class="lab-kopf"><div class="lab-f">\\(f(x) =\\)<math-field id="labF" math-virtual-keyboard-policy="auto">${termFunktion(f).tex}</math-field></div>
       <div class="lab-leiste"><details class="lab-bsp"><summary>Beispiele</summary><div class="lab-bsp-liste">
-        ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</div></details>
+        ${Object.entries(LABOR_BSP).map(([g, l]) => `<div class="lab-gruppe">${g}</div><div class="lab-kacheln">${l.map(t => `<button data-f="${t}">\\(${termFunktion(t).tex}\\)</button>`).join('')}</div>`).join('')}</div></details></div></div>
+      <div class="lab-seite"><div class="lab-titel">Ansichten</div>
       <details class="lab-menu"><summary>Ansichten: <span id="labModiText">${labModiName(modi, zusatz)}</span></summary>
         <div class="lab-menu-liste">${Object.entries(LABOR_MODI).map(([m, n]) => (m === LABOR_ALLEIN[0] ? '<hr><div class="lab-menu-hinweis">einzeln</div>' : '')
           + `<button data-modus="${m}"${an(modi, m)}>${n}</button>`).join('')}
           <hr><div class="lab-menu-hinweis">zusätzlich darunter</div>
-          ${Object.entries(LABOR_ZUSATZ).map(([z, n]) => `<button data-zusatz="${z}"${an(zusatz, z)}>${n}</button>`).join('')}</div></details></div>
+          ${Object.entries(LABOR_ZUSATZ).map(([z, n]) => `<button data-zusatz="${z}"${an(zusatz, z)}>${n}</button>`).join('')}</div></details>
       <label class="lab-regler"><span>Ausschnitt</span><input type="range" id="labW" min="1" max="10" step="0.5" value="${w}"><span id="labWText"></span></label>
       <label class="lab-regler lab-a" hidden><span>Parameter <i>a</i></span><input type="range" id="labA" min="-5" max="5" step="0.1" value="${a}"><span id="labAText">a = ${labZahl(a)}</span></label>
       <label class="lab-regler lab-h"><span>Abstand <i>h</i></span><input type="range" id="labH" min="-3" max="3" step="0.05" value="1"><span id="labHText">h = 1</span></label>
@@ -133,11 +134,11 @@ function laborSek({ f }) {
       <div class="stufen lab-schritte">${['Stellen markieren', 'Übertragen', 'f′ zeichnen'].map((t, i) => `<button data-schritt="${i + 1}" class="${i ? '' : 'on'}">${i + 1} · ${t}</button>`).join('')}</div>
       <div class="stufen lab-ableitung"><button data-aktion="setzen">● Punkt setzen</button><button data-aktion="abspielen">▶ Abspielen</button><button data-aktion="loeschen">Spur löschen</button>
         <button data-schalter="raten" aria-pressed="false">Erst raten</button><button data-schalter="voll" aria-pressed="false">Ganzen Verlauf von f′ zeigen</button></div>
-      <div id="labGraph"></div>
-      <input type="range" id="labX" min="-10" max="10" step="0.05" value="1.5" aria-label="Stelle x₀">
-      <div class="lab-info" id="labInfo"></div>
       <div class="lab-fuss"><button data-aktion="vollbild">⛶ Vollbild</button><button data-schalter="neben"${neben ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"'}>◫ Nebeneinander</button>
-        <button data-aktion="link">Link zu dieser Ansicht kopieren</button></div>
+        <button data-aktion="link">Link zu dieser Ansicht kopieren</button></div></div>
+      <div class="lab-haupt"><div id="labGraph"></div>
+      <input type="range" id="labX" min="-10" max="10" step="0.05" value="1.5" aria-label="Stelle x₀">
+      <div class="lab-info" id="labInfo"></div></div>
     </div></section>`;
 }
 
@@ -393,7 +394,16 @@ function laborZeichnen() {
 }
 
 // Nach dem Aufbau der Seite: Schieberegler an Ausschnitt und Ansicht anpassen, dann zeichnen
-function laborStart() { if (!$('#labor')) return; laborAusschnitt(); laborZeichnen(); }
+function laborStart() { if (!$('#labor')) return; laborBreite(); laborAusschnitt(); laborZeichnen(); }
+
+// Werkbank: auf breiten Bildschirmen Bedienspalte links (Ansichten immer offen), Graph rechts
+const labBreit = matchMedia('(min-width: 960px)');
+function laborBreite() {
+  const box = $('#labor'); if (!box) return;
+  box.classList.toggle('breit', labBreit.matches);
+  box.querySelector('.lab-menu').open = labBreit.matches;
+}
+labBreit.addEventListener('change', () => { laborBreite(); laborZeichnen(); });
 
 // Spurpunkte der Ansicht Ableitung: Stelle → f′(Stelle)
 const labSpur = new Map();
@@ -520,5 +530,5 @@ document.addEventListener('click', e => {
   laborZeichnen();
 });
 // Ansichten-Menü schließen, wenn daneben getippt wird
-document.addEventListener('click', e => document.querySelectorAll('.lab-leiste details[open]').forEach(d => { if (!d.contains(e.target)) d.open = false; }));
+document.addEventListener('click', e => document.querySelectorAll('.lab-leiste details[open], .labor:not(.breit) .lab-menu[open]').forEach(d => { if (!d.contains(e.target)) d.open = false; }));
 addEventListener('resize', laborZeichnen);

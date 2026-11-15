@@ -541,6 +541,7 @@ Object.assign(INHALTE, {
   // ===== Basisfach I.7 =====
   'Differenzialrechnung in Sachsituationen': {
     video: null,
+    labor: { f: '-0,1x^3+1,2x^2' },
     kurz: String.raw`Beschreibt \(f(t)\) eine Größe im Lauf der Zeit, sagt die Ableitung, wie schnell sie sich gerade ändert. Mit den bekannten Werkzeugen findest du größte Werte und Zeitpunkte stärkster Änderung.`,
     merk: {
       zeilen: [
