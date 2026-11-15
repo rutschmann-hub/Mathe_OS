@@ -83,11 +83,11 @@ function inhalt(x, kurs) {
       <div class="fehler">${x.fehler}</div></div></section>
     ${x.labor ? laborSek(x.labor) : ''}
     ${videoSek(x.video)}
-    <section class="sec">${h2('uebungen', 'Übungen')}<p style="margin-bottom:var(--sp-2)">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>
-      ${ue.map((u, i) => `<div class="ue"><span class="nr">${i + 1}</span><div>${u.aufgabe}<span class="lvl">${'●'.repeat(u.niveau)}</span>${u.kurs === 'lk' ? '<span class="tag-lk">LK</span>' : ''}</div>
+    <section class="sec">${h2('uebungen', 'Übungen')}
+      ${ue.map((u, i) => `<div class="ue"><span class="nr">${i + 1}</span><div>${u.aufgabe}${stufeTag(u.niveau)}${u.kurs === 'lk' ? '<span class="tag-lk">LK</span>' : ''}</div>
         <details><summary>Lösung</summary><div class="inner">${u.loesung}</div></details></div>`).join('')}</section>
     ${x.generator ? `<section class="sec">${h2('weiter', 'Weiter üben')}<p>Zufallsaufgaben – so viele du willst. Stufe wählen, dann „Neue Aufgabe“.</p>
-      <div class="gen"><div class="stufen">${[1, 2, 3].map(n => `<button data-stufe="${n}" class="${n === 1 ? 'on' : ''}">${'●'.repeat(n)}</button>`).join('')}
+      <div class="gen"><div class="stufen">${[1, 2, 3].map(n => `<button data-stufe="${n}" class="${n === 1 ? 'on' : ''}">${STUFEN[n - 1]}</button>`).join('')}
         <button class="neu" id="neu">Neue Aufgabe ↻</button></div><div id="genAufgabe"></div></div></section>` : ''}
     ${x.pruefen ? `<section class="sec">${h2('pruefen', 'Lösung prüfen')}<p>Eine KI hat gerechnet – sauber aufgeschrieben, aber in jeder Lösung steckt genau ein Fehler. Tippe auf den falschen Schritt.</p>
       ${x.pruefen.map((k, i) => `<div class="ki" data-k="${i}"><div class="ki-kopf"><span class="ki-tag">KI-Lösung</span>${k.aufgabe}</div>
@@ -158,8 +158,32 @@ function passend() {
   });
 }
 addEventListener('resize', passend);
+// Leiste „Auf dieser Seite“ auf Themenseiten (sichtbar ab 1100 px): ein Eintrag je Abschnitt, mit Symbol
+function seitenNav() {
+  const main = $('#main'), teile = [...main.querySelectorAll('.merk, .sec')];
+  main.classList.toggle('mit-nav', !!main.querySelector('.held .meta'));
+  if (!main.classList.contains('mit-nav')) return;
+  teile.forEach((t, i) => t.id = 'teil' + i);
+  const eintrag = (t, i) => {
+    const h = t.querySelector('h2');
+    return `<button data-teil="teil${i}">${h ? h.querySelector('.sym').outerHTML + h.textContent : '<span class="sym" data-sym="merke"></span>Merke'}</button>`;
+  };
+  main.insertAdjacentHTML('afterbegin', `<nav class="seitennav" aria-label="Auf dieser Seite"><b>Auf dieser Seite</b>${teile.map(eintrag).join('')}</nav>`);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.seitennav button');
+  if (b) document.getElementById(b.dataset.teil).scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+// Beim Scrollen den Abschnitt markieren, in dem man gerade ist
+addEventListener('scroll', () => {
+  const nav = $('.seitennav'); if (!nav || !nav.offsetParent) return;
+  let aktiv;
+  for (const b of nav.querySelectorAll('button')) if (document.getElementById(b.dataset.teil).getBoundingClientRect().top < 160) aktiv = b;
+  nav.querySelectorAll('button').forEach(b => b.classList.toggle('aktiv', b === aktiv));
+}, { passive: true });
+
 const _route = route;
-route = function () { stufe = 1; _route(); neueAufgabe(); laborStart(); typeset($('#main')).then(passend); };
+route = function () { stufe = 1; _route(); seitenNav(); neueAufgabe(); laborStart(); typeset($('#main')).then(passend); };
 
 function themeToggle() {
   const r = document.documentElement;

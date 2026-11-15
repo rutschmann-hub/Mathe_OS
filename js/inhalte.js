@@ -4,6 +4,10 @@
 // Die Themen selbst stehen in js/inhalte/kapitel-*.js.
 const INHALTE = {};
 
+// Schwierigkeitsstufen der Übungen und Zufallsaufgaben (niveau 1–3)
+const STUFEN = ['Basis', 'Training', 'Profi'];
+const stufeTag = n => `<span class="lvl lvl${n}">${STUFEN[n - 1]}</span>`;
+
 // ---- Helfer für Zufallsaufgaben ----
 const zuf = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const wahl = arr => arr[Math.floor(Math.random() * arr.length)];

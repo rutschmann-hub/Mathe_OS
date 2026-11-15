@@ -11,7 +11,7 @@ const [kurs, kapNr, themaNr, ziel = path.join(os.homedir(), 'Documents/Schule/Ma
 const ctx = vm.createContext({ Math, console });
 for (const f of ['js/buecher.js', 'js/inhalte.js', ...fs.readdirSync(path.join(wurzel, 'js/inhalte')).sort().map(f => 'js/inhalte/' + f)])
   vm.runInContext(fs.readFileSync(path.join(wurzel, f), 'utf8'), ctx, { filename: f });
-const { KURSE, INHALTE } = vm.runInContext('({ KURSE, INHALTE })', ctx);
+const { KURSE, INHALTE, stufeTag } = vm.runInContext('({ KURSE, INHALTE, stufeTag })', ctx);
 
 const kap = KURSE[kurs] && KURSE[kurs].kapitel.find(c => c.nr === kapNr);
 if (!kap) { console.log('Aufruf: node tools/arbeitsblatt.js bf|lk Kapitel [Thema] [Zielordner]   z. B. bf II 3'); process.exit(1); }
@@ -23,7 +23,7 @@ function blatt(titel, nr) {
   const kopf = rechts => `<div class="kopf"><span><b>Mathe Kursstufe</b> · ${KURSE[kurs].name}</span><span>Kapitel ${kapNr}.${nr}${rechts ? ' · ' + rechts : ''}</span></div>`;
   const merk = x.merk.zeilen ? `<div class="regeln">${x.merk.zeilen.map(([n, f]) => `<div class="n">${n}</div><div>\\(\\displaystyle ${f}\\)</div>`).join('')}</div>`
     : `<div class="formel">\\[${x.merk.formel}\\]</div>`;
-  const karten = (feld, tag) => ue.map((u, i) => `<div class="aufg"><span class="nr">${i + 1}</span><div>${u[feld]}${tag ? `<span class="lvl">${'●'.repeat(u.niveau)}</span>` : ''}</div></div>`).join('');
+  const karten = (feld, tag) => ue.map((u, i) => `<div class="aufg"><span class="nr">${i + 1}</span><div>${u[feld]}${tag ? stufeTag(u.niveau) : ''}</div></div>`).join('');
   return `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>${titel}</title>
 <link rel="stylesheet" href="${vendor}/fonts/inter.css">
 <link rel="stylesheet" href="file://${path.join(wurzel, 'css/base.css')}">
@@ -63,7 +63,8 @@ function blatt(titel, nr) {
   .neue-seite { break-before: page; }
   .aufg { display: grid; grid-template-columns: 24px 1fr; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; margin: 0 0 8px; break-inside: avoid; }
   .aufg .nr { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--k-fill); color: var(--k-on); font-size: 9pt; font-weight: 700; }
-  .lvl { margin-left: 8px; color: var(--muted); font-size: 8pt; letter-spacing: .1em; }
+  .lvl { display: inline-block; margin-left: 8px; padding: 0 7px; border-radius: 99px; font-size: 7.5pt; font-weight: 600; }
+  .lvl1 { background: var(--k-soft); color: var(--k); } .lvl2 { background: color-mix(in srgb, var(--k-fill) 40%, var(--surface)); color: var(--text); } .lvl3 { background: var(--k-fill); color: var(--k-on); }
   .loes .aufg { font-size: 9pt; padding: 6px 12px; margin-bottom: 6px; }
 </style>
 <script>window.MathJax = { tex: { inlineMath: [['\\\\(', '\\\\)']], displayMath: [['\\\\[', '\\\\]']] },
@@ -78,7 +79,7 @@ ${x.erklaerung ? `<h2>Erklärung</h2><div class="erkl">${x.erklaerung}</div>` : 
 <h2>Beispiel</h2>
 <div class="karte"><div>${x.beispiel.aufgabe}</div><ol class="steps">${x.beispiel.schritte.map(s => `<li>${s}</li>`).join('')}</ol></div>
 <div class="fehler">${x.fehler}</div>
-<div class="neue-seite">${kopf('Übungen')}<h1>Übungen</h1><p class="lead">Schwierigkeit: ● leicht · ●● mittel · ●●● anspruchsvoll</p>${karten('aufgabe', true)}</div>
+<div class="neue-seite">${kopf('Übungen')}<h1>Übungen</h1><p class="lead">Stufen: ${[1, 2, 3].map(stufeTag).join(' ')}</p>${karten('aufgabe', true)}</div>
 <div class="neue-seite loes">${kopf('Lösungen')}<h1>Lösungen</h1>${karten('loesung')}</div>
 </body></html>`;
 }
