@@ -137,7 +137,7 @@ function laborSek({ f }) {
       <div class="lab-fuss"><button data-aktion="vollbild">⛶ Vollbild</button><button data-schalter="neben"${neben ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"'}>◫ Nebeneinander</button>
         <button data-aktion="link">Link zu dieser Ansicht kopieren</button></div></div>
       <div class="lab-haupt"><div id="labGraph"></div>
-      <input type="range" id="labX" min="-10" max="10" step="0.05" value="1.5" aria-label="Stelle x₀">
+      <input type="range" id="labX" min="-10" max="10" step="0.1" value="1.5" aria-label="Stelle x₀">
       <div class="lab-info" id="labInfo"></div></div>
     </div></section>`;
 }
@@ -158,7 +158,8 @@ function laborZeichnen() {
   try { f = termFunktion(labTerm(), { a: +$('#labA').value }); }
   catch (e) { $('#labInfo').innerHTML = `<span class="lab-fehler">${e}</span>`; return; }
   $('.lab-a').hidden = !f.hatA;
-  const modi = box.dataset.modi.split(' '), an = m => modi.includes(m), w = +box.dataset.w, x0 = +$('#labX').value;
+  const modi = box.dataset.modi.split(' '), an = m => modi.includes(m), w = +box.dataset.w;
+  let x0 = +$('#labX').value;
   let W = $('#labGraph').clientWidth;
   const N = 600;
   const trig = /sin|cos|tan/i.test(labTerm());
@@ -241,6 +242,19 @@ function laborZeichnen() {
   $('[data-schalter="neben"]').hidden = alle.length < 2;
   if (neben) W = (W - 12 * (alle.length - 1)) / alle.length;
   W = Math.min(W, Math.max(neben ? 200 : 280, .75 * innerHeight * 2 * w / (neben ? Math.max(...alle.map(S => S.hi - S.lo)) : alle.reduce((s, S) => s + S.hi - S.lo, 0))));
+  // Magnet: rastet bei Nullstellen, Extrem- und Wendestellen ein (nicht beim Raten und Grafisch ableiten)
+  let rast = '';
+  if (!LABOR_ALLEIN.includes(box.dataset.modi) && W) {
+    const stellen = [
+      ...wechsel(bereiche(x => vz(f(x), 0))).filter(x => Math.abs(f(x)) < 1e-6).map(x => [x, 'Nullstelle']),
+      ...wechsel(bereiche(artM)).map(x => [x, 'Extremstelle']),
+      ...wechsel(bereiche(artK)).map(x => [x, 'Wendestelle'])];
+    const nah = stellen.sort((a, b) => Math.abs(a[0] - x0) - Math.abs(b[0] - x0))[0];
+    if (nah && Math.abs(nah[0] - x0) <= Math.min(16 * w / W, .15)) {
+      rast = [...new Set(stellen.filter(([x]) => Math.abs(x - nah[0]) < 1e-3).map(([, n]) => n))].join(' und ');
+      x0 = nah[0];
+    }
+  }
   const y0 = f(x0), m = ableitung(f, x0), m2 = abl2(f, x0);
   // Gerade durch (x₀ | y₀) mit Steigung k über den ganzen Ausschnitt
   const gerade = (k, kl) => `<line class="${kl}" x1="${X(-w)}" y1="${fS.Y(y0 - k * (w + x0))}" x2="${X(w)}" y2="${fS.Y(y0 + k * (w - x0))}"/>`;
@@ -367,8 +381,9 @@ function laborZeichnen() {
     };
     const tm = isFinite(m), xh = `(${z(xq)})`;
     info = !isFinite(y0) ? `${labTex(`f${st}`)} ist nicht definiert.`
-      : `<div>${labTex(`f${st} = ${z(y0)}`)}</div>`
-        + (an('steigung') && tm ? `<div>Steigung der Tangente ${labTex(`f'${st} = ${z(m)}`)} · ${labTex(geradeTex('t', m, y0 - m * x0))}</div>` : '')
+      : `<div>${labTex(`f${st} = ${z(y0)}`)}${rast ? ` · <b>${rast}</b>` : ''}</div>`
+        + (an('steigung') && tm ? `<div>Tangente ${labTex(`y = ${z(m)}\\cdot ${Math.abs(x0) < 5e-3 ? 'x' : `\\left(x ${x0 < 0 ? '+' : '-'} ${z(Math.abs(x0))}\\right)`}${Math.abs(y0) < 5e-3 ? '' : ` ${y0 < 0 ? '-' : '+'} ${z(Math.abs(y0))}`}`)}</div>`
+          + `<div>${labTex(geradeTex('t', m, y0 - m * x0))}</div>` : '')
         + (an('sekante') ? `<div>${!h ? `Für ${labTex('h = 0')} gibt es keine Sekante.` : !isFinite(yq) ? `${labTex(`f${xh}`)} ist nicht definiert.`
           : `Sekante durch ${labTex('P')} und ${labTex(`Q(${z(xq)}\\mid ${z(yq)})`)}: ${labTex(`m_s = \\frac{f${xh} - f${st}}{${z(h)}} = ${z(ms)}`)}`
             + (tm ? ` · ${labTex(`m_s - f'${st} = ${z(ms - m)}`)}` : '')}</div>` : '')
