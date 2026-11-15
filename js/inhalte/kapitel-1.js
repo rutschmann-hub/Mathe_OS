@@ -92,6 +92,28 @@ function kubisch() {
     abl: summe([[3 * a, 'x^{2}'], [2 * k2, 'x'], [k1, '']]), abl2: summe([[6 * a, 'x'], [2 * k2, '']]) };
 }
 
+// Erklärung zu den Ableitungsregeln (Basisfach I.2 und Leistungsfach I.1)
+const erklAblRegeln = String.raw`<p><b>Woher kommt die Potenzregel?</b> Der Differenzenquotient zeigt das Muster:</p>
+  <ul>
+    <li>\(f(x) = x^2\): \(\frac{(x+h)^2 - x^2}{h} = \frac{2xh + h^2}{h} = 2x + h \;\to\; 2x\)</li>
+    <li>\(f(x) = x^3\): \(\frac{(x+h)^3 - x^3}{h} = \frac{3x^2h + 3xh^2 + h^3}{h} = 3x^2 + 3xh + h^2 \;\to\; 3x^2\)</li>
+  </ul>
+  <p>Die Hochzahl rutscht als Faktor nach vorn und wird dabei um 1 kleiner: \((x^n)' = n\,x^{n-1}\). Das gilt für jede Hochzahl, auch für Wurzeln und Brüche – man muss sie nur als Potenz schreiben:</p>
+  <ul>
+    <li>\(\sqrt{x} = x^{\frac12}\;\Rightarrow\; \frac12 x^{-\frac12} = \frac{1}{2\sqrt{x}}\)</li>
+    <li>\(\frac1x = x^{-1}\;\Rightarrow\; -x^{-2} = -\frac{1}{x^2}\)</li>
+    <li>\(\frac{1}{x^3} = x^{-3}\;\Rightarrow\; -3x^{-4} = -\frac{3}{x^4}\)</li>
+  </ul>
+  <p><b>Faktor- und Summenregel:</b> Man leitet Summand für Summand ab. Ein konstanter Faktor bleibt stehen, ein konstanter Summand fällt weg, denn eine waagerechte Gerade hat die Steigung 0: \((3x^2 + 7)' = 6x\).</p>
+  <p><b>Sinus und Kosinus:</b> Am Graphen von \(\sin\) kann man die Steigung ablesen. Bei \(x = 0\) steigt er mit Steigung 1, im Hochpunkt bei \(x = \frac{\pi}{2}\) ist die Steigung 0, bei \(x = \pi\) fällt er mit Steigung \(-1\).
+    Genau diese Werte liefert \(\cos\): \(\cos(0) = 1\), \(\cos\!\left(\tfrac{\pi}{2}\right) = 0\), \(\cos(\pi) = -1\). Die Kosinuskurve ist die „Steigungskurve“ der Sinuskurve (Winkel immer im Bogenmaß).</p>
+  ${graph({ x: [-0.5, 6.5], y: [-1.5, 1.5], kurven: [
+    { f: Math.sin, kl: 'k1', label: 'sin', lx: 1.9 },
+    { f: Math.cos, kl: 'k2', label: 'cos', lx: 0.3 }],
+    punkte: [{ x: 0, y: 0 }, { x: Math.PI / 2, y: 1 }, { x: Math.PI, y: 0 }] })}
+  <p><b>Höhere Ableitungen:</b> \(f''\) ist die Ableitung von \(f'\) und sagt, wie sich die Steigung ändert. Ist \(s(t)\) der Weg eines Fahrzeugs, so ist \(s'(t)\) die Geschwindigkeit und \(s''(t)\) die Beschleunigung.
+    Man leitet einfach nacheinander ab: \(f(x) = x^3\), \(f'(x) = 3x^2\), \(f''(x) = 6x\), \(f'''(x) = 6\).</p>`;
+
 // ---- Themen ----
 
 Object.assign(INHALTE, {
@@ -188,6 +210,7 @@ Object.assign(INHALTE, {
       ],
       text: String.raw`Gilt auch für Wurzeln und Brüche: \(\sqrt{x} = x^{\frac12}\), \(\frac{1}{x} = x^{-1}\).`,
     },
+    erklaerung: erklAblRegeln,
     beispiel: {
       aufgabe: String.raw`Bestimme \(f'\) und \(f''\) für \(f(x) = 4x^3 - 2\sqrt{x} + 3\sin(x)\).`,
       schritte: [
@@ -232,6 +255,15 @@ Object.assign(INHALTE, {
       ],
       text: String.raw`Der innere Term \(mx + c\) bleibt stehen, dazu kommt der Faktor \(m\) („nachdifferenzieren“).`,
     },
+    erklaerung: String.raw`<p>In \(f(x) = g(mx + c)\) durchläuft \(x\) zuerst den inneren Term \(mx + c\). Wächst \(x\) um \(h\), wächst dieser Term um \(m\cdot h\): Er „läuft \(m\)-mal so schnell“.
+      Die äußere Funktion \(g\) reagiert darauf mit ihrer Steigung \(g'(mx + c)\). Beide Faktoren multiplizieren sich: \(f'(x) = g'(mx + c)\cdot m\).</p>
+      <p><b>Am Graphen:</b> \(\sin(2x)\) entsteht aus \(\sin(x)\), indem man den Graphen in \(x\)-Richtung auf die Hälfte staucht. Alles läuft doppelt so schnell, also verdoppelt sich jede Steigung:
+      Bei \(x = 0\) hat \(\sin(x)\) die Steigung 1, \(\sin(2x)\) die Steigung \(2 = 2\cdot\cos(0)\).</p>
+      ${graph({ x: [-0.5, 6.5], y: [-1.5, 1.5], kurven: [
+        { f: Math.sin, kl: 'k1', label: 'sin(x)', lx: 2.3 },
+        { f: x => Math.sin(2 * x), kl: 'k2', label: 'sin(2x)', lx: 0.8 }] })}
+      <p>Auch ein negatives \(m\) ist erlaubt; dann kehrt sich mit dem Faktor das Vorzeichen um.</p>
+      <p><b>Probe:</b> \((3x + 2)^2 = 9x^2 + 12x + 4\) hat die Ableitung \(18x + 12\). Die Regel liefert \(2\cdot 3\,(3x + 2) = 18x + 12\) ✓.</p>`,
     beispiel: {
       aufgabe: String.raw`Leite \(f(x) = (3x - 1)^4\) ab.`,
       schritte: [
@@ -274,6 +306,12 @@ Object.assign(INHALTE, {
       ],
       text: String.raw`Kurz: \((u\cdot v)' = u'v + uv'\) – „erster Faktor abgeleitet mal zweiter, plus erster mal zweiter abgeleitet“.`,
     },
+    erklaerung: String.raw`<p>Ändert sich \(x\) ein wenig, ändern sich <b>beide</b> Faktoren. Das Produkt reagiert auf beides: Zum einen ändert sich \(u\), und \(v\) wirkt als Gewicht (Beitrag \(u'\cdot v\)).
+      Zum anderen ändert sich \(v\), und \(u\) wirkt als Gewicht (Beitrag \(u\cdot v'\)). Beide Beiträge werden <b>addiert</b> – deshalb hat die Regel zwei Summanden.</p>
+      <p><b>Probe an einem Fall, den man auch ohne Regel kann:</b> \(f(x) = x^2\cdot x^3 = x^5\) hat die Ableitung \(5x^4\). Mit der Produktregel (\(u = x^2\), \(v = x^3\)):
+      \(f'(x) = 2x\cdot x^3 + x^2\cdot 3x^2 = 2x^4 + 3x^4 = 5x^4\) ✓</p>
+      <p><b>Wann braucht man sie?</b> Ein konstanter Faktor wie in \(5\sin(x)\) ist kein Fall für die Produktregel, hier genügt die Faktorregel. Lässt sich das Produkt vorher vereinfachen (\(x^2\cdot x^3 = x^5\)), ist das oft kürzer.
+      Bei \(x\cdot\sin(x)\) geht das nicht – hier brauchst du die Produktregel. Hilfreich ist eine kleine Tabelle mit \(u\), \(u'\), \(v\), \(v'\), wie im Beispiel.</p>`,
     beispiel: {
       aufgabe: String.raw`Leite \(f(x) = x^2\cdot\sin(x)\) ab.`,
       schritte: [
@@ -551,6 +589,29 @@ Object.assign(INHALTE, {
       ],
       text: String.raw`Beim größten Wert auch die Ränder prüfen. Einheit von \(f'(t)\): Größe pro Zeit, z. B. m/s. Zum Schluss immer einen Antwortsatz mit Einheit formulieren.`,
     },
+    erklaerung: String.raw`<p>In Sachaufgaben beschreibt \(f(t)\) einen <b>Bestand</b> in Abhängigkeit von der Zeit \(t\), zum Beispiel eine Temperatur, eine Wassermenge oder eine Höhe. Die Ableitungen beantworten drei Fragen:</p>
+      <ul>
+        <li>\(f(t)\): <b>Wie viel?</b> Der Bestand zum Zeitpunkt \(t\), etwa 18 °C oder 40 Liter.</li>
+        <li>\(f'(t)\): <b>Wie schnell ändert er sich?</b> Die Änderungsrate, etwa +1,5 °C pro Stunde oder −3 Liter pro Minute. Positiv heißt: der Bestand wächst, negativ: er nimmt ab.</li>
+        <li>\(f''(t)\): <b>Wird die Änderung stärker oder schwächer?</b> Die Änderung der Änderungsrate.</li>
+      </ul>
+      <p>Hier ein Bestand \(B\) neben seiner Änderungsrate \(B'\):</p>
+      <div class="grafiken">
+        <figure>${graph({ x: [-0.5, 5.5], y: [-0.5, 4.5], kurven: [{ f: t => t < 0 || t > 5 ? NaN : (6 * t * t - t ** 3) / 8, kl: 'k1', label: 'B', lx: 0.6 }],
+          punkte: [{ x: 2, y: 2, label: 'Wendepunkt' }, { x: 4, y: 4 }] })}
+          <figcaption>Bestand \(B(t)\): steigt bis \(t = 4\), danach fällt er</figcaption></figure>
+        <figure>${graph({ x: [-0.5, 5.5], y: [-2.5, 2.5], kurven: [{ f: t => t < 0 || t > 5 ? NaN : (-3 * t * t + 12 * t) / 8, kl: 'k2', label: "B′", lx: 0.6 }],
+          punkte: [{ x: 2, y: 1.5 }, { x: 4, y: 0 }] })}
+          <figcaption>Änderungsrate \(B'(t)\): positiv bis \(t = 4\), am größten bei \(t = 2\)</figcaption></figure>
+      </div>
+      <p>Bei \(t = 4\) hat \(B\) den Hochpunkt und \(B'\) die Nullstelle. Bei \(t = 2\) ist der Graph von \(B\) am steilsten, also hat \(B'\) dort den höchsten Punkt – das ist der Wendepunkt von \(B\).</p>
+      <p><b>Übersetzen:</b></p>
+      <ul>
+        <li>„Wann ist der Bestand am größten?“ → \(f'(t) = 0\) lösen und die Ränder prüfen.</li>
+        <li>„Wann nimmt der Bestand am stärksten zu?“ → größte Änderungsrate, also \(f''(t) = 0\).</li>
+        <li>„Wann nimmt er am stärksten ab?“ → kleinste (negativste) Änderungsrate, ebenfalls über \(f''(t) = 0\) und die Ränder.</li>
+        <li>Die Einheit von \(f'(t)\) ist Einheit des Bestands pro Zeiteinheit.</li>
+      </ul>`,
     beispiel: {
       aufgabe: String.raw`Die Temperatur in einem Gewächshaus wird durch \(T(t) = -0{,}02t^3 + 0{,}3t^2 + 12\) beschrieben (\(t\) in Stunden nach 6 Uhr, \(T\) in °C, \(0 \le t \le 12\)). Wann ist es am wärmsten, wann steigt die Temperatur am stärksten?`,
       schritte: [
@@ -628,7 +689,8 @@ Object.assign(INHALTE, {
       text: String.raw`Leitet man \(f'\) erneut ab, erhält man \(f''\), dann \(f'''\) usw.`,
     },
     erklaerung: String.raw`<p>Drei Sichtweisen auf dieselbe Zahl \(f'(a)\): <b>momentane Änderungsrate</b> (z. B. Geschwindigkeit),
-      <b>Tangentensteigung</b> und <b>lokale Linearität</b> – zoomt man in den Graphen hinein, sieht er aus wie eine Gerade mit Steigung \(f'(a)\).</p>`,
+      <b>Tangentensteigung</b> und <b>lokale Linearität</b> – zoomt man in den Graphen hinein, sieht er aus wie eine Gerade mit Steigung \(f'(a)\).</p>`
+      + erklAblRegeln,
     beispiel: {
       aufgabe: String.raw`Bestimme \(f'\) und \(f''\) für \(f(x) = 2x^3 - 4\sqrt{x} + \sin(x)\).`,
       schritte: [
@@ -676,6 +738,15 @@ Object.assign(INHALTE, {
       ],
       text: String.raw`Die Reihenfolge zählt: \(u(v(x))\) und \(v(u(x))\) sind im Allgemeinen verschieden. \(x\) muss in der Definitionsmenge von \(v\) liegen und \(v(x)\) in der von \(u\).`,
     },
+    erklaerung: String.raw`<p>Eine Verkettung ist das <b>Hintereinanderschalten zweier Funktionsmaschinen</b>: Das Ergebnis der ersten Maschine \(v\) wird in die zweite Maschine \(u\) eingeworfen.</p>
+      \[x \mapsto v(x) \mapsto u(v(x))\]
+      <p><b>Zerlegen:</b> Frage dich, wie du \(f(x)\) mit dem Taschenrechner berechnen würdest. Der <b>erste</b> Rechenschritt ist die innere Funktion \(v\), der <b>letzte</b> die äußere Funktion \(u\).
+      Für \(f(x) = \sin(x^2)\) und \(x = 2\): erst quadrieren (\(v(2) = 4\)), dann den Sinus bilden (\(u(4) = \sin(4) \approx -0{,}757\)).</p>
+      <p><b>Die Reihenfolge zählt:</b> Bei \((\sin x)^2\) ist es umgekehrt. Erst sin (\(\sin(2) \approx 0{,}909\)), dann quadrieren (\(\approx 0{,}827\)). Das sind zwei völlig verschiedene Funktionen:</p>
+      ${graph({ x: [-3, 3], y: [-1.5, 1.5], kurven: [
+        { f: x => Math.sin(x * x), kl: 'k1', label: 'sin(x²)', lx: -1.2 },
+        { f: x => Math.sin(x) ** 2, kl: 'k2', label: '(sin x)²', lx: 1.7 }] })}
+      <p>\(\sin(x^2)\) schwingt nach außen immer schneller, \((\sin x)^2\) bleibt immer \(\ge 0\) und wiederholt sich gleichmäßig.</p>`,
     beispiel: {
       aufgabe: String.raw`Gegeben sind \(u(x) = \sqrt{x}\) und \(v(x) = x^2 + 1\). Bestimme \(u(v(x))\) und \(v(u(x))\).`,
       schritte: [
@@ -740,7 +811,10 @@ Object.assign(INHALTE, {
       text: String.raw`„Äußere Ableitung (innere Funktion bleibt stehen) mal innere Ableitung.“`,
     },
     erklaerung: String.raw`<p><b>Verstärkungsfaktoren:</b> Ändert sich \(x\) ein wenig, ändert sich \(v(x)\) etwa um das \(v'(x)\)-Fache.
-      Diese Änderung wird von \(u\) noch einmal etwa um das \(u'(v(x))\)-Fache verstärkt. Insgesamt multiplizieren sich die beiden Faktoren.</p>`,
+      Diese Änderung wird von \(u\) noch einmal etwa um das \(u'(v(x))\)-Fache verstärkt. Insgesamt multiplizieren sich die beiden Faktoren.</p>
+      <p>Ist die innere Funktion linear, \(v(x) = mx + c\), dann ist \(v'(x) = m\). Die Regel für lineare Verkettungen ist also ein Spezialfall der Kettenregel.</p>
+      <p><b>Probe:</b> \((x^2 + 1)^3 = x^6 + 3x^4 + 3x^2 + 1\) hat die Ableitung \(6x^5 + 12x^3 + 6x\). Mit der Kettenregel: \(3(x^2 + 1)^2\cdot 2x = 6x\,(x^4 + 2x^2 + 1) = 6x^5 + 12x^3 + 6x\) ✓</p>
+      <p><b>Mehrfach verschachtelt</b> leitet man von außen nach innen ab und multipliziert alle Faktoren: \(\bigl(\sin((2x+1)^2)\bigr)' = \cos\!\bigl((2x+1)^2\bigr)\cdot 2(2x+1)\cdot 2 = 4(2x+1)\cos\!\bigl((2x+1)^2\bigr)\).</p>`,
     beispiel: {
       aufgabe: String.raw`Leite \(f(x) = \sin(x^2)\) ab.`,
       schritte: [
@@ -872,6 +946,14 @@ Object.assign(INHALTE, {
       ],
       text: 'Ablauf: Skizze und Variablen – Zielfunktion – Nebenbedingung – einsetzen – Definitionsbereich – Extremum (inklusive Ränder) – Antwortsatz.',
     },
+    erklaerung: String.raw`<p>Gesucht ist eine Größe, die möglichst groß oder klein werden soll, zum Beispiel eine Fläche. Sie hängt zunächst von <b>zwei</b> Variablen ab (etwa \(A = x\cdot y\)). Die <b>Nebenbedingung</b> („der Zaun ist 40 m lang“) verknüpft die beiden.
+      Löst man sie nach einer Variablen auf und setzt sie in die Zielfunktion ein, bleibt eine Funktion einer Variablen übrig – und die kann man ableiten.</p>
+      <p><b>Warum der Definitionsbereich?</b> Die Sachsituation begrenzt die Variablen: Längen sind positiv, ein Ausschnitt kann nicht größer sein als das Blech. Der Definitionsbereich ist daher meist ein Intervall mit Rändern.
+      \(Z'(x) = 0\) findet nur Extremstellen im Inneren; der größte oder kleinste Wert kann auch am Rand liegen. Beispiel: \(g(x) = \frac15\,(x^3 - 6x^2 + 9x)\) auf \([0;\,5]\):</p>
+      ${graph({ x: [-0.5, 6], y: [-0.5, 4.5], kurven: [{ f: x => x < 0 || x > 5 ? NaN : (x ** 3 - 6 * x * x + 9 * x) / 5, kl: 'k1', label: 'g', lx: 2.2 }],
+        punkte: [{ x: 1, y: 0.8 }, { x: 3, y: 0 }, { x: 5, y: 4, label: 'Rand' }] })}
+      <p>Aus \(g'(x) = \frac35\,(x - 1)(x - 3) = 0\) folgen \(x = 1\) und \(x = 3\). Doch \(g(1) = 0{,}8\) und \(g(3) = 0\) sind nicht die Extremwerte auf \([0;\,5]\). Der größte Wert ist \(g(5) = 4\), am rechten Rand.
+      Also immer die Werte an den Extremstellen <b>und</b> an den Rändern vergleichen.</p>`,
     beispiel: {
       aufgabe: String.raw`Ein rechteckiges Beet wird an einer Hauswand mit 40 m Zaun auf den drei anderen Seiten eingezäunt. Wie groß kann es höchstens werden?`,
       schritte: [
