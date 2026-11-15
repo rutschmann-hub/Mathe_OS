@@ -52,12 +52,18 @@ function themaSeite(kurs, kapNr, thema) {
     <h1>${titel}</h1>
     <div class="meta"><span>Kapitel ${c.nr} · Abschnitt ${i + 1}</span>
       ${g ? `<a href="#/${g.kurs}/${g.kap}/${g.nr}">Auch im ${KURSE[g.kurs].name} →</a>` : ''}</div>
-    ${INHALTE[titel] ? inhalt(INHALTE[titel], kurs) : `
+    ${INHALTE[titel] ? inhalt(inhaltFuer(titel, kurs), kurs) : `
     <section class="sec"><h2>Erklärung</h2><p>Noch kein Material – hier kommt dein Input hin.</p></section>
     ${videoSek(null)}
     <section class="sec"><h2>Übungen</h2><p>Noch keine Übungen.</p></section>
     <section class="sec"><h2>Selbsttest</h2><p>Noch kein Kurztest.</p></section>`}
     <div class="pager">${nav(i - 1, '← Zurück')}${nav(i + 1, 'Weiter →')}</div>`;
+}
+
+// Inhalt eines Themas für einen Kurs: Felder unter bf bzw. lk ersetzen die gemeinsamen Felder
+function inhaltFuer(titel, kurs = document.body.dataset.kurs) {
+  const x = INHALTE[titel];
+  return x && x[kurs] ? { ...x, ...x[kurs] } : x;
 }
 
 function inhalt(x, kurs) {
@@ -99,7 +105,7 @@ function videoSek(v) {
 let stufe = 1;
 function neueAufgabe() {
   const box = $('#genAufgabe'); if (!box) return;
-  const r = INHALTE[$('h1').textContent].generator[stufe]();
+  const r = inhaltFuer($('h1').textContent).generator[stufe]();
   box.innerHTML = `<div class="gen-a">\\(${r.aufgabe}\\)</div>
     <details><summary>Lösung</summary><div class="inner"><ol class="steps">${r.schritte.map(s => `<li>\\(${s}\\)</li>`).join('')}</ol></div></details>`;
   typeset(box);
@@ -114,7 +120,7 @@ document.addEventListener('click', e => {
 document.addEventListener('click', e => {
   const btn = e.target.closest('.ki-schritte button');
   if (!btn || btn.disabled) return;
-  const kEl = btn.closest('.ki'), k = INHALTE[$('h1').textContent].pruefen[kEl.dataset.k];
+  const kEl = btn.closest('.ki'), k = inhaltFuer($('h1').textContent).pruefen[kEl.dataset.k];
   if (+btn.dataset.s !== k.fehler) { btn.classList.add('ok'); btn.disabled = true; kEl.querySelector('.fb').textContent = 'Dieser Schritt stimmt – such weiter.'; return; }
   btn.classList.add('no');
   kEl.querySelectorAll('.ki-schritte button').forEach(b => b.disabled = true);
@@ -126,7 +132,7 @@ document.addEventListener('click', e => {
 document.addEventListener('click', e => {
   const btn = e.target.closest('.opts button');
   if (!btn) return;
-  const qEl = btn.closest('.q'), titel = $('h1').textContent, q = INHALTE[titel].test[qEl.dataset.i];
+  const qEl = btn.closest('.q'), titel = $('h1').textContent, q = inhaltFuer(titel).test[qEl.dataset.i];
   const ok = +btn.dataset.j === q.richtig;
   qEl.querySelectorAll('button').forEach(b => { b.disabled = true; if (+b.dataset.j === q.richtig) b.classList.add('ok'); });
   if (!ok) btn.classList.add('no');
@@ -134,7 +140,7 @@ document.addEventListener('click', e => {
   qEl.querySelector('.fb').innerHTML = (ok ? '✓ Richtig. ' : '✗ Leider nicht. ') + q.erklaerung;
   typeset(qEl);
   const done = document.querySelectorAll('.q[data-ok]');
-  if (done.length === INHALTE[titel].test.length)
+  if (done.length === inhaltFuer(titel).test.length)
     $('#score').textContent = `${[...done].filter(d => d.dataset.ok === 'true').length} von ${done.length} richtig.`;
 });
 

@@ -45,6 +45,7 @@ Jede Adresse lässt sich direkt teilen oder in itslearning verlinken.
 Inhalte stehen in `js/inhalte/kapitel-*.js` (neue Datei auch in `index.html` einbinden), Schlüssel ist der Thementitel aus `js/buecher.js`.
 Gleichnamige Themen in Basisfach und Leistungsfach teilen sich das Material automatisch.
 Bausteine mit `kurs: 'lk'` bzw. `kurs: 'bf'` erscheinen nur in diesem Kurs.
+Weicht ein gleichnamiges Thema in einem Kurs stärker ab (z. B. Kettenregel nur im LK), ersetzen Felder unter `lk: { … }` bzw. `bf: { … }` dort die gemeinsamen Felder (etwa `merk`, `erklaerung`, `generator`).
 Mit `labor: { f: 'x^2' }` erscheint im Thema der interaktive Graph „Ausprobieren“ (Startfunktion f).
 
 `labor.html` zeigt nur das „Ausprobieren“, z. B. zum Einbetten als iframe in itslearning. Startzustand über die Adresse (auch auf der Hauptseite), erzeugt vom Knopf „Link zu dieser Ansicht kopieren“:
