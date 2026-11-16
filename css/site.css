@@ -5,7 +5,7 @@
   body[data-kurs=""] { background: linear-gradient(180deg, color-mix(in srgb, var(--bf-fill) 16%, var(--bg)) 0, var(--bg) 560px) no-repeat, var(--bg); }
   body[data-kurs="bf"] { --k: var(--bf); --k-soft: var(--bf-soft); --k-fill: var(--bf-fill); --k-on: var(--bf-on); }
   body[data-kurs="lk"] { --k: var(--lk); --k-soft: var(--lk-soft); --k-fill: var(--lk-fill); --k-on: var(--lk-on); }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 var(--sp-6); }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 var(--sp-6); }
 
   header { display: flex; align-items: center; gap: 1rem; height: 68px; }
   .logo { font-weight: 800; letter-spacing: -.02em; text-decoration: none; font-size: var(--fs-lg); }
@@ -329,14 +329,14 @@
 /* Breites Layout ab 1100 px: Themenseiten mit mitlaufender Leiste „Auf dieser Seite“ links, Fließtext bleibt gut lesbar begrenzt */
   .seitennav { display: none; }
   @media (min-width: 1100px) {
-    .wrap { max-width: 1240px; }
-    main:not(.mit-nav) { max-width: 880px; margin-inline: auto; }
-    main.mit-nav { display: grid; grid-template-columns: 220px minmax(0, 1fr); column-gap: var(--sp-8); }
+    .wrap { max-width: 1680px; }
+    main:not(.mit-nav) { max-width: 1360px; margin-inline: auto; }
+    main.mit-nav { display: grid; grid-template-columns: 200px minmax(0, 1fr); column-gap: var(--sp-8); }
     main.mit-nav > * { grid-column: 2; }
     main.mit-nav > .seitennav { grid-column: 1; grid-row: 1 / span 99; position: sticky; top: var(--sp-5); align-self: start; margin-top: var(--sp-7);
       display: flex; flex-direction: column; gap: 2px; padding: var(--sp-3); background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-card); }
     .mit-nav .lab-sec { width: auto; margin-left: 0; }
-    .intro, .sec > p, .sec .body > p, .sec .body > .fehler { max-width: 72ch; }
+    .intro, .sec > p, .sec .body > p, .sec .body > .fehler { max-width: 100ch; }
   }
   .seitennav b { padding: var(--sp-1) var(--sp-2) var(--sp-2); font-size: var(--fs-xs); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .seitennav button { display: flex; align-items: center; gap: var(--sp-2); width: 100%; padding: 6px var(--sp-2); border: 0; border-radius: var(--radius-xs); background: transparent; text-align: left; font-size: var(--fs-body); }
