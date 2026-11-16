@@ -80,7 +80,7 @@
   .merk .f mjx-container[display="true"] { margin: var(--sp-1) 0 !important; }
   .merk p { margin: var(--sp-4) 0 0; padding-top: var(--sp-3); border-top: 1px solid color-mix(in srgb, var(--k) 20%, transparent);
     max-width: 52ch; font-size: var(--fs-body); color: var(--muted); line-height: 1.6; }
-  .regeln { display: inline-grid; grid-template-columns: auto auto; column-gap: var(--sp-8); text-align: left; align-items: center; max-width: 100%; }
+  .regeln { display: grid; grid-template-columns: minmax(8rem, 14rem) 1fr; column-gap: var(--sp-8); text-align: left; align-items: center; max-width: 100%; }
   .regeln > div { padding: var(--sp-2) 0; }
   .regeln > .t { border-top: 1px solid color-mix(in srgb, var(--k) 18%, transparent); }
   .regeln .r-name { font-size: var(--fs-body); font-weight: 500; color: var(--muted); }
@@ -336,7 +336,7 @@
     main.mit-nav > .seitennav { grid-column: 1; grid-row: 1 / span 99; position: sticky; top: var(--sp-5); align-self: start; margin-top: var(--sp-7);
       display: flex; flex-direction: column; gap: 2px; padding: var(--sp-3); background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-card); }
     .mit-nav .lab-sec { width: auto; margin-left: 0; }
-    .intro, .sec > p, .sec .body > p, .sec .body > .fehler { max-width: 100ch; }
+    .graph { max-width: 540px; }
   }
   .seitennav b { padding: var(--sp-1) var(--sp-2) var(--sp-2); font-size: var(--fs-xs); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .seitennav button { display: flex; align-items: center; gap: var(--sp-2); width: 100%; padding: 6px var(--sp-2); border: 0; border-radius: var(--radius-xs); background: transparent; text-align: left; font-size: var(--fs-body); }
