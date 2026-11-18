@@ -63,5 +63,5 @@ function graph({ x: [x0, x1], y: [y0, y1], kurven = [], punkte = [], hoehe = Mat
     if (k.label) s += `<text class="${k.kl || 'k1'} lbl" x="${X(k.lx)}" y="${Y(k.f(k.lx)) - 8}">${k.label}</text>`;
   }
   for (const p of punkte) s += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="3.5"/>` + (p.label ? `<text x="${X(p.x) + 6}" y="${Y(p.y) + 16}">${p.label}</text>` : '');
-  return `<svg class="graph" viewBox="0 0 ${W} ${H}" role="img">${s}</svg>`;
+  return `<svg class="graph" style="width:${Math.round((x1 - x0) * 50)}px" viewBox="0 0 ${W} ${H}" role="img">${s}</svg>`;
 }
