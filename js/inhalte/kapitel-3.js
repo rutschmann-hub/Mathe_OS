@@ -78,7 +78,7 @@ Object.assign(INHALTE, {
         const r = t => t < t1 ? p : -q;
         return { aufgabe: `\\text{Anfangs } ${b0}\\text{ l. } ${t1}\\text{ min lang Zufluss } ${p}\\text{ l/min, dann } ${t2}\\text{ min lang Abfluss } ${q}\\text{ l/min. Bestand am Ende?}`,
           schritte: [`\\text{Zufluss: } ${p}\\cdot ${t1} = ${p * t1}\\text{ l,\\quad Abfluss: } ${q}\\cdot ${t2} = ${q * t2}\\text{ l}`, `B = ${b0} + ${p * t1} - ${q * t2} = ${B}\\text{ l}`],
-          pruef: [[B, b0 + flaecheZahl(r, 0, t1 + t2)]] };
+          pruef: [[B, b0 + flaecheZahl(r, 0, t1) + flaecheZahl(r, t1, t1 + t2)]] };
       },
     },
     test: [
