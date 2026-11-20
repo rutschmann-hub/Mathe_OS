@@ -45,11 +45,17 @@ const pruefAbl = (f, df, xs = [0.7, 1.3, 2.1]) => xs.map(x => [df(x), ableitung(
 
 // ---- Eigene Graphen als SVG ----
 // graph({ x: [-3, 3], y: [-2, 4], kurven: [{ f, kl: 'k1', label }], punkte: [{ x, y, label }] })
-function graph({ x: [x0, x1], y: [y0, y1], kurven = [], punkte = [], hoehe = Math.round(320 * (y1 - y0) / (x1 - x0)) }) {
+// Optional: flaechen: [{ a, b, f }] färbt die Fläche zwischen f und x-Achse, balken: [{ a, b, h }] zeichnet Rechtecke der Höhe h
+function graph({ x: [x0, x1], y: [y0, y1], kurven = [], punkte = [], flaechen = [], balken = [], hoehe = Math.round(320 * (y1 - y0) / (x1 - x0)) }) {
   const W = 320, H = hoehe, X = x => (x - x0) / (x1 - x0) * W, Y = y => H - (y - y0) / (y1 - y0) * H;
   let s = '';
   for (let x = Math.ceil(x0); x <= x1; x++) s += `<line class="gr" x1="${X(x)}" y1="0" x2="${X(x)}" y2="${H}"/>`;
   for (let y = Math.ceil(y0); y <= y1; y++) s += `<line class="gr" x1="0" y1="${Y(y)}" x2="${W}" y2="${Y(y)}"/>`;
+  for (const { a, b, f } of flaechen) {
+    const pts = Array.from({ length: 41 }, (_, i) => { const x = a + (b - a) * i / 40; return `${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; });
+    s += `<polygon class="fl" points="${X(a).toFixed(1)},${Y(0).toFixed(1)} ${pts.join(' ')} ${X(b).toFixed(1)},${Y(0).toFixed(1)}"/>`;
+  }
+  for (const { a, b, h } of balken) s += `<rect class="fl" x="${X(a).toFixed(1)}" y="${Math.min(Y(h), Y(0)).toFixed(1)}" width="${(X(b) - X(a)).toFixed(1)}" height="${Math.abs(Y(h) - Y(0)).toFixed(1)}"/>`;
   s += `<line class="ax" x1="0" y1="${Y(0)}" x2="${W}" y2="${Y(0)}"/><line class="ax" x1="${X(0)}" y1="0" x2="${X(0)}" y2="${H}"/>`;
   s += `<text x="${W - 8}" y="${Y(0) - 6}">x</text><text x="${X(0) + 6}" y="12">y</text>`;
   for (const k of kurven) {

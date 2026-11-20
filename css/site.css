@@ -149,6 +149,7 @@
 
   /* Eigene Graphen */
   .graph { display: block; width: 100%; max-width: 100%; margin: var(--sp-2) 0 var(--sp-4); color: var(--muted); border-radius: var(--radius-m); box-shadow: 0 0 0 1px var(--line); overflow: hidden; }
+  .graph .fl { fill: var(--plot-1); fill-opacity: .16; stroke: var(--plot-1); stroke-width: .8; stroke-opacity: .5; }
   .graph .gr { stroke: var(--plot-grid); stroke-width: .6; }
   .graph .ax { stroke: var(--plot-axis); stroke-width: 1.1; }
   .graph path { fill: none; stroke-width: 2.2; stroke-linecap: round; }
